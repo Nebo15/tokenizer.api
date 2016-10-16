@@ -37,6 +37,12 @@ config :tokenizer_api, Tokenizer.Endpoint,
 # Do not print debug messages in production
 config :logger, level: :info
 
+config :tokenizer_api,
+  token_expiration_time: {:sustem, :integer, "CARD_STORAGE_EXPIRATION_TIME", 1_800_000}
+
+config :tokenizer_api,
+  card_encryption_key: {:system, "CARD_STORAGE_ENCRYPTION_KEY"}
+
 # ## SSL Support
 #
 # To get SSL working, you will need to add the `https` key

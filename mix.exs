@@ -50,6 +50,7 @@ defmodule Tokenizer.Mixfile do
   defp deps do
     [{:distillery, "~> 0.10"},
      {:confex, "~> 1.4"},
+     {:eview, "~> 0.1.0"},
      {:ecto, "2.1.0-rc.2", override: true}, # TODO: Update when Ecto will release v2.1
      {:postgrex, "~> 0.12", override: true},
      {:cowboy, "~> 1.0"},
@@ -57,13 +58,10 @@ defmodule Tokenizer.Mixfile do
      {:poison, "~> 3.0", override: true},
      {:ecto_enum, git: "https://github.com/gjaldon/ecto_enum", branch: "ecto-2.0", override: true},
      {:phoenix, "~> 1.2"},
-     {:jvalid, "~> 0.3.0"},
      {:timex, "~> 3.0"},
      {:credit_card, "~> 1.0"},
-     {:multiverse, "~> 0.4.1"},
      {:timex_ecto, "~> 3.0"},
      {:phoenix_ecto, "3.1.0-rc.0"}, # TODO: Update when Ecto will release v2.1
-     {:benchfella, "~> 0.3", only: [:dev, :test]},
      {:ex_doc, ">= 0.0.0", only: [:dev, :test]},
      {:excoveralls, "~> 0.5", only: [:dev, :test]},
      {:dogma, "> 0.1.0", only: [:dev, :test]},

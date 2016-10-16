@@ -18,6 +18,6 @@ defmodule Mbill.Repo.Migrations.CreatePayment do
     end
 
     create unique_index(:payments, [:external_id])
-    create unique_index(:token, [:external_id])
+    create unique_index(:payments, [:token])
   end
 end

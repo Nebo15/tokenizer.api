@@ -10,6 +10,7 @@ defmodule Tokenizer.DB.Models.Payment do
     field :description, :string
     field :status, Tokenizer.DB.Enums.PaymentStatuses
     field :auth, :map
+    field :metadata, :map
     embeds_one :sender, Tokenizer.DB.Models.SenderPeer
     embeds_one :recipient, Tokenizer.DB.Models.RecipientPeer
 
@@ -21,7 +22,7 @@ defmodule Tokenizer.DB.Models.Payment do
   """
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:amount, :fee, :description, :status, :auth, :external_id, :token, :token_expires_at])
+    |> cast(params, [:amount, :fee, :description, :status, :auth, :external_id, :token, :token_expires_at, :metadata])
     |> validate_required([:amount, :fee, :status, :auth, :external_id, :token, :token_expires_at, :sender, :recipient])
     |> cast_embed(:sender)
     |> cast_embed(:recipient)
@@ -30,5 +31,11 @@ defmodule Tokenizer.DB.Models.Payment do
     |> validate_length(:description, min: 2, max: 250)
     |> unique_constraint(:external_id)
     |> unique_constraint(:token)
+    |> validate_metadata
+  end
+
+  def validate_metadata(struct, opts \\ []) do
+    # TODO: validate metadata keys and values length
+    struct
   end
 end

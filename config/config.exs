@@ -25,7 +25,7 @@ use Mix.Config
 #     :var_name, "${ENV_VAR_NAME}"
 
 # Configure your database
-config :tokenizer_api, Tokenizer.Repo,
+config :tokenizer_api, Tokenizer.DB.Repo,
   adapter: Ecto.Adapters.Postgres,
   database: "tokenizer_api_dev",
   username: "postgres",
@@ -38,10 +38,10 @@ config :tokenizer_api, Tokenizer.Repo,
 
 config :tokenizer_api,
   namespace: Tokenizer,
-  ecto_repos: [Tokenizer.Repo]
+  ecto_repos: [Tokenizer.DB.Repo]
 
 # Configures the endpoint
-config :tokenizer_api, Tokenizer.Endpoint,
+config :tokenizer_api, Tokenizer.HTTP.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "GJq0cIAxm5Egzg5lpPOibBooSTLWa3qfgoDGRsMpXDCjFkLK3uyTf4wICdyJ6W0Y",
   render_errors: [view: EView.ErrorView, accepts: ~w(json)]

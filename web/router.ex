@@ -17,9 +17,17 @@ defmodule Tokenizer.Router do
     # plug :allow_jsonp
   end
 
-  scope "/", Tokenizer do
+  scope "/", Tokenizer.Controllers do
     pipe_through :api
 
-    get "/page", PageController, :index
+    # Create card tokens
+    post "/cards", Card, :create
+
+    # # Create and get payment
+    # post "/payments", Payment, :create
+    # get  "/payments/:id", Payment, :show
+
+    # # Complete payments
+    # post "/payments/:id/complete", Payment, :complete
   end
 end

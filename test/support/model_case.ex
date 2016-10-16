@@ -14,7 +14,7 @@ defmodule Tokenizer.ModelCase do
 
   using do
     quote do
-      alias Tokenizer.Repo
+      alias Tokenizer.DB.Repo
 
       import Ecto
       import Ecto.Changeset
@@ -24,10 +24,10 @@ defmodule Tokenizer.ModelCase do
   end
 
   setup tags do
-    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Tokenizer.Repo)
+    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Tokenizer.DB.Repo)
 
     unless tags[:async] do
-      Ecto.Adapters.SQL.Sandbox.mode(Tokenizer.Repo, {:shared, self()})
+      Ecto.Adapters.SQL.Sandbox.mode(Tokenizer.DB.Repo, {:shared, self()})
     end
 
     :ok

@@ -1,4 +1,4 @@
-defmodule Tokenizer.Endpoint do
+defmodule Tokenizer.HTTP.Endpoint do
   @moduledoc """
   Phoenix Endpoint for tokenizer_api application.
   """

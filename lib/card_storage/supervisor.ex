@@ -33,9 +33,17 @@ defmodule Tokenizer.CardStorage.Supervisor do
     |> Encryptor.encrypt(get_encryption_keys(token))
 
     child_name = get_card_process_name(token)
+    expires_in = Confex.get(:tokenizer_api, :token_expiration_time)
 
-    {:ok, pid} = Supervisor.start_child(__MODULE__, [card_data, child_name])
-    {:ok, token, pid}
+    {:ok, _pid} = Supervisor.start_child(__MODULE__, [[
+      card_data: card_data,
+      expires_in: expires_in,
+      name: child_name]])
+
+    expires_at = Timex.now
+    |> Timex.shift(microseconds: expires_in)
+
+    {:ok, %{token: token, token_expires_at: expires_at}}
   end
 
   @doc """

@@ -10,7 +10,7 @@ defmodule :tokenizer_api_tasks do
   import Mix.Ecto
 
   @priv_dir "priv"
-  @repo Tokenizer.Repo
+  @repo Tokenizer.DB.Repo
 
   def migrate! do
     # Migrate

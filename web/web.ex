@@ -33,7 +33,7 @@ defmodule Tokenizer.Web do
     quote do
       use Phoenix.Controller, namespace: Tokenizer
 
-      alias Tokenizer.Repo
+      alias Tokenizer.DB.Repo
       import Ecto
       import Ecto.Query
 

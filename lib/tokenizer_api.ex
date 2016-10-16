@@ -10,9 +10,9 @@ defmodule Tokenizer do
 
     children = [
       # Start the Ecto repository
-      supervisor(Tokenizer.Repo, []),
+      supervisor(Tokenizer.DB.Repo, []),
       # Start the endpoint
-      supervisor(Tokenizer.Endpoint, []),
+      supervisor(Tokenizer.HTTP.Endpoint, []),
       # Start the card storage
       supervisor(Tokenizer.CardStorage.Supervisor, []),
     ]
@@ -24,7 +24,7 @@ defmodule Tokenizer do
   # Tell Phoenix to update the endpoint configuration
   # whenever the application is updated.
   def config_change(changed, _new, removed) do
-    Tokenizer.Endpoint.config_change(changed, removed)
+    Tokenizer.HTTP.Endpoint.config_change(changed, removed)
     :ok
   end
 end

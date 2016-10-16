@@ -1,4 +1,4 @@
-defmodule Tokenizer.Repo do
+defmodule Tokenizer.DB.Repo do
   @moduledoc """
   Repo for Ecto database.
 

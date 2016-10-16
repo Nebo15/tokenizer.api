@@ -1,4 +1,8 @@
 defmodule Tokenizer.Controllers.Card do
+  @moduledoc """
+  Controller for `/cards` API requests.
+  """
+
   use Tokenizer.Web, :controller
   alias Tokenizer.DB.Models.SenderCard
   alias Tokenizer.Views.Card
@@ -35,41 +39,4 @@ defmodule Tokenizer.Controllers.Card do
     |> put_status(422)
     |> render(EView.ValidationErrorView, "422.json", changeset)
   end
-
-  # Responses
-  # defp send_response({:ok, payment}, conn) do
-  #   conn
-  #   |> put_status(:created)
-  #   |> render("show.json", payment: payment)
-  # end
-
-  # defp send_response({:error, %{id: _, status: _, decline: _} = reason}, conn) do
-  #   conn
-  #   |> put_status(400)
-  #   |> render(Mbill.ErrorView, "pay2you_400.json", errors: reason)
-  # end
-
-  # defp send_response({:error, %{pay2you: true, reason: reason}}, conn) do
-  #   conn
-  #   |> put_status(400)
-  #   |> render(Mbill.ErrorView, "pay2you_400.json", errors: reason)
-  # end
-
-  # defp send_response({:error, {:validation, param, msg}}, conn) do
-  #   conn
-  #   |> put_status(422)
-  #   |> render(Mbill.ErrorView, "422.json", %{param: param, msg: msg, type: "invalid_completion_code"})
-  # end
-
-  # defp send_response({:error, changeset: changeset}, conn) do
-  #   conn
-  #   |> put_status(422)
-  #   |> render(Mbill.ErrorView, "422.json", %{changeset: changeset})
-  # end
-
-  # defp send_response({:error, reason}, conn) do
-  #   conn
-  #   |> put_status(400)
-  #   |> render(Mbill.ErrorView, "400.json", errors: reason)
-  # end
 end

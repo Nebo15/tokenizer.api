@@ -16,7 +16,14 @@ defmodule Tokenizer.Controllers.CardTest do
     cvv: "160"
   }
 
-  test "create card tokens" do
+  @invalid_card %SenderCard{
+    number: "5591587543706251",
+    expiration_month: "12",
+    expiration_year: "1997",
+    cvv: "11160"
+  }
+
+  test "create card" do
     assert %{
       "meta" => %{
         "code" => 201
@@ -28,6 +35,17 @@ defmodule Tokenizer.Controllers.CardTest do
       }
     } = "cards"
     |> post!(@card)
+    |> get_body
+  end
+
+  test "create invalid card" do
+    assert %{
+      "meta" => %{
+        "code" => 422
+      },
+      "error" => _
+    } = "cards"
+    |> post!(@invalid_card)
     |> get_body
   end
 end

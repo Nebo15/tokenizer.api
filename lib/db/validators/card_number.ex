@@ -1,4 +1,7 @@
 defmodule Ecto.Changeset.CardValidator do
+  @moduledoc """
+  This helper validates card number by luhn algorithm.
+  """
   def validate_card_number(changeset, field) do
      validate changeset, field, Ecto.Changeset.get_field(changeset, field)
   end
@@ -16,8 +19,7 @@ defmodule Ecto.Changeset.CardValidator do
       true ->
         changeset
       _ ->
-        Ecto.Changeset.add_error(changeset, field, "Card is invalid")
+        Ecto.Changeset.add_error(changeset, field, "is invalid")
     end
   end
-
 end

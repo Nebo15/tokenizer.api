@@ -1,4 +1,7 @@
 defmodule Tokenizer.DB.Models.SenderCard do
+  @moduledoc """
+  Model for sender cards.
+  """
   use Tokenizer.Web, :model
 
   @primary_key false

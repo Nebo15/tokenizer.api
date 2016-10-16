@@ -131,8 +131,7 @@ defmodule Tokenizer.CardStorage.Supervisor do
   end
 
   def get_card_process_name(token) do
-    "Cards." <> token
-    |> String.to_atom
+    String.to_atom("Cards." <> token)
   end
 
   @doc false

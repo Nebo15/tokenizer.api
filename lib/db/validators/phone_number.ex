@@ -1,4 +1,7 @@
 defmodule Ecto.Changeset.PhoneNumberValidator do
+  @moduledoc """
+  This helper validates phone numbers in international format (with `+:country_code`).
+  """
   import Ecto.Changeset
 
   def validate_phone_number(changeset, field, opts \\ []) do

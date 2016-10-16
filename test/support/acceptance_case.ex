@@ -40,7 +40,7 @@ defmodule EView.AcceptanceCase do
       end
 
       defp process_request_headers(headers) do
-        beam_headers = #if @repo and @async do
+        beam_headers = [] # if @repo and @async do
         #   meta = Phoenix.Ecto.SQL.Sandbox.metadata_for(@repo, self())
 
         #   encoded = {:v1, meta}
@@ -49,7 +49,7 @@ defmodule EView.AcceptanceCase do
 
         #   [{"User-Agent", "BeamMetadata (#{encoded})"}]
         # else
-          []
+        #  []
         # end
 
         [{"content-type", "application/json"}] ++ beam_headers ++ @headers ++ headers

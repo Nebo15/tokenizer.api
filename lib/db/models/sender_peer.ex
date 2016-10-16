@@ -1,4 +1,7 @@
 defmodule Tokenizer.DB.Models.SenderPeer do
+  @moduledoc """
+  Model for transfer senders.
+  """
   use Tokenizer.Web, :model
 
   @primary_key false

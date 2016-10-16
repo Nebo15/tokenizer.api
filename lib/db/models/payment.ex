@@ -1,4 +1,7 @@
 defmodule Tokenizer.DB.Models.Payment do
+  @moduledoc """
+  Model for payments.
+  """
   use Tokenizer.Web, :model
 
   schema "payments" do
@@ -26,8 +29,8 @@ defmodule Tokenizer.DB.Models.Payment do
     |> validate_required([:amount, :fee, :status, :auth, :external_id, :token, :token_expires_at, :sender, :recipient])
     |> cast_embed(:sender)
     |> cast_embed(:recipient)
-    |> validate_number(:amount, greater_than_or_equal_to: 1, less_than_or_equal_to: 10000)
-    |> validate_number(:fee, greater_than_or_equal_to: 1, less_than_or_equal_to: 1000)
+    |> validate_number(:amount, greater_than_or_equal_to: 1, less_than_or_equal_to: 10_000)
+    |> validate_number(:fee, greater_than_or_equal_to: 1, less_than_or_equal_to: 1_000)
     |> validate_length(:description, min: 2, max: 250)
     |> unique_constraint(:external_id)
     |> unique_constraint(:token)

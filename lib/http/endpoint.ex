@@ -19,6 +19,9 @@ defmodule Tokenizer.Endpoint do
   plug Plug.RequestId
   plug Plug.Logger
 
+  plug EView
+  plug EView.IdempotencyPlug
+
   plug Plug.Parsers,
     parsers: [:urlencoded, :multipart, :json],
     pass: ["*/*"],

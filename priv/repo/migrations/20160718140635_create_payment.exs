@@ -5,7 +5,7 @@ defmodule Mbill.Repo.Migrations.CreatePayment do
     create table(:payments) do
       add :external_id, :string
       add :token, :string
-      add :token_expires_at, :datetime
+      add :token_expires_at, :utc_datetime
       add :amount, :float
       add :fee, :float
       add :description, :string

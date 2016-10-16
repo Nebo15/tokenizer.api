@@ -11,14 +11,12 @@ defmodule Tokenizer do
     children = [
       # Start the Ecto repository
       supervisor(Tokenizer.Repo, []),
-      # Start the endpoint when the application starts
+      # Start the endpoint
       supervisor(Tokenizer.Endpoint, []),
-      # Start card storage
+      # Start the card storage
       supervisor(Tokenizer.CardStorage.Supervisor, []),
     ]
 
-    # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html
-    # for other strategies and supported options
     opts = [strategy: :one_for_one, name: Tokenizer.Supervisor]
     Supervisor.start_link(children, opts)
   end

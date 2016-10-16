@@ -1,6 +1,7 @@
 defmodule Tokenizer.DB.Models.RecipientCard do
   use Tokenizer.Web, :model
 
+  @primary_key false
   embedded_schema do
     field :number, :string
   end
@@ -9,6 +10,6 @@ defmodule Tokenizer.DB.Models.RecipientCard do
     struct
     |> cast(params, [:number])
     |> validate_required([:number])
-    |> validate_format(:number, ~r/^\d{16}$/, message: "Must contains only 16 digits")
+    |> validate_card_number(:number)
   end
 end

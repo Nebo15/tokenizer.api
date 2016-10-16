@@ -1,7 +1,5 @@
 defmodule Tokenizer.DB.Models.SenderCard do
-  use Ecto.Schema
-  import Ecto.Changeset
-  import Ecto.Changeset.CardValidator
+  use Tokenizer.Web, :model
 
   @primary_key false
   embedded_schema do
@@ -18,6 +16,6 @@ defmodule Tokenizer.DB.Models.SenderCard do
     |> validate_card_number(:number)
     |> validate_format(:cvv, ~r/^[0-9]{3,4}$/)
     |> validate_format(:expiration_month, ~r/^0[1-9]|1[0-2]$/)
-    |> validate_format(:expiration_year, ~r/^[12][0-9]$/)
+    |> validate_format(:expiration_year, ~r/^20[12][0-9]$/)
   end
 end

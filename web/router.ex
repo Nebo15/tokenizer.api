@@ -12,9 +12,6 @@ defmodule Tokenizer.Router do
   pipeline :api do
     plug :accepts, ["json"]
     plug :put_secure_browser_headers
-    plug Multiverse, gates: [
-      "2016-07-31": InitialGate
-    ]
 
     # You can allow JSONP requests by uncommenting this line:
     # plug :allow_jsonp

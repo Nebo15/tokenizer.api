@@ -1,20 +1,20 @@
 defmodule Tokenizer.DB.Models.SenderPeer do
   use Tokenizer.Web, :model
-  alias Tokenizer.DB.Models.Card, as: Card
 
+  @primary_key false
   embedded_schema do
-    field :type, :string
+    field :type, Tokenizer.DB.Enums.PeerTypes
     field :phone, :string
     field :email, :string
-    embeds_one :card, Card
+    embeds_one :card, Tokenizer.DB.Models.SenderCard
   end
 
   def changeset(struct, params \\ %{}) do
     struct
     |> cast(params, [:type, :phone, :email])
+    |> validate_required([:type, :phone, :card])
     |> cast_embed(:card)
-    |> validate_required([:type, :phone, :email, :card])
-    |> validate_inclusion(:type, ["card"], message: "Must be a card")
-    |> validate_format(:email, ~r/(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)/, message: "Invalid email")
+    |> validate_email(:email)
+    |> validate_phone_number(:phone)
   end
 end

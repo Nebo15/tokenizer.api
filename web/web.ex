@@ -22,6 +22,9 @@ defmodule Tokenizer.Web do
 
       import Ecto
       import Ecto.Changeset
+      import Ecto.Changeset.CardValidator
+      import Ecto.Changeset.EmailValidator
+      import Ecto.Changeset.PhoneNumberValidator
       import Ecto.Query
     end
   end

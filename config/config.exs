@@ -56,7 +56,7 @@ config :tokenizer_api,
   token_expiration_time: 1_800_000 # 30 minutes
 
 config :tokenizer_api,
-  card_encryption_key: "7AHw1Xitrf/YpLsL"
+  card_encryption_key: {:system, "CARD_STORAGE_ENCRYPTION_KEY", "7AHw1Xitrf/YpLsL"}
 
 # It is also possible to import configuration files, relative to this
 # directory. For example, you can emulate configuration per environment

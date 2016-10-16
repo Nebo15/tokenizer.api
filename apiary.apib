@@ -1,0 +1,717 @@
+FORMAT: 1A
+HOST: https://gateway.mbill.co/api/v1
+
+# MBill Payment Gateway
+
+# Authorization
+
+We use BASIC HTTP authorization. You should provide access token as HTTP Basic username:
+
+> curl -uAPI_TOKEN https://example.com/
+
+# Payment Flow
+
+1. Include tokenizer.js into your application and configure it to replace your card container.
+2. Exchange card details to a card token via tokenization iframe.
+3. Create payment from your back-end using token from st. 1
+4. Update payment status from your back-end whenever you need.
+
+# Payment Lifecycle
+
+Create -> Autorization Waiting -> Compelte (Lookup or 3D-Secure) -> Processing -> Read Status
+
+## Payment completion
+
+### For Non 3-D Secure Card 
+
+API client should use complete this payment using ```/payments/{id}/complete``` method. 
+Auth code will be send to card owners phone number by issuing bank.
+
+### For 3-D Secure Cards
+
+Client broser should create a ```application/x-www-form-urlencoded``` HTTP POST request to page specified in ```auth.acs_url``` response field.
+
+This request should contain following fields:
+
+- ```PaReq``` from ```auth.pa_req``` payment field.
+- ```TermUrl``` from ```auth.terminal_url``` payment field.
+- ```MD``` from ```auth.md``` payment field.
+
+If you want user to be redirected to a custom page after 3-D Secure page, you can add HTTP GET parameter to ```TermUrl```:
+
+> TermUrl = "https://p2y.com.ua/pay2you-ext/Confirm3D/input3d?arrival=https%3A%2F%2Fexample.com%2F%23!%2Fsend%2Fsuccess";
+
+<!--
+## Internal: Determine Auth Type
+
+This code is used to determine auth type:
+> ```
+    if(resp.data.secur3d && resp.data.secur3d.paReq) {
+      if (resp.data.secur3d.paReq === "lookup") { // alternatively look at state.code = 59.
+        // auth.type = "LOOKUP-CODE"
+      } else {
+        // auth.type = "3D-SECURE"
+      }
+    } else if(resp.data.secur3d == null && resp.data.state.code == 0) {
+      // status = "completed"
+    } else {
+      // status = "failed"
+    }
+```
+
+### Tricky part
+
+On payment read state you will receive one of following statuses:
+
+```
+  "55": "3DS_Waiting",
+  "56": "3DS_Waiting",
+  "59": "2DS_Waiting",
+
+```
+"3DS_Waiting" should be mapped to ```auth.type = "3D-SECURE"``` 
+and "2DS_Waiting" to ```auth.type = "LOOKUP-CODE"``` with payment status ```auth_waiting```.
+
+Also there are temporary statuses that should be mapped to "processing" state:
+```
+  "50": "2DS_Valid",
+  "62": "3DS_Valid",
+```
+
+Auth links should be stored internally, since client can get them only once.
+
+Status code ```0``` usually means that payment is in ```authorization_waiting``` stage.
+
+# Internal: Payment Declines
+
+Here is the list to map P2Y status codes into decline reasons:
+```
+{
+  "-1": "Internal_Error__Aquier",
+  "1": "Internal_Error__P2Y",
+  "4": "Amount_Invalid",
+  "5": "CVV_Invalid",
+  "6": "Card_Expired",
+  "7": "PAN_Invalid",
+  "8": "RecipientPAN_Invalid",
+  "9": "PAN_Empty",
+  "10": "RecipientPAN_Empty",
+  "11": "PAN_Invalid",
+  "12": "RecipientPAN_Invalid",
+  "13": "Phone_Invalid",
+  "14": "Internal_Error__P2Y",
+  "16": "Payment_NotFound__P2Y",
+  "17": "2DS_Failed",
+  "18": "2DS_Failed",
+  "19": "2DS_Failed",
+  "20": "2DS_Errored",
+  "21": "2DS_Errored",
+  "22": "Internal_Error__P2Y",
+  "23": "Limits_Exceeded__P2Y",
+  "24": "Internal_Error__P2Y",
+  "25": "PAN_Invalid",
+  "26": "RecipientPAN_Invalid",
+  "27": "APIVersion_Invalid",
+  "28": "Internal_Error__P2Y",
+  "29": "Internal_Error__P2Y",
+  "30": "Internal_Error__P2Y",
+  "31": "Internal_Error__P2Y",
+  "49": "2DS_Failed",
+  "50": "2DS_Valid",
+  "51": "Card_Expired",
+  "54": "Fee_Invalid",
+  "55": "3DS_Waiting",
+  "56": "3DS_Waiting",
+  "58": "Declined__Resipient",
+  "59": "2DS_Waiting",
+  "60": "Declined__Aquier",
+  "61": "3DS_Failed",
+  "62": "3DS_Valid",
+  "69": "Internal_Error__Aquier",
+  "74": "Declined__Aquier",
+  "75": "Card_Invalid",
+  "76": "Funds_Insufficient",
+  "78": "Declined__Aquier",
+  "82": "Limits_Count_Exceeded__Aquier",
+  "85": "Limits_Amount_Exceeded__Aquier",
+  "95": "Limits_Amount_Exceeded__Aquier",
+  "96": "Internal_Error__P2Y",
+  "100": "Declined__Emitent",
+  "101": "Card_Expired",
+  "103": "Declined__Emitent",
+  "104": "Declined__Emitent",
+  "105": "Declined__Emitent",
+  "107": "Declined__Emitent",
+  "108": "Declined__Emitent",
+  "109": "Internal_Error__P2Y",
+  "110": "Declined__Emitent",
+  "111": "Declined__Emitent",
+  "114": "Declined__P2Y",
+  "116": "Funds_Insufficient",
+  "118": "Internal_Error__P2Y",
+  "119": "Declined__P2Y",
+  "120": "Internal_Error__P2Y",
+  "121": "Limits_Exceeded__P2Y",
+  "122": "Declined__P2Y",
+  "123": "Limits_Exceeded__P2Y",
+  "124": "Declined__P2Y",
+  "125": "Card_Expired",
+  "129": "CVV_Invalid",
+  "130": "Limits_Exceeded__P2Y",
+  "200": "Card_Invalid",
+  "201": "Card_Expired",
+  "202": "Card_Invalid",
+  "203": "Declined__P2Y",
+  "204": "Declined__P2Y",
+  "205": "Declined__P2Y",
+  "207": "Declined__P2Y",
+  "208": "Declined__P2Y",
+  "209": "Declined__P2Y",
+  "210": "CVV_Invalid",
+  "211": "CVV_Invalid",
+  "290": "Declined__Aquier",
+  "291": "Internal_Error__P2Y",
+  "302": "Internal_Error__P2Y",
+  "306": "Internal_Error__P2Y",
+  "401": "Internal_Error__P2Y",
+  "402": "Internal_Error__P2Y",
+  "403": "Internal_Error__P2Y",
+  "404": "Internal_Error__P2Y",
+  "405": "Internal_Error__P2Y",
+  "406": "Limits_Exceeded__P2Y",
+  "407": "Internal_Error__P2Y",
+  "408": "Internal_Error__P2Y",
+  "409": "Internal_Error__P2Y",
+  "410": "Internal_Error__P2Y",
+  "411": "Declined__Aquier",
+  "412": "Declined__Aquier",
+  "413": "Declined__Aquier",
+  "420": "Limits_Amount_Exceeded__P2Y",
+  "421": "Limits_Amount_Exceeded__P2Y",
+  "430": "Declined__Emitent",
+  "431": "3DS_Failed",
+  "432": "Declined__P2Y",
+  "433": "Limits_Amount_Exceeded__P2Y",
+  "434": "Limits_Crossborder__P2Y",
+  "435": "Declined__P2Y",
+  "436": "Limits_Count_Exceeded__P2Y",
+  "437": "Limits_Amount_Exceeded__P2Y",
+  "438": "Internal_Error__P2Y",
+  "439": "Internal_Error__P2Y",
+  "440": "Internal_Error__P2Y",
+  "441": "Internal_Error__P2Y",
+  "450": "Internal_Error__P2Y",
+  "451": "Internal_Error__P2Y",
+  "452": "Internal_Error__P2Y",
+  "500": "Internal_Error__Aquier",
+  "501": "Internal_Error__P2Y",
+  "502": "Internal_Error__P2Y",
+  "503": "Internal_Error__P2Y",
+  "504": "Internal_Error__P2Y",
+  "505": "Internal_Error__P2Y",
+  "506": "Internal_Error__P2Y",
+  "507": "Internal_Error__P2Y",
+  "508": "Internal_Error__P2Y",
+  "509": "Internal_Error__P2Y",
+  "510": "Internal_Error__P2Y",
+  "511": "Internal_Error__P2Y",
+  "512": "Internal_Error__P2Y",
+  "567": "Declined__Emitent",
+  "568": "Declined__Emitent",
+  "571": "Declined__Emitent",
+  "574": "Card_Invalid",
+  "580": "CVV_Invalid",
+  "581": "CVV_Invalid",
+  "601": "Internal_Error__P2Y",
+  "800": "Internal_Error__P2Y",
+  "801": "Internal_Error__Aquier",
+  "803": "Payment_Duplicate__Aquier",
+  "809": "Internal_Error__Aquier",
+  "810": "Internal_Error__Aquier",
+  "811": "Internal_Error__Aquier",
+  "820": "Internal_Error__Aquier",
+  "880": "Internal_Error__Aquier",
+  "881": "Internal_Error__Aquier",
+  "882": "Internal_Error__Aquier",
+  "888": "Internal_Error__Aquier",
+  "897": "Internal_Error__Aquier",
+  "898": "Internal_Error__Aquier",
+  "899": "Internal_Error__Aquier",
+  "901": "Card_Expired",
+  "902": "Internal_Error__P2Y",
+  "903": "Internal_Error__P2Y",
+  "904": "Internal_Error__P2Y",
+  "905": "Internal_Error__P2Y",
+  "906": "Limits_Crossborder__Aquier",
+  "907": "Limits_Crossborder__Aquier",
+  "908": "Card_Invalid",
+  "909": "Internal_Error__P2Y",
+  "910": "Declined__Emitent",
+  "911": "Internal_Error__P2Y",
+  "912": "Internal_Error__P2Y",
+  "913": "Payment_Duplicate__P2Y",
+  "914": "Internal_Error__P2Y",
+  "915": "Internal_Error__P2Y",
+  "940": "Declined__Emitent",
+  "959": "Internal_Error__Aquier",
+  "998": "Payment_Duplicate__Aquier",
+  "1001": "Internal_Error__P2Y",
+  "10050": "Internal_Error__P2Y",
+  "100500": "Card_Invalid"
+}
+```
+
+# Internal: Rounding payment amount
+
+Multiply by 100 and trim everyting after ```.```.
+
+```
+  function toCentum(amount) {
+    return parseFloat((100 * amount).toFixed(0));
+  }
+```
+
+# Internal: Calculate the fee
+
+You can use this code to calculate the fee:
+
+```
+  function calcFee(amount, fixed, percent) {
+    amount = parseFloat(amount) || 0;
+    fixed = parseFloat(fixed) || 0;
+    return amount ? Math.round(amount * 100 * percent / 100 + fixed * 100) / 100 : 0;
+  }
+```
+-->
+
+# TODOs
+
+- card2phone and code2card transfers
+- payment status webhooks
+
+# Group Cards
+## Collection [/cards]
+### Create Card Token [POST]
+
+This request will save card mask and token in Postgre DB. 
+Also it will create GenServer that will be available within hour an it should 
+store full card data, that will be used in [Payments][] endpoint.
+
++ Request (application/json)
+
+            {
+              "card":{
+                "number":"0000111122223333",
+                "expiration_year": 2016,
+                "expiration_month": 12,
+                "cvv":"000"
+              }
+            }
+        
++ Response 201 (application/json)
+
+            {
+              "meta": {
+                "code": 200,
+                "idempotency_key": 383883
+              },
+              "data": {
+                "card": {
+                    "number":"000011******5457",
+                    "token": "token-5457-sdopeje9083uojidojd9"
+                }
+              }
+            }
+            
+### Get Card Data [GET /cards/{token}]
+
+This response will read from Postgre without access to GenServer (card mask is a persistent entity).
+
++ Response 201 (application/json)
+
+            {
+              "meta": {
+                "code": 200
+              },
+              "data": {
+                "card": {
+                    "number":"000011******3333",
+                    "token": "token-5457-sdopeje9083uojidojd9"
+                }
+              }
+            }
+
+
+# Group Payments
+## Payments [/payments]
+### Create Payment [POST]
+
+For lookup code authorization ```auth``` object should look like this:
+
+```
+"auth": {
+  "type": "LOOKUP-CODE",
+  "md": "281866"
+}
+```
+
++ Request (application/json)
+    + Headers
+        X-Idempotency-Key: 383883
+
+    + Body
+            {
+              "sender":{
+                "type": "card",
+                "card":{
+                  "token": "token-5457-sdopeje9083uojidojd9"
+                },
+                "phone":"+380631112233",
+                "email":"ivan@example.com"
+              },
+              "recipient": {
+                "type": "card",
+                "card":{
+                  "number":"0000111122223333"
+                },
+                "phone":"+380631112233",
+                "email":"ivan@example.com"
+              },
+              "amount":100.00,
+              "fee": 10.00,
+              "description":"Оплата за фенилциклогексиламин"
+            }
+
++ Response 201 (application/json)
+
+    + Body
+
+            {
+              "meta": {
+                "code": 200,
+                "idempotency_key": 383883
+              },
+              "data": {
+                "id": "216045",
+                "created_at":"2015-12-04T13:55:14.00Z",
+                "updated_at":"2015-12-04T13:55:14.00Z",
+                "token": "sljsad88uu3ojiojds8",
+                "token_expires": 19383882,
+                "sender":{
+                  "type": "card",
+                  "card":{
+                    "number":"000011******3333"
+                  },
+                  "phone":"+380631112233",
+                  "email":"ivan@example.com"
+                },
+                "recipient": {
+                  "type": "card",
+                  "card":{
+                    "number":"000011******3333"
+                  },
+                  "phone":"+380631112233",
+                  "email":"ivan@example.com"
+                },
+                "amount":100.00,
+                "fee": 10.00,
+                "description":"Оплата за фенилциклогексиламин",
+                "status": "auth_waiting",
+                "auth": {
+                  "type": "3D-SECURE",
+                  "acs_url": "https://acs.privatbank.ua/pPaReqMC.jsp",
+                  "pa_req": "eJxVUk1zmztXDwBIuEX...mRZL5E2D03+f4C7qWvpU=",
+                  "terminal_url": "https://p2y.com.ua/pay2you-external/Confirm3D/input3d",
+                  "md": "281866"
+                }
+              }
+            }
+
++ Response 422 (application/json)
+
+    + Body
+
+            {
+              "meta":{
+                "code":422
+              },
+              "errors":[
+                {
+                  "code": 422,
+                  "type":"request_validation_failed",
+                  "invalid": [
+                    {
+                      "entry_type": "field",
+                      "entry_id": "sender.card.number",
+                      "rules": [
+                        {
+                          "rule": "min:6",
+                          "params":{"min": 6}
+                        },
+                        {
+                          "rule": "length:2",
+                          "params":{"lenght": 2}
+                        }
+                      ]
+                    },
+                    {
+                      "entry_type": "field",
+                      "entry_id": "sender.card.recipient",
+                      "rules": [
+                        {"rule": "empty"}
+                      ]
+                    }
+                  ],
+                }
+              ]
+            }
+
++ Response 401 (application/json)
+
+    + Body
+
+            {
+              "meta":{
+                "code":401
+              },
+              "errors":[
+                {
+                  "code": 401,
+                  "type":"expired_payment_token",
+                  "invalid":[
+                    {
+                      "entry_type":"basic_password",
+                      "entry_id":null
+                    }
+                  ]
+                }
+              ]
+            }
+
++ Response 400 (application/json)
+
+    + Body
+
+            {
+              "meta":{
+                "code":400
+              },
+              "errors":[
+                {
+                  "code": 400,
+                  "type":"duplicate_idempotency_key",
+                  "invalid":[
+                    {
+                      "entry_type":"header",
+                      "entry_id":"x-idempotency-key",
+                      "rules": [
+                        {"rule": "unique"}
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+
+## Payment Completion via Lookup [/payments/{id}/complete]
+### Complete Payment [POST]
+
+To access payment you need to use ```token``` returned in POST request. Send it as HTTP Basic Password field:
+
+> curl -uAPI_TOKEN:PAYMENT_TOKEN https://example.com/
+
++ Request (application/json)
+
+            {
+              "code": 3382837
+            }
+
++ Response 201 (application/json)
+
+    + Body
+
+            {
+              "meta": {
+                "code": 200
+              },
+              "data": {
+                "id": "216045",
+                "created_at":"2015-12-04T13:55:14.00Z",
+                "updated_at":"2015-12-04T13:55:14.00Z",
+                "token": "sljsad88uu3ojiojds8",
+                "token_expires": 19383882,
+                "sender":{
+                  "type": "card",
+                  "card":{
+                    "number":"000011******3333"
+                  },
+                  "phone":"+380631112233",
+                  "email":"ivan@example.com"
+                },
+                "recipient": {
+                  "type": "card",
+                  "card":{
+                    "number":"000011******3333"
+                  },
+                  "phone":"+380631112233",
+                  "email":"ivan@example.com"
+                },
+                "amount":100.00,
+                "fee": 10.00,
+                "description":"Оплата за фенилциклогексиламин",
+                "status": "completed"
+              }
+            }
+
++ Response 422 (application/json)
+
+    + Body
+
+            {
+              "meta":{
+                "code":422
+              },
+              "errors":[
+                {
+                  "code": 422,
+                  "type":"invalid_completion_code",
+                  "invalid":[
+                    {
+                      "entry_type":"field",
+                      "entry_id":"code"
+                    }
+                  ]
+                }
+              ]
+            }
+
++ Response 401 (application/json)
+
+    + Body
+
+            {
+              "meta":{
+                "code":401
+              },
+              "errors":[
+                {
+                  "code": 401,
+                  "type":"expired_payment_token",
+                  "invalid":[
+                    {
+                      "entry_type":"http_basic_password",
+                      "entry_id":null
+                    }
+                  ]
+                }
+              ]
+            }
+
+## Payment By ID [/payments/{id}]
+### Get Payment [GET]
+
+To access payment you need to use ```token``` returned in POST request. Send it as HTTP Basic Password field:
+
+> curl -uAPI_TOKEN:PAYMENT_TOKEN https://example.com/
+
++ Parameters
+    + id: 383838 (number) - Payment ID
+
++ Response 200 (application/json)
+
+    + Body
+
+            {
+              "meta": {
+                "code": 200
+              },
+              "data": {
+                "id": "216045",
+                "created_at":"2015-12-04T13:55:14.00Z",
+                "updated_at":"2015-12-04T13:55:14.00Z",
+                "token": "sljsad88uu3ojiojds8",
+                "token_expires": 19383882,
+                "sender":{
+                  "type": "card",
+                  "card":{
+                    "number":"000011******3333"
+                  },
+                  "phone":"+380631112233",
+                  "email":"ivan@example.com"
+                },
+                "recipient": {
+                  "type": "card",
+                  "card":{
+                    "number":"000011******3333"
+                  },
+                  "phone":"+380631112233",
+                  "email":"ivan@example.com"
+                },
+                "amount":100.00,
+                "fee": 10.00,
+                "description":"Оплата за фенилциклогексиламин",
+                "status": "completed"
+              }
+            }
+
++ Response 400 (application/json)
+
+    + Body
+
+            {
+              "meta": {
+                "code": 200
+              },
+              "data": {
+                "id": "216045",
+                "created_at":"2015-12-04T13:55:14.00Z",
+                "updated_at":"2015-12-04T13:55:14.00Z",
+                "token": "sljsad88uu3ojiojds8",
+                "token_expires": 19383882,
+                "sender":{
+                  "type": "card",
+                  "card":{
+                    "number":"000011******3333"
+                  },
+                  "phone":"+380631112233",
+                  "email":"ivan@example.com"
+                },
+                "recipient": {
+                  "type": "card",
+                  "card":{
+                    "number":"000011******3333"
+                  },
+                  "phone":"+380631112233",
+                  "email":"ivan@example.com"
+                },
+                "amount":100.00,
+                "fee": 10.00,
+                "description":"Оплата за фенилциклогексиламин",
+                "status": "declined",
+                "decline": {
+                    reason: "Declined__Emitent"
+                }
+              }
+            }
+
++ Response 401 (application/json)
+
+    + Body
+
+            {
+              "meta":{
+                "code":401
+              },
+              "errors":[
+                {
+                  "code": 401,
+                  "type":"expired_payment_token",
+                  "invalid":[
+                    {
+                      "entry_type":"http_basic_password",
+                      "entry_id":null
+                    }
+                  ]
+                }
+              ]
+            }

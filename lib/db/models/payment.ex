@@ -11,7 +11,7 @@ defmodule Tokenizer.DB.Models.Payment do
     field :amount, :float
     field :fee, :float
     field :description, :string
-    field :status, Tokenizer.DB.Enums.PaymentStatuses
+    field :status, Tokenizer.DB.Enums.PaymentStatuses, default: :authorization
     field :auth, :map
     field :metadata, :map
     embeds_one :sender, Tokenizer.DB.Models.SenderPeer
@@ -23,12 +23,24 @@ defmodule Tokenizer.DB.Models.Payment do
   @doc """
   Builds a changeset based on the `struct` and `params`.
   """
+  def creation_changeset(struct, params \\ %{}) do
+    struct
+    |> cast(params, [:amount, :fee, :description, :metadata])
+    |> cast_embed(:sender)
+    |> cast_embed(:recipient)
+    |> validate_required([:amount, :fee, :description, :sender, :recipient])
+    |> validate_number(:amount, greater_than_or_equal_to: 1, less_than_or_equal_to: 10_000)
+    |> validate_number(:fee, greater_than_or_equal_to: 1, less_than_or_equal_to: 1_000)
+    |> validate_length(:description, min: 2, max: 250)
+    |> validate_metadata
+  end
+
   def changeset(struct, params \\ %{}) do
     struct
     |> cast(params, [:amount, :fee, :description, :status, :auth, :external_id, :token, :token_expires_at, :metadata])
-    |> validate_required([:amount, :fee, :status, :auth, :external_id, :token, :token_expires_at, :sender, :recipient])
     |> cast_embed(:sender)
     |> cast_embed(:recipient)
+    |> validate_required([:amount, :fee, :status, :auth, :external_id, :token, :token_expires_at, :sender, :recipient])
     |> validate_number(:amount, greater_than_or_equal_to: 1, less_than_or_equal_to: 10_000)
     |> validate_number(:fee, greater_than_or_equal_to: 1, less_than_or_equal_to: 1_000)
     |> validate_length(:description, min: 2, max: 250)

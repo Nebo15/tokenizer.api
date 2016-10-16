@@ -1,7 +1,101 @@
-# defmodule Mbill.PaymentControllerTest do
-#   use Mbill.ConnCase, async: true
+defmodule Tokenizer.Controllers.PaymentTest do
+  use EView.AcceptanceCase,
+    async: true,
+    otp_app: :tokenizer_api,
+    endpoint: Tokenizer.HTTP.Endpoint,
+    repo: Tokenizer.DB.Repo
 
-#   alias Mbill.Payment
+  # alias Tokenizer.DB.Models.Payment
+
+  @payment_raw %{
+    amount: 1000,
+    fee: "10",
+    description: "some content",
+    metadata: %{
+      feel_free: "to set any metadata"
+    },
+    recipient: %{
+      type: "card",
+      phone: "+380631112233",
+      email: "ivan@example.com",
+      card: %{
+        number: "5473959513413611"
+      }
+    },
+    sender: %{
+      type: "card",
+      phone: "+380631112233",
+      email: "ivan@example.com",
+      card: %{
+        number: "5473959513413611",
+        cvv: "160",
+        expiration_month: "01",
+        expiration_year: "2020"
+      }
+    }
+  }
+
+  @payment_raw_invalid %{
+    amount: 1000,
+    fee: "10",
+    description: "some content",
+    metadata: %{
+      feel_free: "to set any metadata"
+    },
+    recipient: %{
+      type: "card",
+      phone: "+380631112233",
+      email: "ivan@example.com",
+      card: %{
+        number: "1473959513413611"
+      }
+    },
+    sender: %{
+      type: "card",
+      phone: "+380631112233",
+      email: "ivan@example.com",
+      card: %{
+        number: "5473959513413611",
+        cvv: "160",
+        expiration_month: "01",
+        expiration_year: "20"
+      }
+    }
+  }
+
+  test "create payment with raw card data" do
+    assert %{
+      "meta" => %{
+        "code" => 201
+      },
+      "data" => %{
+        "type" => "card",
+        "token" => _,
+        "token_expires_at" => _
+      }
+    } = "payments"
+    |> post!(@payment_raw)
+    |> get_body
+  end
+
+  # test "create invalid payment with raw card data" do
+  #   assert %{
+  #     "meta" => %{
+  #       "code" => 422
+  #     },
+  #     "error" => _
+  #   } = "payments"
+  #   |> post!(@payment_raw_invalid)
+  #   |> get_body
+  # end
+end
+
+
+# # defmodule Mbill.PaymentControllerTest do
+# #   use Mbill.ConnCase,
+# async: true
+
+# #   alias Mbill.Payment
 
 #   @valid_attrs %{
 #     amount: 1000,

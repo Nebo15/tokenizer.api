@@ -53,10 +53,13 @@ config :logger, :console,
 
 # Card token life period
 config :tokenizer_api,
-  token_expiration_time: 1_800_000 # 30 minutes
+  card_token_expires_in: {:system, :integer, "CARD_TOKEN_EXPIRES_IN", 900_000} # 15 minutes
 
 config :tokenizer_api,
-  card_encryption_key: {:system, "CARD_STORAGE_ENCRYPTION_KEY", "7AHw1Xitrf/YpLsL"}
+  card_data_encryption_key: {:system, "CARD_DATA_ENCRYPTION_KEY", "7AHw1Xitrf/YpLsL"}
+
+config :tokenizer_api,
+  :payment_token_expires_in, {:system, :integer, "PAYMENT_TOKEN_EXPIRES_IN", 900_000} # 15 minutes
 
 # It is also possible to import configuration files, relative to this
 # directory. For example, you can emulate configuration per environment

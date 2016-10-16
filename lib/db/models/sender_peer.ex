@@ -15,8 +15,8 @@ defmodule Tokenizer.DB.Models.SenderPeer do
   def changeset(struct, params \\ %{}) do
     struct
     |> cast(params, [:type, :phone, :email])
-    |> validate_required([:type, :phone, :card])
     |> cast_embed(:card)
+    |> validate_required([:type, :phone, :card])
     |> validate_email(:email)
     |> validate_phone_number(:phone)
   end

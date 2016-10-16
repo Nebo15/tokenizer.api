@@ -33,7 +33,7 @@ defmodule Tokenizer.CardStorage.Supervisor do
     |> Encryptor.encrypt(get_encryption_keys(token))
 
     child_name = get_card_process_name(token)
-    expires_in = Confex.get(:tokenizer_api, :token_expiration_time)
+    expires_in = Confex.get(:tokenizer_api, :card_token_expires_in)
 
     {:ok, _pid} = Supervisor.start_child(__MODULE__, [[
       card_data: card_data,
@@ -120,7 +120,7 @@ defmodule Tokenizer.CardStorage.Supervisor do
   defp get_encryption_keys(<<@token_prefix, "-", _last4::bytes-size(4), "-", user_key::bytes>>) do
     [
       user_key,
-      Confex.get(:tokenizer_api, :card_encryption_key)
+      Confex.get(:tokenizer_api, :card_data_encryption_key)
     ]
   end
 

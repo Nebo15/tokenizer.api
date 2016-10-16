@@ -24,14 +24,14 @@ defmodule Tokenizer.CardStorage.SupervisorTest do
   end
 
   test "deletes expired tokens" do
-    Application.put_env(:tokenizer_api, :token_expiration_time, 10)
+    Application.put_env(:tokenizer_api, :card_token_expires_in, 10)
 
     assert {:ok, %{token: token, token_expires_at: _}} = CardStorage.save_card(@card)
     :timer.sleep(100)
     assert {:error, :card_not_found} = CardStorage.get_card(token)
 
     on_exit(fn ->
-      Application.put_env(:tokenizer_api, :token_expiration_time, 15_000)
+      Application.put_env(:tokenizer_api, :card_token_expires_in, 15_000)
     end)
   end
 end

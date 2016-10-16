@@ -38,10 +38,7 @@ config :tokenizer_api, Tokenizer.HTTP.Endpoint,
 config :logger, level: :info
 
 config :tokenizer_api,
-  token_expiration_time: {:sustem, :integer, "CARD_STORAGE_EXPIRATION_TIME", 1_800_000}
-
-config :tokenizer_api,
-  card_encryption_key: {:system, "CARD_STORAGE_ENCRYPTION_KEY"}
+  card_data_encryption_key: {:system, "CARD_DATA_ENCRYPTION_KEY"}
 
 # ## SSL Support
 #

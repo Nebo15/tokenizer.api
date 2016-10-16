@@ -24,7 +24,6 @@ defmodule EView.AcceptanceCase do
 
       @http_uri "http://#{host}:#{port}/"
       @repo opts[:repo]
-      @async opts[:async]
       @endpoint opts[:endpoint]
       @headers opts[:headers] || []
 
@@ -39,20 +38,21 @@ defmodule EView.AcceptanceCase do
         @http_uri <> url
       end
 
-      defp process_request_headers(headers) do
-        beam_headers = [] # if @repo and @async do
-        #   meta = Phoenix.Ecto.SQL.Sandbox.metadata_for(@repo, self())
+      if is_atom(opts[:repo]) and opts[:async] do
+        defp process_request_headers(headers) do
+          meta = Phoenix.Ecto.SQL.Sandbox.metadata_for(@repo, self())
 
-        #   encoded = {:v1, meta}
-        #   |> :erlang.term_to_binary
-        #   |> Base.url_encode64
+          encoded = {:v1, meta}
+          |> :erlang.term_to_binary
+          |> Base.url_encode64
 
-        #   [{"User-Agent", "BeamMetadata (#{encoded})"}]
-        # else
-        #  []
-        # end
-
-        [{"content-type", "application/json"}] ++ beam_headers ++ @headers ++ headers
+          [{"content-type", "application/json"},
+           {"user-agent", "BeamMetadata (#{encoded})"}] ++ @headers ++ headers
+        end
+      else
+        defp process_request_headers(headers) do
+          [{"content-type", "application/json"}] ++ @headers ++ headers
+        end
       end
 
       defp process_request_body(body) do
@@ -65,7 +65,7 @@ defmodule EView.AcceptanceCase do
         |> Poison.decode!
       end
 
-      if opts[:repo] do
+      if is_atom(opts[:repo]) do
         setup tags do
           :ok = Ecto.Adapters.SQL.Sandbox.checkout(@repo)
 

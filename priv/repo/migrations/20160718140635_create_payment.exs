@@ -11,6 +11,7 @@ defmodule Mbill.Repo.Migrations.CreatePayment do
       add :description, :string
       add :status, :string
       add :auth, :map
+      add :metadata, :map
       add :sender, :map
       add :recipient, :map
 

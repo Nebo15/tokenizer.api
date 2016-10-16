@@ -24,7 +24,7 @@ defmodule Tokenizer.Router do
     post "/cards", Card, :create
 
     # # Create and get payment
-    # post "/payments", Payment, :create
+    post "/payments", Payment, :create
     # get  "/payments/:id", Payment, :show
 
     # # Complete payments

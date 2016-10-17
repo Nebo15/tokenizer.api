@@ -11,7 +11,7 @@ defmodule Tokenizer.CardStorage.SupervisorTest do
   }
 
   test "generates tokens" do
-    assert <<"token-", last4::bytes-size(4), "-", _token::binary>> = @card.number
+    assert <<"card-", last4::bytes-size(4), "-", _token::binary>> = @card.number
     |> CardStorage.generate_token
 
     assert ^last4 = String.slice(@card.number, -4..-1)

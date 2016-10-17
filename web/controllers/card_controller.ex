@@ -21,14 +21,12 @@ defmodule Tokenizer.Controllers.Card do
   end
 
   defp save_card(%Ecto.Changeset{valid?: true} = changeset) do
-    card = changeset
+    changeset
     |> Ecto.Changeset.apply_changes
-
-    card
     |> CardStorage.save_card
   end
 
-  defp send_response({:ok, %SenderCard{} = card}, conn) do
+  defp send_response({:ok, %{token: _, token_expires_at: _} = card}, conn) do
     conn
     |> put_status(:created)
     |> render(CardView, "card.json", card: card)

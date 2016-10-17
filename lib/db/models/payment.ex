@@ -7,12 +7,12 @@ defmodule Tokenizer.DB.Models.Payment do
   schema "payments" do
     field :external_id, :string
     field :token, :string
-    field :token_expires_at, Ecto.DateTime
-    field :amount, :float
-    field :fee, :float
+    field :token_expires_at, Timex.Ecto.DateTime
+    field :amount, :decimal
+    field :fee, :decimal
     field :description, :string
     field :status, Tokenizer.DB.Enums.PaymentStatuses, default: :authorization
-    field :auth, :map
+    field :auth, Tokenizer.DB.Types.Authorization
     field :metadata, :map
     embeds_one :sender, Tokenizer.DB.Models.SenderPeer
     embeds_one :recipient, Tokenizer.DB.Models.RecipientPeer
@@ -49,7 +49,7 @@ defmodule Tokenizer.DB.Models.Payment do
     |> validate_metadata
   end
 
-  def validate_metadata(struct, opts \\ []) do
+  defp validate_metadata(struct, opts \\ []) do
     # TODO: validate metadata keys and values length
     struct
   end

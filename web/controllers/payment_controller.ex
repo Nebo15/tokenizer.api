@@ -36,7 +36,7 @@ defmodule Tokenizer.Controllers.Payment do
   # Payment Gateway delegates
   defp get_payment_autorization(%Ecto.Changeset{valid?: false} = changeset), do: {:error, :invalid, changeset}
   defp get_payment_autorization(%Ecto.Changeset{valid?: true} = changeset) do
-    changeset
+    changeset = changeset
     |> Ecto.Changeset.put_change(:auth, %Tokenizer.DB.Models.Authorization3DS{})
     |> Ecto.Changeset.put_change(:external_id, "007")
     |> put_token
@@ -51,9 +51,8 @@ defmodule Tokenizer.Controllers.Payment do
     |> Timex.shift(microseconds: expires_in)
 
     changeset
-    |> Ecto.Changeset.put_change(:token, Ecto.UUID.generate)
+    |> Ecto.Changeset.put_change(:token, "payment-" <> Ecto.UUID.generate)
     |> Ecto.Changeset.put_change(:token_expires_at, expires_at)
-    |> IO.inspect
   end
 
   # Store payment changes into DB
@@ -61,8 +60,9 @@ defmodule Tokenizer.Controllers.Payment do
   defp store_payment({:error, reason, details}), do: {:error, reason, details}
   defp store_payment({:ok, %Ecto.Changeset{} = changeset}) do
     changeset
-    |> Tokenizer.DB.Repo.insert
+    |> PaymentSchema.changeset
     |> IO.inspect
+    |> Tokenizer.DB.Repo.insert
   end
 
   # Responses

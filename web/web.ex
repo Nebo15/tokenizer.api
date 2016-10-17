@@ -47,6 +47,7 @@ defmodule Tokenizer.Web do
       import Phoenix.Controller, only: [get_csrf_token: 0, get_flash: 2, view_module: 1]
 
       import Tokenizer.Router.Helpers
+      import Phoenix.View
     end
   end
 

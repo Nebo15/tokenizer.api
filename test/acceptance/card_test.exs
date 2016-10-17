@@ -7,7 +7,7 @@ defmodule Tokenizer.Controllers.CardTest do
 
   alias Tokenizer.DB.Models.SenderCard
 
-  @token_prefix "token"
+  @token_prefix "card"
 
   @card %SenderCard{
     number: "5591587543706253",

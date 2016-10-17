@@ -22,9 +22,9 @@ Create -> Autorization Waiting -> Compelte (Lookup or 3D-Secure) -> Processing -
 
 ## Payment completion
 
-### For Non 3-D Secure Card 
+### For Non 3-D Secure Card
 
-API client should use complete this payment using ```/payments/{id}/complete``` method. 
+API client should use complete this payment using ```/payments/{id}/complete``` method.
 Auth code will be send to card owners phone number by issuing bank.
 
 ### For 3-D Secure Cards
@@ -69,7 +69,7 @@ On payment read state you will receive one of following statuses:
   "59": "2DS_Waiting",
 
 ```
-"3DS_Waiting" should be mapped to ```auth.type = "3D-SECURE"``` 
+"3DS_Waiting" should be mapped to ```auth.type = "3D-SECURE"```
 and "2DS_Waiting" to ```auth.type = "LOOKUP-CODE"``` with payment status ```auth_waiting```.
 
 Also there are temporary statuses that should be mapped to "processing" state:
@@ -293,8 +293,8 @@ You can use this code to calculate the fee:
 ## Collection [/cards]
 ### Create Card Token [POST]
 
-This request will save card mask and token in Postgre DB. 
-Also it will create GenServer that will be available within hour an it should 
+This request will save card mask and token in Postgre DB.
+Also it will create GenServer that will be available within hour an it should
 store full card data, that will be used in [Payments][] endpoint.
 
 + Request (application/json)
@@ -307,7 +307,7 @@ store full card data, that will be used in [Payments][] endpoint.
                 "cvv":"000"
               }
             }
-        
+
 + Response 201 (application/json)
 
             {
@@ -318,11 +318,11 @@ store full card data, that will be used in [Payments][] endpoint.
               "data": {
                 "card": {
                     "number":"000011******5457",
-                    "token": "token-5457-sdopeje9083uojidojd9"
+                    "token": "card-5457-sdopeje9083uojidojd9"
                 }
               }
             }
-            
+
 ### Get Card Data [GET /cards/{token}]
 
 This response will read from Postgre without access to GenServer (card mask is a persistent entity).
@@ -336,7 +336,7 @@ This response will read from Postgre without access to GenServer (card mask is a
               "data": {
                 "card": {
                     "number":"000011******3333",
-                    "token": "token-5457-sdopeje9083uojidojd9"
+                    "token": "card-5457-sdopeje9083uojidojd9"
                 }
               }
             }
@@ -364,7 +364,7 @@ For lookup code authorization ```auth``` object should look like this:
               "sender":{
                 "type": "card",
                 "card":{
-                  "token": "token-5457-sdopeje9083uojidojd9"
+                  "token": "card-5457-sdopeje9083uojidojd9"
                 },
                 "phone":"+380631112233",
                 "email":"ivan@example.com"

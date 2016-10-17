@@ -5,8 +5,6 @@ defmodule Tokenizer.Controllers.PaymentTest do
     endpoint: Tokenizer.HTTP.Endpoint,
     repo: Tokenizer.DB.Repo
 
-  # alias Tokenizer.DB.Models.Payment
-
   @payment_raw %{
     amount: 1000,
     fee: "10",
@@ -69,25 +67,32 @@ defmodule Tokenizer.Controllers.PaymentTest do
         "code" => 201
       },
       "data" => %{
-        "type" => "card",
+        "id" => _,
+        "amount" => "1000",
+        "fee" => "10",
+        "auth" => %{"acs_url" => nil, "md" => nil, "pa_req" => nil, "terminal_url" => nil, "type" => "3d_secure"},
+        "description" => "some content",
+        "external_id" => "007",
+        "status" => "authorization",
         "token" => _,
-        "token_expires_at" => _
+        "token_expires_at" => _,
+        "type" => "payment",
+        "metadata" => %{"feel_free" => "to set any metadata"},
+        "recipient" => %{"card" => %{"number" => "473959******3611"},
+                         "email" => "ivan@example.com",
+                         "phone" => "+380631112233",
+                         "type" => "card"},
+        "sender" => %{"card" => %{"number" => "473959******3611"},
+                      "email" => "ivan@example.com",
+                      "phone" => "+380631112233",
+                      "type" => "card"},
+        "created_at" => _,
+        "updated_at" => _
       }
     } = "payments"
     |> post!(@payment_raw)
     |> get_body
   end
-
-  # test "create invalid payment with raw card data" do
-  #   assert %{
-  #     "meta" => %{
-  #       "code" => 422
-  #     },
-  #     "error" => _
-  #   } = "payments"
-  #   |> post!(@payment_raw_invalid)
-  #   |> get_body
-  # end
 end
 
 

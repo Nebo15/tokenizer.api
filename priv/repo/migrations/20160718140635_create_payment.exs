@@ -6,8 +6,8 @@ defmodule Mbill.Repo.Migrations.CreatePayment do
       add :external_id, :string
       add :token, :string
       add :token_expires_at, :utc_datetime
-      add :amount, :float
-      add :fee, :float
+      add :amount, :decimal, precision: 19, scale: 2
+      add :fee, :decimal, precision: 19, scale: 2
       add :description, :string
       add :status, :string
       add :auth, :map

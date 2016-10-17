@@ -6,7 +6,7 @@ defmodule Tokenizer.DB.Models.AuthorizationLookupCode do
 
   @primary_key false
   embedded_schema do
-    field :type, :string, default: "lookup_code"
+    field :type, Tokenizer.DB.Enums.AuthTypes, default: "lookup_code"
     field :md, :string
   end
 end

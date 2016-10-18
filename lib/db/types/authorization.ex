@@ -5,12 +5,11 @@ defmodule Tokenizer.DB.Types.Authorization do
   def type, do: Tokenizer.DB.Types.Authorization
 
   # Cast type to the one that can be saved in DB
-  def cast(%Tokenizer.DB.Models.Authorization3DS{} = auth) when is_map(auth) do
-    IO.inspect auth
+  def cast(%Tokenizer.DB.Models.Authorization3DS{type: "3d_secure"} = auth) when is_map(auth) do
     {:ok, Map.delete(auth, :__struct__)}
   end
 
-  def cast(%Tokenizer.DB.Models.AuthorizationLookupCode{} = auth) when is_map(auth) do
+  def cast(%Tokenizer.DB.Models.AuthorizationLookupCode{type: "lookup_code"} = auth) when is_map(auth) do
     {:ok, Map.delete(auth, :__struct__)}
   end
 

@@ -93,7 +93,30 @@ defmodule Tokenizer.Controllers.PaymentTest do
     |> post!(@payment_raw)
     |> get_body
   end
+
+  test "create payment with invalid card data" do
+    assert %{
+      "meta" => %{
+        "code" => 422
+      },
+      "error" => %{
+        "invalid" => [
+          %{"entry" => "#/recipient/card/number",
+            "entry_type" => "json_data_proprty",
+            "rules" => [%{"params" => [], "rule" => "invalid"}]},
+          %{"entry" => "#/sender/card/expiration_year",
+            "entry_type" => "json_data_proprty",
+            "rules" => [%{"params" => [], "rule" => "has invalid format"}]}
+        ],
+        "message" => _,
+        "type" => "validation_failed"
+      }
+    } = "payments"
+    |> post!(@payment_raw_invalid)
+    |> get_body
+  end
 end
+
 
 
 # # defmodule Mbill.PaymentControllerTest do

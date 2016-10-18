@@ -4,6 +4,8 @@ defmodule Tokenizer.Controllers.Payment do
   alias Tokenizer.DB.Models.Payment, as: PaymentSchema
   alias Tokenizer.Views.Payment, as: PaymentView
 
+  @payment_token_prefix "payment"
+
   # Actions
   def create(conn, params) when is_map(params) do
     %PaymentSchema{}
@@ -51,7 +53,7 @@ defmodule Tokenizer.Controllers.Payment do
     |> Timex.shift(microseconds: expires_in)
 
     changeset
-    |> Ecto.Changeset.put_change(:token, "payment-" <> Ecto.UUID.generate)
+    |> Ecto.Changeset.put_change(:token, @payment_token_prefix <> "-" <> Ecto.UUID.generate)
     |> Ecto.Changeset.put_change(:token_expires_at, expires_at)
   end
 
@@ -61,7 +63,6 @@ defmodule Tokenizer.Controllers.Payment do
   defp store_payment({:ok, %Ecto.Changeset{} = changeset}) do
     changeset
     |> PaymentSchema.changeset
-    |> IO.inspect
     |> Tokenizer.DB.Repo.insert
   end
 
@@ -73,9 +74,6 @@ defmodule Tokenizer.Controllers.Payment do
   end
 
   defp send_response({:error, :invalid, %Ecto.Changeset{} = changeset}, conn) do
-
-    IO.inspect changeset
-
     conn
     |> put_status(422)
     |> render(EView.ValidationErrorView, "422.json", changeset)

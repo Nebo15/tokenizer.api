@@ -9,6 +9,15 @@ defmodule Tokenizer.DB.Types.DynamicEmbed do
       def type, do: :map
 
       @doc """
+      Helps to resolve string-keyed maps.
+      """
+      def resolve(%{"type" => _} = map) do
+        map
+        |> to_atom_keys()
+        |> resolve()
+      end
+
+      @doc """
       Cast type to the one that can be saved in DB.
       """
       def cast(%{"type" => _} = credential) do
@@ -50,6 +59,7 @@ defmodule Tokenizer.DB.Types.DynamicEmbed do
       # but any value could be inserted into the struct, so we need
       # guard against them.
       def dump(map) when is_map(map), do: {:ok, map}
+      def dump(%{__struct__: _} = struct), do: struct |> struct_to_map() |> dump()
       def dump(_), do: :error
 
       defp to_atom_keys(string_key_map) do

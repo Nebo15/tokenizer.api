@@ -50,8 +50,8 @@ defmodule Tokenizer.Mixfile do
   defp deps do
     [{:distillery, "~> 0.10"},
      {:confex, "~> 1.4"},
-     {:eview, "~> 0.1.0"},
-     {:ecto, "2.1.0-rc.2", override: true}, # TODO: Update when Ecto will release v2.1
+     {:eview, "~> 0.2.1"},
+     {:ecto, "2.1.0-rc.3", override: true}, # TODO: Update when Ecto will release v2.1
      {:postgrex, "~> 0.12", override: true},
      {:cowboy, "~> 1.0"},
      {:httpoison, "~> 0.9.2"},

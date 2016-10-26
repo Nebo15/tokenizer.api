@@ -11,4 +11,7 @@ end
 
 release :tokenizer_api do
   set version: current_version(:tokenizer_api)
+  set applications: [
+    tokenizer_api: :permanent
+  ]
 end

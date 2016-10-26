@@ -14,43 +14,47 @@ defmodule Tokenizer.DB.Models.Payment do
     field :status, Tokenizer.DB.Enums.PaymentStatuses, default: :authorization
     field :auth, Tokenizer.DB.Types.Authorization
     field :metadata, :map
-    embeds_one :sender, Tokenizer.DB.Models.SenderPeer
-    embeds_one :recipient, Tokenizer.DB.Models.RecipientPeer
+    embeds_one :sender, Tokenizer.DB.Models.Peer
+    embeds_one :recipient, Tokenizer.DB.Models.Peer
 
     timestamps()
   end
 
   @doc """
   Builds a changeset based on the `struct` and `params`.
+
+  It should be used to validate data that is sent by API consumers,
+  so we don't force them to send internally required fields.
   """
   def creation_changeset(struct, params \\ %{}) do
     struct
     |> cast(params, [:amount, :fee, :description, :metadata])
-    |> cast_embed(:sender)
-    |> cast_embed(:recipient)
+    |> cast_embed(:sender, with: &Tokenizer.DB.Models.Peer.sender_changeset/2)
+    |> cast_embed(:recipient, with: &Tokenizer.DB.Models.Peer.recipient_changeset/2)
     |> validate_required([:amount, :fee, :description, :sender, :recipient])
     |> validate_number(:amount, greater_than_or_equal_to: 1, less_than_or_equal_to: 10_000)
     |> validate_number(:fee, greater_than_or_equal_to: 1, less_than_or_equal_to: 1_000)
     |> validate_length(:description, min: 2, max: 250)
-    |> validate_metadata
+    |> validate_metadata(:metadata)
   end
 
+  @doc """
+  Builds a changeset based on the `struct` and `params`.
+
+  It should be used in internal validations to make sure that payment is valid
+  when it's constructed from payment gateway response.
+  """
   def changeset(struct, params \\ %{}) do
     struct
     |> cast(params, [:amount, :fee, :description, :status, :auth, :external_id, :token, :token_expires_at, :metadata])
-    |> cast_embed(:sender)
-    |> cast_embed(:recipient)
+    |> cast_embed(:sender, with: &Tokenizer.DB.Models.Peer.sender_changeset/2)
+    |> cast_embed(:recipient, with: &Tokenizer.DB.Models.Peer.recipient_changeset/2)
     |> validate_required([:amount, :fee, :status, :auth, :external_id, :token, :token_expires_at, :sender, :recipient])
     |> validate_number(:amount, greater_than_or_equal_to: 1, less_than_or_equal_to: 10_000)
     |> validate_number(:fee, greater_than_or_equal_to: 1, less_than_or_equal_to: 1_000)
     |> validate_length(:description, min: 2, max: 250)
     |> unique_constraint(:external_id)
     |> unique_constraint(:token)
-    |> validate_metadata
-  end
-
-  defp validate_metadata(struct, opts \\ []) do
-    # TODO: validate metadata keys and values length
-    struct
+    |> validate_metadata(:metadata)
   end
 end

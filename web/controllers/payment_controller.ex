@@ -16,6 +16,8 @@ defmodule Tokenizer.Controllers.Payment do
   end
 
   # def show(conn, %{"id" => id}) do
+  #   Tokenizer.DB.Repo.get_by(Payment, external_id: id)
+
   #   payment = Repo.get_by!(Payment, pay2you_id: id)
   #   String.to_integer(id)
   #   |> Pay2You.get_transfer_status
@@ -61,9 +63,15 @@ defmodule Tokenizer.Controllers.Payment do
   defp store_payment({:error, reason}), do: {:error, reason}
   defp store_payment({:error, reason, details}), do: {:error, reason, details}
   defp store_payment({:ok, %Ecto.Changeset{} = changeset}) do
-    changeset
-    |> PaymentSchema.changeset
-    |> Tokenizer.DB.Repo.insert
+    case PaymentSchema.changeset(changeset) do
+      %Ecto.Changeset{valid?: true} = changeset ->
+        IO.inspect changeset.changes.sender.changes.credential.validations
+
+        changeset
+        |> Tokenizer.DB.Repo.insert
+      %Ecto.Changeset{valid?: false} = changeset ->
+        {:error, :invalid, changeset}
+    end
   end
 
   # Responses
@@ -74,38 +82,9 @@ defmodule Tokenizer.Controllers.Payment do
   end
 
   defp send_response({:error, :invalid, %Ecto.Changeset{} = changeset}, conn) do
+    IO.inspect changeset
     conn
     |> put_status(422)
     |> render(EView.ValidationErrorView, "422.json", changeset)
   end
-
-  # defp send_response({:error, %{id: _, status: _, decline: _} = reason}, conn) do
-  #   conn
-  #   |> put_status(400)
-  #   |> render(Mbill.ErrorView, "pay2you_400.json", errors: reason)
-  # end
-
-  # defp send_response({:error, %{pay2you: true, reason: reason}}, conn) do
-  #   conn
-  #   |> put_status(400)
-  #   |> render(Mbill.ErrorView, "pay2you_400.json", errors: reason)
-  # end
-
-  # defp send_response({:error, {:validation, param, msg}}, conn) do
-  #   conn
-  #   |> put_status(422)
-  #   |> render(Mbill.ErrorView, "422.json", %{param: param, msg: msg, type: "invalid_completion_code"})
-  # end
-
-  # defp send_response({:error, changeset: changeset}, conn) do
-  #   conn
-  #   |> put_status(422)
-  #   |> render(Mbill.ErrorView, "422.json", %{changeset: changeset})
-  # end
-
-  # defp send_response({:error, reason}, conn) do
-  #   conn
-  #   |> put_status(400)
-  #   |> render(Mbill.ErrorView, "400.json", errors: reason)
-  # end
 end

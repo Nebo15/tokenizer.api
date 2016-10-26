@@ -5,7 +5,7 @@ defmodule Tokenizer.CardStorage.Supervisor do
   """
   use Supervisor
   require Logger
-  alias Tokenizer.DB.Models.SenderCard
+  alias Tokenizer.DB.Models.Card
   alias Tokenizer.CardStorage.Encryptor
 
   @token_prefix "card"
@@ -24,7 +24,7 @@ defmodule Tokenizer.CardStorage.Supervisor do
   In this way we make sure that card data can't be decoded without server-key if user-key is stolen,
   and by user-key if server is hacked.
   """
-  def save_card(%SenderCard{number: card_number} = card) do
+  def save_card(%Card{number: card_number} = card) do
     token = card_number
     |> generate_token
 
@@ -43,7 +43,7 @@ defmodule Tokenizer.CardStorage.Supervisor do
     expires_at = Timex.now
     |> Timex.shift(microseconds: expires_in)
 
-    {:ok, %{token: token, token_expires_at: expires_at}}
+    {:ok, %Tokenizer.DB.Models.CardToken{token: token, token_expires_at: expires_at}}
   end
 
   @doc """
@@ -80,7 +80,7 @@ defmodule Tokenizer.CardStorage.Supervisor do
       _ ->
         card = message
         |> Poison.decode!
-        |> to_struct(SenderCard)
+        |> to_struct(Card)
 
         {:ok, card}
     end

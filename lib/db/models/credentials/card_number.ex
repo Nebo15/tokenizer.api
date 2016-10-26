@@ -1,11 +1,12 @@
-defmodule Tokenizer.DB.Models.RecipientCard do
+defmodule Tokenizer.DB.Models.CardNumber do
   @moduledoc """
-  Model for recipient cards.
+  Model for sender cards.
   """
   use Tokenizer.Web, :model
 
   @primary_key false
   embedded_schema do
+    field :type, Tokenizer.DB.Enums.AccountCredential, default: "card-number"
     field :number, :string
   end
 

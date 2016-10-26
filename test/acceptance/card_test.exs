@@ -5,18 +5,18 @@ defmodule Tokenizer.Controllers.CardTest do
     endpoint: Tokenizer.HTTP.Endpoint,
     repo: Tokenizer.DB.Repo
 
-  alias Tokenizer.DB.Models.SenderCard
+  alias Tokenizer.DB.Models.Card
 
   @token_prefix "card"
 
-  @card %SenderCard{
+  @card %Card{
     number: "5591587543706253",
     expiration_month: "01",
     expiration_year: "2020",
     cvv: "160"
   }
 
-  @invalid_card %SenderCard{
+  @invalid_card %Card{
     number: "5591587543706251",
     expiration_month: "12",
     expiration_year: "1997",
@@ -29,7 +29,7 @@ defmodule Tokenizer.Controllers.CardTest do
         "code" => 201
       },
       "data" => %{
-        "type" => "card",
+        "type" => "card-token",
         "token" => @token_prefix <> _,
         "token_expires_at" => _
       }

@@ -1,4 +1,4 @@
-defmodule Tokenizer.DB.Models.SenderCard do
+defmodule Tokenizer.DB.Models.Card do
   @moduledoc """
   Model for sender cards.
   """
@@ -6,10 +6,11 @@ defmodule Tokenizer.DB.Models.SenderCard do
 
   @primary_key false
   embedded_schema do
-    field :number
-    field :expiration_month
-    field :expiration_year
-    field :cvv
+    field :type, Tokenizer.DB.Enums.AccountCredential, default: "card"
+    field :number, :string
+    field :expiration_month, :string
+    field :expiration_year, :string
+    field :cvv, :string
   end
 
   def changeset(struct, params \\ %{}) do

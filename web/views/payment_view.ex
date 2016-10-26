@@ -23,13 +23,17 @@ defmodule Tokenizer.Views.Payment do
   end
 
   def render("peer.json", %{peer: peer}) do
-    %{type: peer.type,
-      phone: peer.phone,
+    %{phone: peer.phone,
       email: peer.email,
-      card: render_one(peer.card, Tokenizer.Views.Payment, "card.json", as: :card)}
+      credential: render_one(peer.credential, Tokenizer.Views.Payment, "credential.json", as: :credential)}
   end
 
-  def render("card.json", %{card: %{number: number}}) do
-    %{number: String.slice(number, 1..6) <> String.duplicate("*", 6) <> String.slice(number, -4..-1)}
+  def render("credential.json", %{credential: %{type: type, number: number}}) when type in ["card", "card-number"] do
+    %{type: type,
+      number: hide_card_number(number)}
+  end
+
+  defp hide_card_number(card_number) do
+    String.slice(card_number, 1..6) <> String.duplicate("*", 6) <> String.slice(card_number, -4..-1)
   end
 end

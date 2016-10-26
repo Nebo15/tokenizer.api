@@ -4,14 +4,15 @@ defmodule Tokenizer.Controllers.Card do
   """
 
   use Tokenizer.Web, :controller
-  alias Tokenizer.DB.Models.SenderCard
+  alias Tokenizer.DB.Models.Card, as: CardModel
+  alias Tokenizer.DB.Models.CardToken, as: CardTokenModel
   alias Tokenizer.Views.Card, as: CardView
   alias Tokenizer.CardStorage.Supervisor, as: CardStorage
 
   # Actions
   def create(conn, params) when is_map(params) do
-    %SenderCard{}
-    |> SenderCard.changeset(params)
+    %CardModel{}
+    |> CardModel.changeset(params)
     |> save_card
     |> send_response(conn)
   end
@@ -26,7 +27,7 @@ defmodule Tokenizer.Controllers.Card do
     |> CardStorage.save_card
   end
 
-  defp send_response({:ok, %{token: _, token_expires_at: _} = card}, conn) do
+  defp send_response({:ok, %CardTokenModel{} = card}, conn) do
     conn
     |> put_status(:created)
     |> render(CardView, "card.json", card: card)

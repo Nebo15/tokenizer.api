@@ -1,12 +1,12 @@
 defmodule Tokenizer.CardStorage.SupervisorTest do
   use ExUnit.Case
-  alias Tokenizer.DB.Models.SenderCard
+  alias Tokenizer.DB.Models.Card
   alias Tokenizer.CardStorage.Supervisor, as: CardStorage
 
-  @card %SenderCard{
+  @card %Card{
     number: "5591587543706253",
     expiration_month: "01",
-    expiration_year: "20",
+    expiration_year: "2020",
     cvv: "160"
   }
 

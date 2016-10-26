@@ -46,7 +46,7 @@ defmodule Tokenizer.DB.Types.DynamicEmbed do
       end
 
       # When loading data from the database, we are guaranteed to
-      # receive an integer (as databases are strict) and we will
+      # receive an raw map (as databases are strict) and we will
       # just return it to be stored in the schema struct.
       def load(params) do
         case resolve(params) do

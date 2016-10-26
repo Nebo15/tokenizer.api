@@ -1,4 +1,7 @@
 defmodule Tokenizer.Controllers.Payment do
+  @moduledoc """
+  This controller implements REST API to send different kins of payments and fetch information about them.
+  """
   use Tokenizer.Web, :controller
 
   alias Tokenizer.DB.Models.Payment, as: PaymentSchema

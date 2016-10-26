@@ -1,4 +1,7 @@
-defmodule Tokenizer.DB.Types.AccountCredential do
+defmodule Tokenizer.DB.Types.PeerCredential do
+  @moduledoc """
+  Dynamic embed type for `peer.credential` field.
+  """
   use Tokenizer.DB.Types.DynamicEmbed
 
   @doc """

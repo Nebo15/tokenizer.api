@@ -1,4 +1,7 @@
 defmodule Tokenizer.DB.Types.DynamicEmbed do
+  @moduledoc """
+  This module provides common interface and helper function for types that can be embedded dynamically into schema.
+  """
   defmacro __using__(_) do
     quote do
       @behaviour Ecto.Type
@@ -47,7 +50,7 @@ defmodule Tokenizer.DB.Types.DynamicEmbed do
       # just return it to be stored in the schema struct.
       def load(params) do
         case resolve(params) do
-          {:ok, type} -> {:ok, struct(type, params)}
+          {:ok, embed_type} -> {:ok, struct(embed_type, params)}
           {:error, reason} -> {:error, reason}
         end
       end
@@ -61,9 +64,9 @@ defmodule Tokenizer.DB.Types.DynamicEmbed do
 
       defp to_atom_keys(string_key_map) do
         for {key, val} <- string_key_map, into: %{} do
-          cond do
-            is_atom(key) -> {key, val}
-            true -> {String.to_atom(key), val}
+          case is_atom(key) do
+            true -> {key, val}
+            false -> {String.to_atom(key), val}
           end
         end
       end

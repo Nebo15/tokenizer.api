@@ -11,7 +11,9 @@ defmodule Tokenizer.Controllers.Payment do
     %PaymentSchema{}
     |> PaymentSchema.creation_changeset(params)
     |> get_payment_autorization
-    |> store_payment
+    |> put_payment_token
+    |> validate_payment
+    |> save_payment
     |> send_response(conn)
   end
 
@@ -43,35 +45,34 @@ defmodule Tokenizer.Controllers.Payment do
     changeset = changeset
     |> Ecto.Changeset.put_change(:auth, %Tokenizer.DB.Models.Authorization3DS{})
     |> Ecto.Changeset.put_change(:external_id, "007")
-    |> put_token
 
     {:ok, changeset}
   end
 
-  defp put_token(%Ecto.Changeset{} = changeset) do
+  defp put_payment_token({:error, reason, details}), do: {:error, reason, details}
+  defp put_payment_token({:ok, %Ecto.Changeset{} = changeset}) do
     expires_in = Confex.get(:tokenizer_api, :payment_token_expires_in)
 
     expires_at = Timex.now
     |> Timex.shift(microseconds: expires_in)
 
-    changeset
-    |> Ecto.Changeset.put_change(:token, @payment_token_prefix <> "-" <> Ecto.UUID.generate)
-    |> Ecto.Changeset.put_change(:token_expires_at, expires_at)
+    {:ok, changeset
+          |> Ecto.Changeset.put_change(:token, @payment_token_prefix <> "-" <> Ecto.UUID.generate)
+          |> Ecto.Changeset.put_change(:token_expires_at, expires_at)}
+  end
+
+  # Prepare payment changeset
+  defp validate_payment({:error, reason, details}), do: {:error, reason, details}
+  defp validate_payment({:ok, %Ecto.Changeset{} = changeset}) do
+    {:ok, PaymentSchema.changeset(changeset)}
   end
 
   # Store payment changes into DB
-  defp store_payment({:error, reason}), do: {:error, reason}
-  defp store_payment({:error, reason, details}), do: {:error, reason, details}
-  defp store_payment({:ok, %Ecto.Changeset{} = changeset}) do
-    case PaymentSchema.changeset(changeset) do
-      %Ecto.Changeset{valid?: true} = changeset ->
-        IO.inspect changeset.changes.sender.changes.credential.validations
-
-        changeset
-        |> Tokenizer.DB.Repo.insert
-      %Ecto.Changeset{valid?: false} = changeset ->
-        {:error, :invalid, changeset}
-    end
+  defp save_payment({:error, reason, details}), do: {:error, reason, details}
+  defp save_payment({:ok, %Ecto.Changeset{valid?: false} = changeset}), do: {:error, :invalid, changeset}
+  defp save_payment({:ok, %Ecto.Changeset{valid?: true} = changeset}) do
+    changeset
+    |> Tokenizer.DB.Repo.insert
   end
 
   # Responses
@@ -82,7 +83,6 @@ defmodule Tokenizer.Controllers.Payment do
   end
 
   defp send_response({:error, :invalid, %Ecto.Changeset{} = changeset}, conn) do
-    IO.inspect changeset
     conn
     |> put_status(422)
     |> render(EView.ValidationErrorView, "422.json", changeset)

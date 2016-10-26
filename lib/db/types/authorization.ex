@@ -8,4 +8,6 @@ defmodule Tokenizer.DB.Types.Authorization do
     do: {:ok, Tokenizer.DB.Models.Authorization3DS}
   def resolve(%{type: "lookup_code"}),
     do: {:ok, Tokenizer.DB.Models.AuthorizationLookupCode}
+  def resolve(_),
+    do: {:error, :unkown_type}
 end

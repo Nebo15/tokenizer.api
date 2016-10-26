@@ -3,6 +3,7 @@ defmodule Tokenizer.DB.Models.Payment do
   Model for payments.
   """
   use Tokenizer.Web, :model
+  import Tokenizer.DB.Changeset.Validators.DynamicEmbeds
 
   schema "payments" do
     field :external_id, :string
@@ -46,7 +47,8 @@ defmodule Tokenizer.DB.Models.Payment do
   """
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:amount, :fee, :description, :status, :auth, :external_id, :token, :token_expires_at, :metadata])
+    |> cast(params, [:amount, :fee, :description, :status, :external_id, :token, :token_expires_at, :metadata])
+    |> cast_dynamic_embed(:auth)
     |> cast_embed(:sender, with: &Tokenizer.DB.Models.Peer.sender_changeset/2)
     |> cast_embed(:recipient, with: &Tokenizer.DB.Models.Peer.recipient_changeset/2)
     |> validate_required([:amount, :fee, :status, :auth, :external_id, :token, :token_expires_at, :sender, :recipient])

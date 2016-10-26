@@ -29,13 +29,10 @@ defmodule Tokenizer.DB.Types.DynamicEmbed do
       def cast(%{type: _} = credential) do
         case resolve(credential) do
           {:ok, _type} ->
-            IO.inspect "CAST CAST"
-            IO.inspect struct_to_map(credential)
             {:ok, struct_to_map(credential)}
           {:error, _reason} ->
             :error
         end
-
       end
 
       def cast(nil), do: {:ok, nil}
@@ -58,8 +55,8 @@ defmodule Tokenizer.DB.Types.DynamicEmbed do
       # When dumping data to the database, we *expect* a map
       # but any value could be inserted into the struct, so we need
       # guard against them.
-      def dump(map) when is_map(map), do: {:ok, map}
       def dump(%{__struct__: _} = struct), do: struct |> struct_to_map() |> dump()
+      def dump(map) when is_map(map), do: {:ok, map}
       def dump(_), do: :error
 
       defp to_atom_keys(string_key_map) do

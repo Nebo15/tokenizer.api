@@ -92,27 +92,27 @@ defmodule Tokenizer.Controllers.PaymentTest do
     |> get_body
   end
 
-  # test "create payment with invalid card data" do
-  #   assert %{
-  #     "meta" => %{
-  #       "code" => 422
-  #     },
-  #     "error" => %{
-  #       "invalid" => [
-  #         %{"entry" => "$.recipient.credential.number",
-  #           "entry_type" => "json_data_property",
-  #           "rules" => [%{"params" => [], "rule" => "card_number"}]},
-  #         %{"entry" => "$.sender.credential.expiration_year",
-  #           "entry_type" => "json_data_property",
-  #           "rules" => [%{"params" => ["~r/^20[12][0-9]$/"], "rule" => "format"}]}
-  #       ],
-  #       "message" => _,
-  #       "type" => "validation_failed"
-  #     }
-  #   } = "payments"
-  #   |> post!(@payment_raw_invalid)
-  #   |> get_body
-  # end
+  test "create payment with invalid card data" do
+    assert %{
+      "meta" => %{
+        "code" => 422
+      },
+      "error" => %{
+        "invalid" => [
+          %{"entry" => "$.recipient.credential.number",
+            "entry_type" => "json_data_property",
+            "rules" => [%{"params" => [], "rule" => "card_number"}]},
+          %{"entry" => "$.sender.credential.expiration_year",
+            "entry_type" => "json_data_property",
+            "rules" => [%{"params" => ["~r/^20[12][0-9]$/"], "rule" => "format"}]}
+        ],
+        "message" => _,
+        "type" => "validation_failed"
+      }
+    } = "payments"
+    |> post!(@payment_raw_invalid)
+    |> get_body
+  end
 end
 
 

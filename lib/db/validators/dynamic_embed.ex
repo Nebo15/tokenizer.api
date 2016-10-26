@@ -4,17 +4,24 @@ defmodule Tokenizer.DB.Changeset.Validators.DynamicEmbeds do
 
   Also it will run embed run child changeset as `cast_embed` would do.
   """
-  def cast_dynamic_embed(changeset, field, opts \\ []) do
-    case Ecto.Changeset.get_change(changeset, field) do
+  def cast_dynamic_embeds(changeset, fields, opts \\ []) do
+    Enum.reduce(fields, changeset, fn field, changeset ->
+      cast_dynamic_embed(changeset, field, opts)
+    end)
+  end
+
+  def cast_dynamic_embed(%{params: params} = changeset, field, opts \\ []) do
+    val = Map.get(params, to_string(field), nil) || Map.get(params, field, nil) # Map can be string- or atom-keyed
+    case val do
       nil ->
         changeset
       change ->
         changeset
         |> resolve_embed_schema(field, change, opts)
-        |> Ecto.Changeset.cast_embed(field)
     end
   end
 
+  # Resolved embed type via types `resolve/1` method.
   defp resolve_embed_schema(%{types: types} = changeset, field, change, opts) when is_map(change) do
     key = cast_key!(field)
     type = Map.get(types, key)
@@ -43,21 +50,19 @@ defmodule Tokenizer.DB.Changeset.Validators.DynamicEmbeds do
     |> Map.get(:__struct__)
     |> build_embed_type(schema, field, on_cast)
 
-    tmp = %{changeset | changes: Map.put(changes, field, embed_changeset),
-                  valid?: changeset.valid? and embed_changeset.valid?,
-                  types: Map.put(types, field, embed_type)}
-
-    # IO.inspect embed_changeset
-    # IO.inspect tmp
-    # tmp
+    %{changeset | changes: Map.put(changes, field, embed_changeset),
+                  valid?: changeset.valid? and embed_changeset.valid?}#,
+                  #types: Map.put(types, field, embed_type)}
   end
 
   defp build_embed_type(owner, schema, field, on_cast) do
     {:embed, %Ecto.Embedded{
-      cardinality: :one, field: field,
-      on_cast: on_cast,
-      on_replace: :raise, owner: owner,
-      related: schema, unique: true}}
+        cardinality: :one, field: field,
+        on_cast: on_cast,
+        on_replace: :raise, owner: owner,
+        related: schema, unique: true
+      }
+    }
   end
 
   defp build_embed_schema(schema, field, %{data: data}) when is_map(data) and not is_nil(data) do
@@ -88,7 +93,7 @@ defmodule Tokenizer.DB.Changeset.Validators.DynamicEmbeds do
     }
   end
 
-  defp message(opts, key \\ :message, default) do
+  defp message(opts, key, default) do
     Keyword.get(opts, key, default)
   end
 end

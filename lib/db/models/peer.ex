@@ -15,7 +15,7 @@ defmodule Tokenizer.DB.Models.Peer do
   # Sender should have card or card token, but can't have card!
   def sender_changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:phone, :email, :credential])
+    |> cast(params, [:phone, :email])
     |> cast_dynamic_embed(:credential)
     |> validate_required([:credential])
     |> validate_email(:email)
@@ -24,7 +24,7 @@ defmodule Tokenizer.DB.Models.Peer do
 
   def recipient_changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:phone, :email, :credential])
+    |> cast(params, [:phone, :email])
     |> cast_dynamic_embed(:credential)
     |> validate_required([:credential])
     |> validate_email(:email)

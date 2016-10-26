@@ -15,11 +15,10 @@ otp_release:
 env:
   global:
     - MIX_ENV=test
-    - DOCKER_HUB_ACCOUNT=place_your_account_name_here
+    - DOCKER_HUB_ACCOUNT=nebo15
     - MAIN_BRANCHES="master develop staging" # Branches on which you want version to be incremented
     - RELEASE_BRANCH="master"
-    # Docker credentials
-    - secure: "..."
+    - secure: r4X8qA7x/vfjc8cVFvd32HI2vjG6+K4qzXcNs4wVB113i4Bd7hWGgMELssP8qoBDOYZaTRUcmJreMraJJx1sJ/Eaav87dGu7ujtwCX6Ry9h+Vi0tLIfZeAWqusQiwEOELPfDDrzlck9Up3c95rMnYsCBBpjHUfUvq46BewpIUmh/FXzF2DvRneIqY+r8AoHeUimRQuUClsnhcq4QInj1EpBdxL2T0TJJm9vHU6homnVOqlcaUw9TU+zU3NvizzfHwKI31gjuEgaLXwnOVJeAjPuW0/ysKzAO/Z5ijPp9ORvL2XuB4xzl0MHdk4undVuBOjIHF5wqmOC2nRe4/43urNLyYj2pFHDBcce21ShZvtrkCm45es52f6RZMLoVnmQdZOSlQuSnSXDlXTQForVSGXxg9Odia2AMryUseaIHu/tM7Ql7/m5D5/rFp6mnG31PDvZmDgaLJvIw+7HxzuAfFkvkIAn68ML7buiBxtk5K6O0HyID+WR6tSqVkpv52aNI6bZCwC8K2NyVGGTqJR+0ShOfwuWdp77VazI9rC0bejN+gJY1cixeg9Kdi4ApPE69Z1tGldRHO1ifDgkALTw6DGYAH52vrDrS0k0EZr1nbdEdd7HLlD2s6a1j0n/fT6hCZBGl2sb9ljEr9//DrdbXQZyWihtXY9N4/s82txf8o0o=
 branches:
   # Releases are generated automatically, stop infinite build loop
   except:
@@ -29,14 +28,12 @@ before_install:
   - sudo ./bin/ci/init-db.sh
 script:
   # Increment version in mix.exs
-  # Uncomment this if you want to increment patch version on each Travis build.
-  # - "./bin/version-increment.sh"
+  - "./bin/version-increment.sh"
   # Install dependencies
   - "mix deps.get"
   # Run all tests except pending ones
   - "mix test --exclude pending --trace"
   # Submit code coverage report to Coveralls
-  # Add --pro if you using private repo.
   - "mix coveralls.travis"
   # Run static code analysis
   - "mix credo"
@@ -51,31 +48,8 @@ script:
   - sleep 5
   - docker ps
   - RUNNING_CONTAINERS=`docker ps | wc -l`;
-  - if [ "${RUNNING_CONTAINERS//[[:space:]]/}" == "1" ]; then echo "[E] Container is not started!" exit 1; fi;
+  - if [ "${RUNNING_CONTAINERS//[[:space:]]/}" = "1" ]; then echo "[E] Container is not started!" exit 1; fi;
   # Run acceptance tests on Docker container
   - "MIX_TEST_HOST=localhost MIX_TEST_PORT=4000 mix test test/acceptance"
-# after_success:
-
-# Also you can
-# - automatically build images and push them to Docker Hub;
-# - create new git tag with build version and GitHub release on it.
-#
-# To do so you need to encrypt your docker user name and password and add to environment variables:
-#
-#   $ travis encrypt DOCKER_USERNAME=sample_username DOCKER_PASSWORD=strong_password
-#
-# More info: https://docs.travis-ci.com/user/encryption-keys/
-#
-# Additionally should add env "DOCKER_HUB_ACCOUNT=org_name" to set Hub's organization or account that will hold images.
-# Sample:
-#
-#   env:
-#     global:
-#       - DOCKER_HUB_ACCOUNT=org_name # Docker Hub Account or Organization that will hold images
-#       - secure: "encrypeted_credentials" # Encrypted credentials to login into Docker Hub
-#
-# Then uncomment following lines:
-#
-# after_success:
-#   # Submit Docker container to Docker Hub and create GitHub Release by pushing tag with changelog
-#   - ./bin/ci/push.sh
+after_success:
+  - ./bin/ci/push.sh

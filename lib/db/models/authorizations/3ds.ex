@@ -12,4 +12,10 @@ defmodule Tokenizer.DB.Models.Authorization3DS do
     field :terminal_url, :string
     field :md, :string
   end
+
+  def changeset(struct, params \\ %{}) do
+    struct
+    |> cast(params, [:acs_url, :pa_req, :terminal_url, :md])
+    |> validate_required([:acs_url, :pa_req, :terminal_url, :md])
+  end
 end

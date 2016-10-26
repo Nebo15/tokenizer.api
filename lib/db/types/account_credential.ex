@@ -1,9 +1,9 @@
 defmodule Tokenizer.DB.Types.AccountCredential do
   use Tokenizer.DB.Types.DynamicEmbed
 
-  # @doc """
-  # Returns related struct based on data structure.
-  # """
+  @doc """
+  Returns related struct based on data structure.
+  """
   def resolve(%{type: "card"}),
     do: {:ok, Tokenizer.DB.Models.Card}
   def resolve(%{type: "card-number"}),

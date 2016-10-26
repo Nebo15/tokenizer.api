@@ -1,4 +1,4 @@
-defmodule Tokenizer.DB.Changeset.Validators.DynamicEmbeds do
+defmodule Tokenizer.DB.Changeset.DynamicEmbeds do
   @moduledoc """
   This module provides validation function that can inject `DynamicEmbed` type as embed schema in changeset.
 
@@ -51,8 +51,8 @@ defmodule Tokenizer.DB.Changeset.Validators.DynamicEmbeds do
     |> build_embed_type(schema, field, on_cast)
 
     %{changeset | changes: Map.put(changes, field, embed_changeset),
-                  valid?: changeset.valid? and embed_changeset.valid?}#,
-                  #types: Map.put(types, field, embed_type)}
+                  valid?: changeset.valid? and embed_changeset.valid?,
+                  types: Map.put(types, field, embed_type)}
   end
 
   defp build_embed_type(owner, schema, field, on_cast) do

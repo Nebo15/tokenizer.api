@@ -3,7 +3,7 @@ defmodule Tokenizer.DB.Models.Payment do
   Model for payments.
   """
   use Tokenizer.Web, :model
-  import Tokenizer.DB.Changeset.Validators.DynamicEmbeds
+  import Tokenizer.DB.Changeset.DynamicEmbeds
 
   schema "payments" do
     field :external_id, :string

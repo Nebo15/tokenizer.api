@@ -3,7 +3,7 @@ defmodule Tokenizer.DB.Models.Peer do
   Model for transfer senders.
   """
   use Tokenizer.Web, :model
-  import Tokenizer.DB.Changeset.Validators.DynamicEmbeds
+  import Tokenizer.DB.Changeset.DynamicEmbeds
 
   @primary_key false
   embedded_schema do

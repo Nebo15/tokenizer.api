@@ -27,7 +27,7 @@ defmodule Tokenizer.DB.Changeset.DynamicEmbeds do
     type = Map.get(types, key)
     case type.resolve(change) do
       {:ok, schema} ->
-        run_embed_validator(changeset, field, change, schema, opts)
+        run_embed_validator(changeset, field, change, schema)
       {:error, _reason} ->
         put_invalid_error(changeset, key, type, opts)
     end
@@ -39,7 +39,7 @@ defmodule Tokenizer.DB.Changeset.DynamicEmbeds do
     put_invalid_error(changeset, key, type, opts)
   end
 
-  defp run_embed_validator(%{changes: changes, types: types, data: data} = changeset, field, change, schema, opts) do
+  defp run_embed_validator(%{changes: changes, types: types, data: data} = changeset, field, change, schema) do
     on_cast = &schema.changeset(&1, &2)
 
     embed_changeset = schema
@@ -88,7 +88,7 @@ defmodule Tokenizer.DB.Changeset.DynamicEmbeds do
 
   defp put_invalid_error(%{errors: errors} = changeset, key, type, opts) do
     %{changeset |
-      errors: [{key, {message(opts, :message, "is invalid"), [type: type, validation: :cast]}} | changeset.errors],
+      errors: [{key, {message(opts, :message, "is invalid"), [type: type, validation: :cast]}} | errors],
       valid?: false
     }
   end

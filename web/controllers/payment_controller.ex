@@ -72,7 +72,7 @@ defmodule Tokenizer.Controllers.Payment do
   defp save_payment({:ok, %Ecto.Changeset{valid?: false} = changeset}), do: {:error, :invalid, changeset}
   defp save_payment({:ok, %Ecto.Changeset{valid?: true} = changeset}) do
     changeset
-    |> Tokenizer.DB.Repo.insert
+    |> PaymentSchema.insert
   end
 
   # Responses

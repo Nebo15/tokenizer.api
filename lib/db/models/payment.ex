@@ -21,6 +21,17 @@ defmodule Tokenizer.DB.Models.Payment do
     timestamps()
   end
 
+  def insert(%Ecto.Changeset{} = changeset) do
+    changeset
+    |> Ecto.Changeset.apply_changes()
+    |> Tokenizer.DB.Repo.insert
+  end
+
+  def insert(%Tokenizer.DB.Models.Payment{} = struct) do
+    struct
+    |> Tokenizer.DB.Repo.insert
+  end
+
   @doc """
   Builds a changeset based on the `struct` and `params`.
 

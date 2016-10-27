@@ -49,7 +49,7 @@ defmodule Tokenizer.DB.Models.Payment do
     |> validate_number(:amount,
         greater_than_or_equal_to: limits[:amount][:min],
         less_than_or_equal_to: limits[:amount][:max])
-    |> validate_number(:fee)
+    |> validate_number(:fee, greater_than: 0)
     |> validate_length(:description, max: 250)
     |> validate_metadata(:metadata)
   end
@@ -72,7 +72,7 @@ defmodule Tokenizer.DB.Models.Payment do
     |> validate_number(:amount,
         greater_than_or_equal_to: limits[:amount][:min],
         less_than_or_equal_to: limits[:amount][:max])
-    |> validate_number(:fee)
+    |> validate_number(:fee, greater_than: 0)
     |> validate_length(:description, max: 250)
     |> unique_constraint(:external_id)
     |> unique_constraint(:token)

@@ -61,6 +61,34 @@ defmodule Tokenizer.Controllers.PaymentTest do
     }
   }
 
+  @payment_raw_invalid_type %{
+    amount: 1000,
+    fee: "10",
+    description: "some content",
+    metadata: %{
+      feel_free: "to set any metadata"
+    },
+    recipient: %{
+      phone: "+380631112233",
+      email: "ivan@example.com",
+      credential: %{
+        type: "card",
+        number: "5473959513413611",
+        cvv: "160",
+        expiration_month: "01",
+        expiration_year: "2020"
+      }
+    },
+    sender: %{
+      phone: "+380631112233",
+      email: "ivan@example.com",
+      credential: %{
+        type: "card-number",
+        number: "5473959513413611"
+      }
+    }
+  }
+
   test "create payment with raw card data" do
     assert %{
       "meta" => %{
@@ -89,6 +117,29 @@ defmodule Tokenizer.Controllers.PaymentTest do
       }
     } = "payments"
     |> post!(@payment_raw)
+    |> get_body
+  end
+
+
+  test "cant sent payment with invalid credential type" do
+    assert %{
+      "meta" => %{
+        "code" => 422
+      },
+      "error" => %{
+        "invalid" => [
+          %{"entry" => "$.recipient.credential",
+            "entry_type" => "json_data_property",
+            "rules" => [%{"params" => ["card-number", "external-credential"], "rule" => "inclusion"}]},
+          %{"entry" => "$.sender.credential",
+            "entry_type" => "json_data_property",
+            "rules" => [%{"params" => ["card", "card-token"], "rule" => "inclusion"}]}
+        ],
+        "message" => _,
+        "type" => "validation_failed"
+      }
+    } = "payments"
+    |> post!(@payment_raw_invalid_type)
     |> get_body
   end
 

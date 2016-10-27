@@ -4,6 +4,7 @@ defmodule Tokenizer.DB.Models.Peer do
   """
   use Tokenizer.Web, :model
   import Tokenizer.DB.Changeset.DynamicEmbeds
+  import Tokenizer.DB.Changeset.Validators.EmbedType
 
   @primary_key false
   embedded_schema do
@@ -12,7 +13,6 @@ defmodule Tokenizer.DB.Models.Peer do
     field :credential, Tokenizer.DB.Types.PeerCredential
   end
 
-  # TODO: Sender should have card or card token, but can't have card!
   def sender_changeset(struct, params \\ %{}) do
     struct
     |> cast(params, [:phone, :email])
@@ -20,6 +20,7 @@ defmodule Tokenizer.DB.Models.Peer do
     |> validate_required([:credential])
     |> validate_email(:email)
     |> validate_phone_number(:phone)
+    |> validate_embed_type(:credential, ["card", "card-token"])
   end
 
   def recipient_changeset(struct, params \\ %{}) do
@@ -29,5 +30,6 @@ defmodule Tokenizer.DB.Models.Peer do
     |> validate_required([:credential])
     |> validate_email(:email)
     |> validate_phone_number(:phone)
+    |> validate_embed_type(:credential, ["card-number", "external-credential"])
   end
 end

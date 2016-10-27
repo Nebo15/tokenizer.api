@@ -61,6 +61,19 @@ config :tokenizer_api,
 config :tokenizer_api,
   :payment_token_expires_in, {:system, :integer, "PAYMENT_TOKEN_EXPIRES_IN", 900_000} # 15 minutes
 
+config :tokenizer_api, :limits,
+  amount: [
+    min: 1,
+    max: 15000
+  ],
+  fee: [
+    min: 1,
+    max: :infinity,
+    fix: 5,
+    percent: 0.5
+  ]
+
+
 # It is also possible to import configuration files, relative to this
 # directory. For example, you can emulate configuration per environment
 # by uncommenting the line below and defining dev.exs, test.exs and such.

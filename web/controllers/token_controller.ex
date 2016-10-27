@@ -1,4 +1,4 @@
-defmodule Tokenizer.Controllers.Card do
+defmodule Tokenizer.Controllers.Token do
   @moduledoc """
   Controller for `/cards` API requests.
   """
@@ -6,7 +6,7 @@ defmodule Tokenizer.Controllers.Card do
   use Tokenizer.Web, :controller
   alias Tokenizer.DB.Models.Card, as: CardModel
   alias Tokenizer.DB.Models.CardToken, as: CardTokenModel
-  alias Tokenizer.Views.Card, as: CardView
+  alias Tokenizer.Views.Token, as: TokenView
   alias Tokenizer.CardStorage.Supervisor, as: CardStorage
 
   # Actions
@@ -30,7 +30,7 @@ defmodule Tokenizer.Controllers.Card do
   defp send_response({:ok, %CardTokenModel{} = card}, conn) do
     conn
     |> put_status(:created)
-    |> render(CardView, "card.json", card: card)
+    |> render(TokenView, "card.json", card: card)
   end
 
   defp send_response({:error, :invalid, %Ecto.Changeset{} = changeset}, conn) do

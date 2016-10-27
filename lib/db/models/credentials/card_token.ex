@@ -3,6 +3,7 @@ defmodule Tokenizer.DB.Models.CardToken do
   Model for sender cards.
   """
   use Tokenizer.Web, :model
+  import Tokenizer.DB.Changeset.Validators.Expiration
 
   @primary_key false
   embedded_schema do
@@ -15,5 +16,6 @@ defmodule Tokenizer.DB.Models.CardToken do
     struct
     |> cast(params, [:token, :token_expires_at])
     |> validate_required([:token, :token_expires_at])
+    |> validate_expiration(:token_expires_at)
   end
 end

@@ -21,7 +21,7 @@ defmodule Tokenizer.Router do
     pipe_through :api
 
     # Create card tokens
-    post "/cards", Card, :create
+    post "/tokens", Token, :create
 
     # # Create and get payment
     post "/payments", Payment, :create

@@ -1,4 +1,4 @@
-defmodule Tokenizer.Controllers.CardTest do
+defmodule Tokenizer.Controllers.TokenTest do
   use EView.AcceptanceCase,
     async: true,
     otp_app: :tokenizer_api,
@@ -33,7 +33,7 @@ defmodule Tokenizer.Controllers.CardTest do
         "token" => @token_prefix <> _,
         "token_expires_at" => _
       }
-    } = "cards"
+    } = "tokens"
     |> post!(@card)
     |> get_body
   end
@@ -44,7 +44,7 @@ defmodule Tokenizer.Controllers.CardTest do
         "code" => 422
       },
       "error" => _
-    } = "cards"
+    } = "tokens"
     |> post!(@invalid_card)
     |> get_body
   end

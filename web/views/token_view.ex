@@ -1,4 +1,4 @@
-defmodule Tokenizer.Views.Card do
+defmodule Tokenizer.Views.Token do
   @moduledoc """
   View for Card controller.
   """

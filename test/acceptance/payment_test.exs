@@ -120,7 +120,6 @@ defmodule Tokenizer.Controllers.PaymentTest do
     |> get_body
   end
 
-
   test "cant sent payment with invalid credential type" do
     assert %{
       "meta" => %{
@@ -162,6 +161,66 @@ defmodule Tokenizer.Controllers.PaymentTest do
       }
     } = "payments"
     |> post!(@payment_raw_invalid)
+    |> get_body
+  end
+
+  test "get payment" do
+    assert %{
+      "meta" => %{
+        "code" => 201
+      },
+      "data" => %{
+        "id" => id,
+        "amount" => "1000",
+        "fee" => "10",
+        "auth" => %{"acs_url" => nil, "md" => nil, "pa_req" => nil, "terminal_url" => nil, "type" => "3d_secure"},
+        "description" => "some content",
+        "external_id" => "007",
+        "status" => "authorization",
+        "token" => token,
+        "token_expires_at" => _,
+        "type" => "payment",
+        "metadata" => %{"feel_free" => "to set any metadata"},
+        "recipient" => %{"credential" => %{"type" => "card-number", "number" => "473959******3611"},
+                         "email" => "ivan@example.com",
+                         "phone" => "+380631112233"},
+        "sender" => %{"credential" => %{"type" => "card", "number" => "473959******3611"},
+                      "email" => "ivan@example.com",
+                      "phone" => "+380631112233"},
+        "created_at" => _,
+        "updated_at" => _
+      }
+    } = "payments"
+    |> post!(@payment_raw)
+    |> get_body
+
+    assert %{
+      "meta" => %{
+        "code" => 200
+      },
+      "data" => %{
+        "id" => _,
+        "amount" => "1000" <> _,
+        "fee" => "10" <> _,
+        "auth" => %{"acs_url" => nil, "md" => nil, "pa_req" => nil, "terminal_url" => nil, "type" => "3d_secure"},
+        "description" => "some content",
+        "external_id" => "007",
+        "status" => "authorization",
+        "token" => _,
+        "token_expires_at" => _,
+        "type" => "payment",
+        "metadata" => %{"feel_free" => "to set any metadata"},
+        "recipient" => %{"credential" => %{"type" => "card-number", "number" => "473959******3611"},
+                         "email" => "ivan@example.com",
+                         "phone" => "+380631112233"},
+        "sender" => %{"credential" => %{"type" => "card", "number" => "473959******3611"},
+                      "email" => "ivan@example.com",
+                      "phone" => "+380631112233"},
+        "created_at" => _,
+        "updated_at" => _
+      }
+    } = "payments/" <> to_string(id) <> "?token=" <> token
+    |> get!
     |> get_body
   end
 end

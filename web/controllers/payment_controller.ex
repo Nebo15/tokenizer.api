@@ -6,6 +6,7 @@ defmodule Tokenizer.Controllers.Payment do
 
   alias Tokenizer.DB.Models.Payment, as: PaymentSchema
   alias Tokenizer.Views.Payment, as: PaymentView
+  alias Tokenizer.DB.Repo
 
   @payment_token_prefix "payment"
 
@@ -17,18 +18,19 @@ defmodule Tokenizer.Controllers.Payment do
     |> put_payment_token
     |> validate_payment
     |> save_payment
-    |> send_response(conn)
+    |> send_response(:created, conn)
   end
 
-  # def show(conn, %{"id" => id}) do
-  #   Tokenizer.DB.Repo.get_by(Payment, external_id: id)
+  def show(conn, %{"id" => id, "token" => token}) do
+    PaymentSchema
+    |> Repo.get_by(id: id, token: token)
+    |> check_query_result
+    #|> update_payment_status TODO: get payment status and persist it
+    |> send_response(:ok, conn)
+  end
 
-  #   payment = Repo.get_by!(Payment, pay2you_id: id)
-  #   String.to_integer(id)
-  #   |> Pay2You.get_transfer_status
-  #   |> Mbill.Service.Payments.update_status(payment)
-  #   |> send_response(conn)
-  # end
+  defp check_query_result(nil), do: {:error, :not_found}
+  defp check_query_result(%PaymentSchema{} = payment), do: {:ok, payment}
 
   # def complete(conn, %{"id" => id, "code" => code}) do
   #   payment = Repo.get_by!(Payment, pay2you_id: id)
@@ -79,15 +81,21 @@ defmodule Tokenizer.Controllers.Payment do
   end
 
   # Responses
-  defp send_response({:ok, %PaymentSchema{} = payment}, conn) do
+  defp send_response({:ok, %PaymentSchema{} = payment}, status, conn) do
     conn
-    |> put_status(:created)
+    |> put_status(status)
     |> render(PaymentView, "payment.json", payment: payment)
   end
 
-  defp send_response({:error, :invalid, %Ecto.Changeset{} = changeset}, conn) do
+  defp send_response({:error, :invalid, %Ecto.Changeset{} = changeset}, _, conn) do
     conn
     |> put_status(422)
     |> render(EView.ValidationErrorView, "422.json", changeset)
+  end
+
+  defp send_response({:error, :not_found}, _, conn) do
+    conn
+    |> put_status(404)
+    |> render(EView.ErrorView, "404.json", %{})
   end
 end

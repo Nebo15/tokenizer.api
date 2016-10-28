@@ -23,11 +23,12 @@ defmodule Tokenizer.Router do
     # Create card tokens
     post "/tokens", Token, :create
 
-    # # Create and get payment
+    # Create and get payment
     post "/payments", Payment, :create
     get  "/payments/:id", Payment, :show
 
-    # # Complete payments
-    # post "/payments/:id/complete", Payment, :complete
+    # Complete payments
+    # post "/payments/:id/confirm", Payment, :confirm
+    # post "/payments/:id/receive", Payment, :receive
   end
 end

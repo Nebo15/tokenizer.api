@@ -43,6 +43,7 @@ defmodule Tokenizer.DB.Models.Payment do
 
     struct
     |> cast(params, [:amount, :fee, :description, :metadata])
+    |> cast_dynamic_embed(:auth)
     |> cast_embed(:sender, with: &Tokenizer.DB.Models.Peer.sender_changeset/2)
     |> cast_embed(:recipient, with: &Tokenizer.DB.Models.Peer.recipient_changeset/2)
     |> validate_required([:amount, :fee, :description, :sender, :recipient])

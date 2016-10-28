@@ -38,7 +38,7 @@ defmodule Tokenizer.DB.Models.Payment do
   It should be used to validate data that is sent by API consumers,
   so we don't force them to send internally required fields.
   """
-  def creation_changeset(struct, params \\ %{}) do
+  def changeset(struct, params \\ %{}) do
     limits = Confex.get(:tokenizer_api, :limits)
 
     struct
@@ -51,31 +51,6 @@ defmodule Tokenizer.DB.Models.Payment do
         less_than_or_equal_to: limits[:amount][:max])
     |> validate_number(:fee, greater_than: 0)
     |> validate_length(:description, max: 250)
-    |> validate_metadata(:metadata)
-  end
-
-  @doc """
-  Builds a changeset based on the `struct` and `params`.
-
-  It should be used in internal validations to make sure that payment is valid
-  when it's constructed from payment gateway response.
-  """
-  def changeset(struct, params \\ %{}) do
-    limits = Confex.get(:tokenizer_api, :limits)
-
-    struct
-    |> cast(params, [:amount, :fee, :description, :status, :external_id, :token, :token_expires_at, :metadata])
-    |> cast_dynamic_embed(:auth)
-    |> cast_embed(:sender, with: &Tokenizer.DB.Models.Peer.sender_changeset/2)
-    |> cast_embed(:recipient, with: &Tokenizer.DB.Models.Peer.recipient_changeset/2)
-    |> validate_required([:amount, :fee, :status, :auth, :external_id, :token, :token_expires_at, :sender, :recipient])
-    |> validate_number(:amount,
-        greater_than_or_equal_to: limits[:amount][:min],
-        less_than_or_equal_to: limits[:amount][:max])
-    |> validate_number(:fee, greater_than: 0)
-    |> validate_length(:description, max: 250)
-    |> unique_constraint(:external_id)
-    |> unique_constraint(:token)
     |> validate_metadata(:metadata)
   end
 end

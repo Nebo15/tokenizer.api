@@ -15,7 +15,7 @@ defmodule Tokenizer.DB.Models.CardToken do
   def changeset(struct, params \\ %{}) do
     struct
     |> cast(params, [:token, :token_expires_at])
-    |> validate_required([:token, :token_expires_at])
+    |> validate_required([:token])
     |> validate_expiration(:token_expires_at)
   end
 end

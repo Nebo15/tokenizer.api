@@ -73,6 +73,9 @@ config :tokenizer_api, :limits,
     percent: 0.5
   ]
 
+# TODO: webhook updates on payment status changes
+config :tokenizer_api, :webhooks,
+  payment_status: "http://example.com/"
 
 # It is also possible to import configuration files, relative to this
 # directory. For example, you can emulate configuration per environment

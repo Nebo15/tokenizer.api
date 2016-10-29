@@ -19,7 +19,7 @@ defmodule Tokenizer.DB.Changeset.Validators.Fee do
   end
 
   def calculate(amount, percent, fix, min, max) do
-    D.set_context(%D.Context{D.get_context | precision: 2, rounding: :half_up})
+    D.set_context(%D.Context{D.get_context | precision: 3, rounding: :half_up})
 
     amount
     |> calculate_body(percent, fix)

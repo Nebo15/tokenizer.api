@@ -15,5 +15,6 @@ defmodule Tokenizer.DB.Schemas.ExternalCredential do
     struct
     |> cast(params, [:id, :metadata])
     |> validate_required([:id])
+    |> validate_metadata(:metadata)
   end
 end

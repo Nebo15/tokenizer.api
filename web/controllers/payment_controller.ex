@@ -9,7 +9,7 @@ defmodule Tokenizer.Controllers.Payment do
   alias Tokenizer.CardStorage.Supervisor, as: CardStorage
   alias Tokenizer.DB.Repo
 
-  @payment_token_prefix "payment"
+  @payment_token_prefix "payment-token"
 
   # Actions
 

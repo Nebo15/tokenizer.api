@@ -8,7 +8,7 @@ defmodule Tokenizer.CardStorage.Supervisor do
   alias Tokenizer.DB.Schemas.Card
   alias Tokenizer.CardStorage.Encryptor
 
-  @token_prefix "card"
+  @token_prefix "card-token"
 
   def start_link do
     Supervisor.start_link(__MODULE__, [], name: __MODULE__)

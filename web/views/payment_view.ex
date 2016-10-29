@@ -7,6 +7,7 @@ defmodule Tokenizer.Views.Payment do
 
   def render("payment.json", %{payment: payment}) do
     %{id: payment.id,
+      external_id: payment.external_id,
       token: payment.token,
       token_expires_at: payment.token_expires_at,
       amount: payment.amount,

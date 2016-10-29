@@ -1,8 +1,8 @@
-defmodule Tokenizer.DB.Models.Peer do
+defmodule Tokenizer.DB.Schemas.Peer do
   @moduledoc """
   Model for transfer senders.
   """
-  use Tokenizer.Web, :model
+  use Tokenizer.Web, :schema
   import Tokenizer.DB.Changeset.DynamicEmbeds
   import Tokenizer.DB.Changeset.Validators.EmbedType
 

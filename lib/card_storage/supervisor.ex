@@ -5,7 +5,7 @@ defmodule Tokenizer.CardStorage.Supervisor do
   """
   use Supervisor
   require Logger
-  alias Tokenizer.DB.Models.Card
+  alias Tokenizer.DB.Schemas.Card
   alias Tokenizer.CardStorage.Encryptor
 
   @token_prefix "card"
@@ -43,7 +43,7 @@ defmodule Tokenizer.CardStorage.Supervisor do
     expires_at = Timex.now
     |> Timex.shift(microseconds: expires_in)
 
-    {:ok, %Tokenizer.DB.Models.CardToken{token: token, token_expires_at: expires_at}}
+    {:ok, %Tokenizer.DB.Schemas.CardToken{token: token, token_expires_at: expires_at}}
   end
 
   @doc """

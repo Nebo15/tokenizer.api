@@ -1,8 +1,8 @@
-defmodule Tokenizer.DB.Models.Authorization3DS do
+defmodule Tokenizer.DB.Schemas.Authorization3DS do
   @moduledoc """
   Model for 3D-Secure authorization response.
   """
-  use Tokenizer.Web, :model
+  use Tokenizer.Web, :schema
 
   @primary_key false
   embedded_schema do

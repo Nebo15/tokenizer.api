@@ -4,8 +4,8 @@ defmodule Tokenizer.Controllers.Token do
   """
 
   use Tokenizer.Web, :controller
-  alias Tokenizer.DB.Models.Card, as: CardModel
-  alias Tokenizer.DB.Models.CardToken, as: CardTokenModel
+  alias Tokenizer.DB.Schemas.Card, as: CardModel
+  alias Tokenizer.DB.Schemas.CardToken, as: CardTokenModel
   alias Tokenizer.Views.Token, as: TokenView
   alias Tokenizer.CardStorage.Supervisor, as: CardStorage
 

@@ -1,8 +1,8 @@
-defmodule Tokenizer.DB.Models.CardToken do
+defmodule Tokenizer.DB.Schemas.CardToken do
   @moduledoc """
   Model for sender cards.
   """
-  use Tokenizer.Web, :model
+  use Tokenizer.Web, :schema
   import Tokenizer.DB.Changeset.Validators.Expiration
 
   @primary_key false

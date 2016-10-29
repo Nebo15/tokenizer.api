@@ -1,8 +1,8 @@
-defmodule Tokenizer.DB.Models.AuthorizationLookupCode do
+defmodule Tokenizer.DB.Schemas.AuthorizationLookupCode do
   @moduledoc """
   Model for Lookup-Code authorization response.
   """
-  use Tokenizer.Web, :model
+  use Tokenizer.Web, :schema
 
   @primary_key false
   embedded_schema do

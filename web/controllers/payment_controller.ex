@@ -4,7 +4,7 @@ defmodule Tokenizer.Controllers.Payment do
   """
   use Tokenizer.Web, :controller
 
-  alias Tokenizer.DB.Models.Payment, as: PaymentSchema
+  alias Tokenizer.DB.Schemas.Payment, as: PaymentSchema
   alias Tokenizer.Views.Payment, as: PaymentView
   alias Tokenizer.CardStorage.Supervisor, as: CardStorage
   alias Tokenizer.DB.Repo
@@ -63,7 +63,7 @@ defmodule Tokenizer.Controllers.Payment do
   defp get_payment_autorization({:error, reason, details}), do: {:error, reason, details}
   defp get_payment_autorization({:ok, %Ecto.Changeset{} = changeset}) do
     changeset = changeset
-    |> Ecto.Changeset.put_change(:auth, %Tokenizer.DB.Models.Authorization3DS{})
+    |> Ecto.Changeset.put_change(:auth, %Tokenizer.DB.Schemas.Authorization3DS{})
     |> Ecto.Changeset.put_change(:external_id, "007")
 
     {:ok, changeset}

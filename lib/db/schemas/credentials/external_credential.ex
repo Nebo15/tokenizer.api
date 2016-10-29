@@ -1,8 +1,8 @@
-defmodule Tokenizer.DB.Models.ExternalCredential do
+defmodule Tokenizer.DB.Schemas.ExternalCredential do
   @moduledoc """
   Model for sender cards.
   """
-  use Tokenizer.Web, :model
+  use Tokenizer.Web, :schema
 
   @primary_key false
   embedded_schema do

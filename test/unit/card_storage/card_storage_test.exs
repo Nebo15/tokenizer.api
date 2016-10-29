@@ -1,6 +1,6 @@
 defmodule Tokenizer.CardStorage.SupervisorTest do
   use ExUnit.Case
-  alias Tokenizer.DB.Models.Card
+  alias Tokenizer.DB.Schemas.Card
   alias Tokenizer.CardStorage.Supervisor, as: CardStorage
 
   @card %Card{

@@ -61,16 +61,17 @@ config :tokenizer_api,
 config :tokenizer_api,
   :payment_token_expires_in, {:system, :integer, "PAYMENT_TOKEN_EXPIRES_IN", 900_000} # 15 minutes
 
-config :tokenizer_api, :limits,
+config :tokenizer_api, :limits, # TODO: Move to envs
   amount: [
     min: 1,
     max: 15000
-  ],
-  fee: [
-    min: 1,
-    max: :infinity,
+  ]
+
+config :tokenizer_api, :fees, [ # TODO: Move to envs
+    percent: 0.5,
     fix: 5,
-    percent: 0.5
+    min: 5,
+    max: :infinity
   ]
 
 # TODO: webhook updates on payment status changes

@@ -5,7 +5,7 @@ defmodule Tokenizer.Controllers.TokenTest do
     endpoint: Tokenizer.HTTP.Endpoint,
     repo: Tokenizer.DB.Repo
 
-  alias Tokenizer.DB.Models.Card
+  alias Tokenizer.DB.Schemas.Card
 
   @token_prefix "card"
 

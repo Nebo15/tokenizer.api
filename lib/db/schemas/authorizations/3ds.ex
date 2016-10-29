@@ -6,7 +6,7 @@ defmodule Tokenizer.DB.Schemas.Authorization3DS do
 
   @primary_key false
   embedded_schema do
-    field :type, Tokenizer.DB.Enums.AuthTypes, default: "3d_secure"
+    field :type, Tokenizer.DB.Enums.AuthTypes, default: "3d-secure"
     field :acs_url, :string
     field :pa_req, :string
     field :terminal_url, :string

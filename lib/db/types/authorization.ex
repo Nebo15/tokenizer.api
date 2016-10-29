@@ -7,9 +7,9 @@ defmodule Tokenizer.DB.Types.Authorization do
   # @doc """
   # Returns related struct based on data structure.
   # """
-  def resolve(%{type: "3d_secure"}),
+  def resolve(%{type: "3d-secure"}),
     do: {:ok, Tokenizer.DB.Schemas.Authorization3DS}
-  def resolve(%{type: "lookup_code"}),
+  def resolve(%{type: "lookup-code"}),
     do: {:ok, Tokenizer.DB.Schemas.AuthorizationLookupCode}
   def resolve(_),
     do: {:error, :unkown_type}

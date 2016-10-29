@@ -106,7 +106,7 @@ defmodule Tokenizer.Controllers.PaymentTest do
         "id" => _,
         "amount" => _,
         "fee" => _,
-        "auth" => %{"acs_url" => nil, "md" => nil, "pa_req" => nil, "terminal_url" => nil, "type" => "3d_secure"},
+        "auth" => %{"acs_url" => nil, "md" => nil, "pa_req" => nil, "terminal_url" => nil, "type" => "3d-secure"},
         "description" => "some content",
         "status" => "authorization",
         "token" => _,

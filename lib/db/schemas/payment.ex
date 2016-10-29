@@ -7,7 +7,6 @@ defmodule Tokenizer.DB.Schemas.Payment do
   import Tokenizer.DB.Changeset.Validators.Fee
 
   schema "payments" do
-    field :external_id, :string
     field :token, :string
     field :token_expires_at, Timex.Ecto.DateTime
     field :amount, :decimal

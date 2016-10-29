@@ -3,7 +3,6 @@ defmodule Mbill.Repo.Migrations.CreatePayment do
 
   def change do
     create table(:payments) do
-      add :external_id, :string
       add :token, :string
       add :token_expires_at, :utc_datetime
       add :amount, :decimal, precision: 19, scale: 2
@@ -18,7 +17,6 @@ defmodule Mbill.Repo.Migrations.CreatePayment do
       timestamps()
     end
 
-    create unique_index(:payments, [:external_id])
     create unique_index(:payments, [:token])
   end
 end

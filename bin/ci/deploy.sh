@@ -14,17 +14,21 @@ fi
 PROJECT_NAME=$(sed -n 's/.*app: :\([^, ]*\).*/\1/pg' "${PROJECT_DIR}/mix.exs")
 PROJECT_VERSION=$(sed -n 's/.*@version "\([^"]*\)".*/\1/pg' "${PROJECT_DIR}/mix.exs")
 
-echo "Logging in into Heroku";
 heroku plugins:install heroku-container-registry
-heroku login
+
+echo "Logging in into Heroku";
+heroku auth:login
 heroku container:login
 
 if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
   if [ "$TRAVIS_BRANCH" == "$RELEASE_BRANCH" ]; then
+
+    echo "Tagging container to a Heroku CE";
     docker tag "${PROJECT_NAME}:${PROJECT_VERSION}" "registry.heroku.com/${PROJECT_NAME}/web"
   fi;
 
   if [[ "$MAIN_BRANCHES" =~ "$TRAVIS_BRANCH" ]]; then
+    echo "Pushing container to a Heroku CE";
     docker push "registry.heroku.com/${PROJECT_NAME}/web"
   fi;
 fi;

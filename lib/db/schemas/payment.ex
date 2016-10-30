@@ -9,7 +9,7 @@ defmodule Tokenizer.DB.Schemas.Payment do
   schema "payments" do
     field :external_id, :string
     field :token, :string
-    field :token_expires_at, Timex.Ecto.DateTime
+    field :token_expires_at, :utc_datetime
     field :amount, :decimal
     field :fee, :decimal
     field :description, :string

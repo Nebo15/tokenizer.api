@@ -25,7 +25,7 @@ defmodule Tokenizer.Mixfile do
   # Type "mix help compile.app" for more information
   def application do
     [applications: [:logger, :phoenix, :phoenix_ecto, :cowboy, :httpoison, :poison,
-                    :ecto, :postgrex, :ecto_enum, :timex, :timex_ecto],
+                    :ecto, :postgrex, :ecto_enum, :timex],
      included_applications: [:credit_card, :confex, :eview],
      mod: {Tokenizer, []}]
   end
@@ -60,7 +60,6 @@ defmodule Tokenizer.Mixfile do
      {:phoenix, "~> 1.2"},
      {:credit_card, "~> 1.0"},
      {:timex, "~> 3.0"},
-     {:timex_ecto, "~> 3.0"},
      {:phoenix_ecto, "3.1.0-rc.0"}, # TODO: Update when Ecto will release v2.1
      {:ex_doc, ">= 0.0.0", only: [:dev, :test]},
      {:excoveralls, "~> 0.5", only: [:dev, :test]},

@@ -9,7 +9,7 @@ defmodule Tokenizer.DB.Schemas.CardToken do
   embedded_schema do
     field :type, Tokenizer.DB.Enums.AccountCredential, default: "card-token"
     field :token, :string
-    field :token_expires_at, Timex.Ecto.DateTime
+    field :token_expires_at, :utc_datetime
   end
 
   def changeset(struct, params \\ %{}) do

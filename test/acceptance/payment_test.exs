@@ -3,7 +3,8 @@ defmodule Tokenizer.Controllers.PaymentTest do
     async: true,
     otp_app: :tokenizer_api,
     endpoint: Tokenizer.HTTP.Endpoint,
-    repo: Tokenizer.DB.Repo
+    repo: Tokenizer.DB.Repo,
+    headers: [{"authorization", "Basic " <> Base.encode64("DGRsMpXDCj:")}]
 
   @card_credential %{
     type: "card",
@@ -180,10 +181,10 @@ defmodule Tokenizer.Controllers.PaymentTest do
       |> post!(construct_payment())
       |> get_body()
 
-      path = "payments/" <> to_string(id) <> "?token=" <> token
+      path = "payments/" <> to_string(id)
 
       path
-      |> get!
+      |> get!([{"authorization", "Basic " <> Base.encode64("DGRsMpXDCj:" <> token)}])
       |> assert_payment
     end
 
@@ -192,21 +193,20 @@ defmodule Tokenizer.Controllers.PaymentTest do
       |> post!(construct_payment())
       |> get_body()
 
-      path = "payments/" <> to_string(id) <> "?token=invalid_token"
+      path = "payments/" <> to_string(id)
 
       %{"meta" => %{"code" => 401},
         "error" => %{"type" => "access_denied"}} = path
-      |> get!
+      |> get!([{"authorization", "Basic " <> Base.encode64("DGRsMpXDCj:invalid_token")}])
       |> get_body
     end
 
     test "404 for non-existent payments" do
-      path = "payments/0?token=unknown"
+      path = "payments/0"
 
       %{"meta" => %{"code" => 404}} = path
       |> get!
       |> get_body
     end
-
   end
 end

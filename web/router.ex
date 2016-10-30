@@ -12,9 +12,7 @@ defmodule Tokenizer.Router do
   pipeline :api do
     plug :accepts, ["json"]
     plug :put_secure_browser_headers
-
-    # You can allow JSONP requests by uncommenting this line:
-    # plug :allow_jsonp
+    plug Tokenizer.HTTP.Plugs.Authorization
   end
 
   scope "/", Tokenizer.Controllers do
@@ -28,7 +26,7 @@ defmodule Tokenizer.Router do
     get  "/payments/:id", Payment, :show
 
     # Complete payments
-    # post "/payments/:id/confirm", Payment, :confirm
-    # post "/payments/:id/receive", Payment, :receive
+    # post "/payments/:id/auth", PaymentAuthorization, :authorize
+    # post "/payments/:id/claim", Payment, :claim
   end
 end

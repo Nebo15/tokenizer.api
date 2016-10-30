@@ -3,7 +3,8 @@ defmodule Tokenizer.Controllers.TokenTest do
     async: true,
     otp_app: :tokenizer_api,
     endpoint: Tokenizer.HTTP.Endpoint,
-    repo: Tokenizer.DB.Repo
+    repo: Tokenizer.DB.Repo,
+    headers: [{"authorization", "Basic " <> Base.encode64("DGRsMpXDCj:")}]
 
   alias Tokenizer.DB.Schemas.Card
 

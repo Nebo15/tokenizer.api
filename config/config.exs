@@ -74,6 +74,11 @@ config :tokenizer_api, :fees, [ # TODO: Move to envs
     max: :infinity
   ]
 
+# Authorized consumers
+config :tokenizer_api, :consumer_tokens, [
+    {:system, "CONSUMER_TOKEN", "DGRsMpXDCj"}
+  ]
+
 # TODO: webhook updates on payment status changes
 config :tokenizer_api, :webhooks,
   payment_status: "http://example.com/"

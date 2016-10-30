@@ -93,7 +93,7 @@ defmodule Tokenizer.Controllers.Payment do
   @doc """
   GET /payments/:id?token=token
   """
-  def show(conn, %{"id" => id, "token" => token}) do
+  def show(%Plug.Conn{assigns: %{payment_token: token}} = conn, %{"id" => id}) do
     PaymentSchema
     |> Repo.get_by(id: id)
     |> check_query_result

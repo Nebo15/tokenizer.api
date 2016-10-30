@@ -18,6 +18,7 @@ heroku plugins:install heroku-container-registry
 
 echo "Logging in into Heroku";
 heroku container:login
+docker login --email=_ --username=_ --password=$(heroku auth:token) registry.heroku.com
 
 if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
   if [ "$TRAVIS_BRANCH" == "$RELEASE_BRANCH" ]; then

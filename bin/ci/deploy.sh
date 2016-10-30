@@ -17,7 +17,6 @@ PROJECT_VERSION=$(sed -n 's/.*@version "\([^"]*\)".*/\1/pg' "${PROJECT_DIR}/mix.
 heroku plugins:install heroku-container-registry
 
 echo "Logging in into Heroku";
-heroku auth:login
 heroku container:login
 
 if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then

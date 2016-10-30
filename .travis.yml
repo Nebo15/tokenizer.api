@@ -51,9 +51,11 @@ script:
   - sleep 5
   - docker ps
   - RUNNING_CONTAINERS=`docker ps | wc -l`;
-  - if [ "${RUNNING_CONTAINERS//[[:space:]]/}" == "1" ]; then echo "[E] Container is not started!" exit 1; fi;
+  - bash -x if [ "${RUNNING_CONTAINERS//[[:space:]]/}" == "1" ]; then echo "[E] Container is not started!"; exit 1; fi;
   # Run acceptance tests on Docker container
-  - "MIX_TEST_HOST=localhost MIX_TEST_PORT=4000 mix test test/acceptance"
+  - "MIX_TEST_HOST=localhost CONTAINER_HTTP_PORT=4000 mix test test/acceptance"
+after_failure:
+  - docker logs tokenizer_api --details --since 5h
 after_success:
   - ./bin/ci/push.sh
   - ./bin/ci/deploy.sh

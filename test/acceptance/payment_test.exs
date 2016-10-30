@@ -18,62 +18,6 @@ defmodule Tokenizer.Controllers.PaymentTest do
     number: "5473959513413611"
   }
 
-  @payment_raw_invalid %{
-    amount: 1000,
-    fee: "10",
-    description: "some content",
-    metadata: %{
-      feel_free: "to set any metadata"
-    },
-    recipient: %{
-      phone: "+380631112233",
-      email: "ivan@example.com",
-      credential: %{
-        type: "card-number",
-        number: "1473959513413611"
-      }
-    },
-    sender: %{
-      phone: "+380631112233",
-      email: "ivan@example.com",
-      credential: %{
-        type: "card",
-        number: "5473959513413611",
-        cvv: "160",
-        expiration_month: "01",
-        expiration_year: "20"
-      }
-    }
-  }
-
-  @payment_raw_invalid_type %{
-    amount: 1000,
-    fee: "10",
-    description: "some content",
-    metadata: %{
-      feel_free: "to set any metadata"
-    },
-    recipient: %{
-      phone: "+380631112233",
-      email: "ivan@example.com",
-      credential: %{
-        type: "card",
-        number: "5473959513413611",
-        cvv: "160",
-        expiration_month: "01",
-        expiration_year: "2020"
-      }
-    },
-    sender: %{
-      phone: "+380631112233",
-      email: "ivan@example.com",
-      credential: %{
-        type: "card-number",
-        number: "5473959513413611"
-      }
-    }
-  }
-
   defp construct_payment(sender_credential \\ @card_credential, recipient_credential \\ @card_number_credential) do
     %{
       amount: 1000,

@@ -27,6 +27,7 @@ defmodule Tokenizer.Controllers.Payment do
   end
 
   # Payment Gateway delegates
+  # TODO: resolve recipients token
   defp resolve_credential_token(%Ecto.Changeset{valid?: false} = changeset), do: {:error, :invalid, changeset}
   defp resolve_credential_token(%Ecto.Changeset{valid?: true, changes: %{sender: %{
                                                                 changes: %{credential: %{
@@ -51,7 +52,7 @@ defmodule Tokenizer.Controllers.Payment do
         changeset = changeset
         |> Ecto.Changeset.put_embed(:sender, sender)
 
-        {:error, :token_invalid, changeset}
+        {:error, :invalid, changeset}
     end
   end
   defp resolve_credential_token(%Ecto.Changeset{valid?: true, changes: %{sender: %{
@@ -113,29 +114,11 @@ defmodule Tokenizer.Controllers.Payment do
     {:error, :access_denied}
   end
 
-  # def complete(conn, %{"id" => id, "code" => code}) do
-  #   payment = Repo.get_by!(Payment, pay2you_id: id)
-  #   Pay2You.complete_transfer(payment.auth["md"], code)
-  #   |> Mbill.Service.Payments.update_status(payment)
-  #   |> send_response(conn)
-  # end
-
-  # def complete(conn, _params) do
-  #   # ToDo: render 422 error
-  #   render conn, Mbill.ErrorView, "404.json"
-  # end
-
   # Responses
   defp send_response({:ok, %PaymentSchema{} = payment}, status, conn) do
     conn
     |> put_status(status)
     |> render(PaymentView, "payment.json", payment: payment)
-  end
-
-  defp send_response({:error, :token_invalid, %Ecto.Changeset{} = changeset}, _, conn) do
-    conn
-    |> put_status(422)
-    |> render(EView.ValidationErrorView, "422.json", changeset)
   end
 
   defp send_response({:error, :invalid, %Ecto.Changeset{} = changeset}, _, conn) do

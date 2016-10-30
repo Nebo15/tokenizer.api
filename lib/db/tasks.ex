@@ -38,9 +38,8 @@ defmodule :tokenizer_api_tasks do
   end
 
   defp start_repo(repo) do
-    load_app
-    # If you don't include Repo in application supervisor start it here manually
-    # repo.start_link()
+    load_app()
+    repo.start_link()
     repo
   end
 

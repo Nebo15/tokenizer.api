@@ -71,6 +71,9 @@ config :tokenizer_api,
 #
 config :phoenix, :serve_endpoints, true
 
+# Allow to run concurrent acceptance tests on container
+config :tokenizer_api, sql_sandbox: {:system, :boolean, "SQL_SANDBOX", false}
+
 #
 # Alternatively, you can configure exactly which server to
 # start per endpoint:

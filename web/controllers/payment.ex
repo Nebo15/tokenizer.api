@@ -64,9 +64,13 @@ defmodule Tokenizer.Controllers.Payment do
 
   defp get_payment_autorization({:error, reason, details}), do: {:error, reason, details}
   defp get_payment_autorization({:ok, %Ecto.Changeset{} = changeset}) do
+    external_id = 10000
+    |> :rand.uniform()
+    |> to_string
+
     changeset = changeset
     |> Ecto.Changeset.put_change(:auth, %Tokenizer.DB.Schemas.Authorization3DS{})
-    |> Ecto.Changeset.put_change(:external_id, "007")
+    |> Ecto.Changeset.put_change(:external_id, external_id)
 
     {:ok, changeset}
   end

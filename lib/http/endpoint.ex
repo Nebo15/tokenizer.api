@@ -8,7 +8,6 @@ defmodule Tokenizer.HTTP.Endpoint do
 
   # Allow acceptance tests to run in concurrent mode
   if Confex.get(:tokenizer_api, :sql_sandbox) do
-    Logger.warn("This endpoint is running in SQL Sandbox mode, don't enable it on production!")
     plug Phoenix.Ecto.SQL.Sandbox
   end
 

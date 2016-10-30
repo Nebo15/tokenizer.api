@@ -25,8 +25,7 @@ defmodule Tokenizer.Mixfile do
   # Type "mix help compile.app" for more information
   def application do
     [applications: [:logger, :phoenix, :phoenix_ecto, :cowboy, :httpoison, :poison,
-                    :ecto, :postgrex, :ecto_enum, :timex],
-     included_applications: [:credit_card, :confex, :eview],
+                    :ecto, :postgrex, :ecto_enum, :timex, :credit_card, :confex, :eview],
      mod: {Tokenizer, []}]
   end
 
@@ -49,18 +48,18 @@ defmodule Tokenizer.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [{:distillery, "~> 0.10"},
+     {:phoenix, "~> 1.2"},
+     {:phoenix_ecto, "3.1.0-rc.0"}, # TODO: Update when Ecto will release v2.1
+     {:ecto, "2.1.0-rc.3", override: true}, # TODO: Update when Ecto will release v2.1
+     {:ecto_enum, github: "gjaldon/ecto_enum", branch: "ecto-2.0"},
+     {:postgrex, "~> 0.12", override: true},
      {:confex, "~> 1.4"},
      {:eview, "~> 0.2.1"},
-     {:ecto, "2.1.0-rc.3", override: true}, # TODO: Update when Ecto will release v2.1
-     {:postgrex, "~> 0.12", override: true},
      {:cowboy, "~> 1.0"},
+     {:poison, "~> 2.2"},
      {:httpoison, "~> 0.9.2"},
-     {:poison, "~> 3.0", override: true},
-     {:ecto_enum, git: "https://github.com/gjaldon/ecto_enum", branch: "ecto-2.0", override: true},
-     {:phoenix, "~> 1.2"},
      {:credit_card, "~> 1.0"},
      {:timex, "~> 3.0"},
-     {:phoenix_ecto, "3.1.0-rc.0"}, # TODO: Update when Ecto will release v2.1
      {:ex_doc, ">= 0.0.0", only: [:dev, :test]},
      {:excoveralls, "~> 0.5", only: [:dev, :test]},
      {:dogma, "> 0.1.0", only: [:dev, :test]},

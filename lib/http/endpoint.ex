@@ -4,9 +4,11 @@ defmodule Tokenizer.HTTP.Endpoint do
   """
 
   use Phoenix.Endpoint, otp_app: :tokenizer_api
+  require Logger
 
   # Allow acceptance tests to run in concurrent mode
   if Application.get_env(:tokenizer_api, :sql_sandbox) do
+    Logger.warn("This endpoint is running in SQL Sandbox mode, don't enable it on production!")
     plug Phoenix.Ecto.SQL.Sandbox
   end
 

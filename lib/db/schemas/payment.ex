@@ -56,5 +56,6 @@ defmodule Tokenizer.DB.Schemas.Payment do
     |> validate_length(:description, max: 250)
     |> validate_fee(:amount, :fee, fees)
     |> validate_metadata(:metadata)
+    |> unique_constraint(:external_id)
   end
 end

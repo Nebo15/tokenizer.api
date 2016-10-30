@@ -32,7 +32,8 @@ defmodule Tokenizer.Controllers.Payment do
   defp resolve_credential_token(%Ecto.Changeset{valid?: true, changes: %{sender: %{
                                                                 changes: %{credential: %{
                                                                   changes: %{token: token},
-                                                                  data: %{type: "card-token"}} = credential}} = sender}} = changeset) do
+                                                                  data: %{type: "card-token"}} = credential}
+                                                                } = sender}} = changeset) do
     case CardStorage.get_card(token) do
       {:ok, card_data} ->
         sender = sender
@@ -98,7 +99,7 @@ defmodule Tokenizer.Controllers.Payment do
     |> Repo.get_by(id: id)
     |> check_query_result
     |> validate_token(token)
-    #|> update_payment_status TODO: get payment status and persist it
+    # |> update_payment_status TODO: get payment status and persist it
     |> send_response(:ok, conn)
   end
 

@@ -1,4 +1,7 @@
 defmodule Tokenizer.HTTP.Plugs.Authorization do
+  @moduledoc """
+  This plug implements token based consumer authentication on top of HTTP Basic Auth.
+  """
   alias Plug.Conn
 
   @auhtorization_type "Basic"
@@ -39,10 +42,6 @@ defmodule Tokenizer.HTTP.Plugs.Authorization do
   defp assert_consumer_token({conn, [consumer_token, _payment_token] = credentials}, consumer_tokens) do
     case Enum.find(consumer_tokens, &(&1 == consumer_token)) do
       nil ->
-        IO.inspect "not found"
-        IO.inspect consumer_token
-        IO.inspect "in"
-        IO.inspect consumer_tokens
         {render(conn, "401.json"), :unathorized}
       _ ->
         {conn, credentials}

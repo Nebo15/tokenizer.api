@@ -9,17 +9,26 @@ defmodule Tokenizer.Router do
 
   use Tokenizer.Web, :router
 
-  pipeline :api do
+  pipeline :public_api do
+    plug :accepts, ["json"]
+    plug :put_secure_browser_headers
+  end
+
+  pipeline :private_api do
     plug :accepts, ["json"]
     plug :put_secure_browser_headers
     plug Tokenizer.HTTP.Plugs.Authorization
   end
 
-  scope "/", Tokenizer.Controllers do
-    pipe_through :api
+  scope "/tokens", Tokenizer.Controllers do
+    pipe_through :public_api
 
     # Create card tokens
-    post "/tokens", Token, :create
+    post "/", Token, :create
+  end
+
+  scope "/", Tokenizer.Controllers do
+    pipe_through :private_api
 
     # Create and get payment
     post "/payments", Payment, :create

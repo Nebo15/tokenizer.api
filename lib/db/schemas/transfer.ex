@@ -1,19 +1,19 @@
-defmodule Tokenizer.DB.Schemas.Payment do
+defmodule Tokenizer.DB.Schemas.Transfer do
   @moduledoc """
-  Model for payments.
+  Model for transfers.
   """
   use Tokenizer.Web, :schema
   import Tokenizer.DB.Changeset.DynamicEmbeds
   import Tokenizer.DB.Changeset.Validators.Fee
 
-  schema "payments" do
+  schema "transfers" do
     field :external_id, :string
     field :token, :string
     field :token_expires_at, :utc_datetime
     field :amount, :decimal
     field :fee, :decimal
     field :description, :string
-    field :status, Tokenizer.DB.Enums.PaymentStatuses, default: :authorization
+    field :status, Tokenizer.DB.Enums.TransferStatuses, default: :authorization
     field :auth, Tokenizer.DB.Types.Authorization
     field :metadata, :map
     embeds_one :sender, Tokenizer.DB.Schemas.Peer
@@ -28,7 +28,7 @@ defmodule Tokenizer.DB.Schemas.Payment do
     |> Tokenizer.DB.Repo.insert
   end
 
-  def insert(%Tokenizer.DB.Schemas.Payment{} = struct) do
+  def insert(%Tokenizer.DB.Schemas.Transfer{} = struct) do
     struct
     |> Tokenizer.DB.Repo.insert
   end
@@ -56,6 +56,6 @@ defmodule Tokenizer.DB.Schemas.Payment do
     |> validate_length(:description, max: 250)
     |> validate_fee(:amount, :fee, fees)
     |> validate_metadata(:metadata)
-    |> unique_constraint(:external_id, name: :payments_external_id_index)
+    |> unique_constraint(:external_id, name: :transfers_external_id_index)
   end
 end

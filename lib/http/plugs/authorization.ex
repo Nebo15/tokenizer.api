@@ -35,11 +35,11 @@ defmodule Tokenizer.HTTP.Plugs.Authorization do
   defp decode_credentials({conn, :error}), do: {conn, :unathorized}
   defp decode_credentials({conn, :unathorized}), do: {conn, :unathorized}
   defp decode_credentials({conn, credentials}) do
-    {conn, destructure([_consumer_token, _payment_token], String.split(credentials, ":"))}
+    {conn, destructure([_consumer_token, _transfer_token], String.split(credentials, ":"))}
   end
 
   defp assert_consumer_token({conn, :unathorized}, _), do: {render(conn, "401.json"), :unathorized}
-  defp assert_consumer_token({conn, [consumer_token, _payment_token] = credentials}, consumer_tokens) do
+  defp assert_consumer_token({conn, [consumer_token, _transfer_token] = credentials}, consumer_tokens) do
     case Enum.find(consumer_tokens, &(&1 == consumer_token)) do
       nil ->
         {render(conn, "401.json"), :unathorized}
@@ -49,10 +49,10 @@ defmodule Tokenizer.HTTP.Plugs.Authorization do
   end
 
   defp put_assigns({conn, :unathorized}), do: conn
-  defp put_assigns({conn, [consumer_token, payment_token]}) do
+  defp put_assigns({conn, [consumer_token, transfer_token]}) do
     conn
     |> Conn.assign(:consumer_token, consumer_token)
-    |> Conn.assign(:payment_token, payment_token)
+    |> Conn.assign(:transfer_token, transfer_token)
   end
 
   defp render(conn, "401.json") do

@@ -1,8 +1,8 @@
 import EctoEnum
 
 # loans
-defenum Tokenizer.DB.Enums.PaymentStatuses,
-  :payment_status, ["authorization", "completed", "processing", "declined", "error"]
+defenum Tokenizer.DB.Enums.TransferStatuses,
+  :transfer_status, ["authorization", "completed", "processing", "declined", "error"]
 
 defenum Tokenizer.DB.Enums.AuthTypes,
   :auth_type, ["3d-secure", "lookup-code"]

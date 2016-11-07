@@ -1,8 +1,8 @@
-defmodule Mbill.Repo.Migrations.CreatePayment do
+defmodule Mbill.Repo.Migrations.CreateTransfer do
   use Ecto.Migration
 
   def change do
-    create table(:payments) do
+    create table(:transfers) do
       add :external_id, :string
       add :token, :string
       add :token_expires_at, :utc_datetime
@@ -18,7 +18,7 @@ defmodule Mbill.Repo.Migrations.CreatePayment do
       timestamps()
     end
 
-    create unique_index(:payments, [:external_id])
-    create unique_index(:payments, [:token])
+    create unique_index(:transfers, [:external_id])
+    create unique_index(:transfers, [:token])
   end
 end

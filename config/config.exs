@@ -59,7 +59,7 @@ config :tokenizer_api,
   card_data_encryption_key: {:system, "CARD_DATA_ENCRYPTION_KEY", "7AHw1Xitrf/YpLsL"}
 
 config :tokenizer_api,
-  :payment_token_expires_in, {:system, :integer, "PAYMENT_TOKEN_EXPIRES_IN", 900_000} # 15 minutes
+  :transfer_token_expires_in, {:system, :integer, "PAYMENT_TOKEN_EXPIRES_IN", 900_000} # 15 minutes
 
 config :tokenizer_api, :limits, # TODO: Move to envs
   amount: [
@@ -79,9 +79,9 @@ config :tokenizer_api, :consumer_tokens, [
     {:system, "CONSUMER_TOKEN", "DGRsMpXDCj"}
   ]
 
-# TODO: webhook updates on payment status changes
+# TODO: webhook updates on transfer status changes
 config :tokenizer_api, :webhooks,
-  payment_status: "http://example.com/"
+  transfer_status: "http://example.com/"
 
 # It is also possible to import configuration files, relative to this
 # directory. For example, you can emulate configuration per environment

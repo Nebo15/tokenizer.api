@@ -1,4 +1,4 @@
-defmodule Tokenizer.Controllers.PaymentTest do
+defmodule Tokenizer.Controllers.TransferTest do
   use EView.AcceptanceCase,
     async: true,
     otp_app: :tokenizer_api,
@@ -19,7 +19,7 @@ defmodule Tokenizer.Controllers.PaymentTest do
     number: "5473959513413611"
   }
 
-  defp construct_payment(sender_credential \\ @card_credential, recipient_credential \\ @card_number_credential) do
+  defp construct_transfer(sender_credential \\ @card_credential, recipient_credential \\ @card_number_credential) do
     %{
       amount: 1000,
       fee: "10",
@@ -40,7 +40,7 @@ defmodule Tokenizer.Controllers.PaymentTest do
     }
   end
 
-  defp assert_payment(resp) do
+  defp assert_transfer(resp) do
     resp_body = get_body(resp)
 
     assert %{
@@ -57,7 +57,7 @@ defmodule Tokenizer.Controllers.PaymentTest do
         "status" => "authorization",
         "token" => _,
         "token_expires_at" => _,
-        "type" => "payment",
+        "type" => "transfer",
         "metadata" => %{"feel_free" => "to set any metadata"},
         "recipient" => %{"credential" => _, "email" => "ivan@example.com", "phone" => "+380631112233"},
         "sender" => %{"credential" => _, "email" => "ivan@example.com", "phone" => "+380631112233"},
@@ -69,11 +69,11 @@ defmodule Tokenizer.Controllers.PaymentTest do
     resp_body
   end
 
-  describe "POST /payments" do
+  describe "POST /transfers" do
     test "with raw data" do
-      resp = "payments"
-      |> post!(construct_payment())
-      |> assert_payment()
+      resp = "transfers"
+      |> post!(construct_transfer())
+      |> assert_transfer()
 
       assert %{
         "meta" => %{
@@ -91,9 +91,9 @@ defmodule Tokenizer.Controllers.PaymentTest do
       |> post!(@card_credential)
       |> get_body
 
-      resp = "payments"
-      |> post!(construct_payment(%{type: "card-token", token: token}))
-      |> assert_payment()
+      resp = "transfers"
+      |> post!(construct_transfer(%{type: "card-token", token: token}))
+      |> assert_transfer()
 
       assert %{
         "meta" => %{
@@ -107,8 +107,8 @@ defmodule Tokenizer.Controllers.PaymentTest do
     end
 
     test "with invalid card token" do
-      resp = "payments"
-      |> post!(construct_payment(%{type: "card-token", token: "invalid_token"}))
+      resp = "transfers"
+      |> post!(construct_transfer(%{type: "card-token", token: "invalid_token"}))
       |> get_body()
 
       assert %{
@@ -125,8 +125,8 @@ defmodule Tokenizer.Controllers.PaymentTest do
     end
 
     test "with invalid credential type" do
-      resp = "payments"
-      |> post!(construct_payment(
+      resp = "transfers"
+      |> post!(construct_transfer(
         %{type: "card-number", number: "5473959513413611"},
         %{type: "card", number: "5473959513413611", cvv: "160", expiration_month: "01", expiration_year: "2020"}
       ))
@@ -150,8 +150,8 @@ defmodule Tokenizer.Controllers.PaymentTest do
     end
 
     test "with invalid card data" do
-      resp = "payments"
-      |> post!(construct_payment(
+      resp = "transfers"
+      |> post!(construct_transfer(
         %{type: "card", number: "5473959513413611", cvv: "160", expiration_month: "01", expiration_year: "20"},
         %{type: "card-number", number: "1473959513413611"}
       ))
@@ -175,25 +175,25 @@ defmodule Tokenizer.Controllers.PaymentTest do
     end
   end
 
-  describe "GET /payments/:id" do
+  describe "GET /transfers/:id" do
     test "200" do
-      %{"data" => %{"id" => id, "token" => token}} = "payments"
-      |> post!(construct_payment())
+      %{"data" => %{"id" => id, "token" => token}} = "transfers"
+      |> post!(construct_transfer())
       |> get_body()
 
-      path = "payments/" <> to_string(id)
+      path = "transfers/" <> to_string(id)
 
       path
       |> get!([{"authorization", "Basic " <> Base.encode64("DGRsMpXDCj:" <> token)}])
-      |> assert_payment
+      |> assert_transfer
     end
 
     test "401 when token is invalid" do
-      %{"data" => %{"id" => id}} = "payments"
-      |> post!(construct_payment())
+      %{"data" => %{"id" => id}} = "transfers"
+      |> post!(construct_transfer())
       |> get_body()
 
-      path = "payments/" <> to_string(id)
+      path = "transfers/" <> to_string(id)
 
       %{"meta" => %{"code" => 401},
         "error" => %{"type" => "access_denied"}} = path
@@ -201,8 +201,8 @@ defmodule Tokenizer.Controllers.PaymentTest do
       |> get_body
     end
 
-    test "404 for non-existent payments" do
-      path = "payments/0"
+    test "404 for non-existent transfers" do
+      path = "transfers/0"
 
       %{"meta" => %{"code" => 404}} = path
       |> get!

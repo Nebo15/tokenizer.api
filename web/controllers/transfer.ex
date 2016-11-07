@@ -1,32 +1,32 @@
-defmodule Tokenizer.Controllers.Payment do
+defmodule Tokenizer.Controllers.Transfer do
   @moduledoc """
-  This controller implements REST API to send different kins of payments and fetch information about them.
+  This controller implements REST API to send different kins of transfers and fetch information about them.
   """
   use Tokenizer.Web, :controller
 
-  alias Tokenizer.DB.Schemas.Payment, as: PaymentSchema
-  alias Tokenizer.Views.Payment, as: PaymentView
+  alias Tokenizer.DB.Schemas.Transfer, as: TransferSchema
+  alias Tokenizer.Views.Transfer, as: TransferView
   alias Tokenizer.CardStorage.Supervisor, as: CardStorage
   alias Tokenizer.DB.Repo
 
-  @payment_token_prefix "payment-token"
+  @transfer_token_prefix "transfer-token"
 
   # Actions
 
   @doc """
-  POST /payments
+  POST /transfers
   """
   def create(conn, params) when is_map(params) do
-    %PaymentSchema{}
-    |> PaymentSchema.changeset(params)
+    %TransferSchema{}
+    |> TransferSchema.changeset(params)
     |> resolve_credential_token
-    |> get_payment_autorization
-    |> put_payment_token
-    |> save_payment
+    |> get_transfer_autorization
+    |> put_transfer_token
+    |> save_transfer
     |> send_response(:created, conn)
   end
 
-  # Payment Gateway delegates
+  # Transfer Gateway delegates
   # TODO: resolve recipients token
   defp resolve_credential_token(%Ecto.Changeset{valid?: false} = changeset), do: {:error, :invalid, changeset}
   defp resolve_credential_token(%Ecto.Changeset{valid?: true, changes: %{sender: %{
@@ -62,8 +62,8 @@ defmodule Tokenizer.Controllers.Payment do
     {:ok, changeset}
   end
 
-  defp get_payment_autorization({:error, reason, details}), do: {:error, reason, details}
-  defp get_payment_autorization({:ok, %Ecto.Changeset{} = changeset}) do
+  defp get_transfer_autorization({:error, reason, details}), do: {:error, reason, details}
+  defp get_transfer_autorization({:ok, %Ecto.Changeset{} = changeset}) do
     external_id = 10000
     |> :rand.uniform()
     |> to_string
@@ -75,44 +75,44 @@ defmodule Tokenizer.Controllers.Payment do
     {:ok, changeset}
   end
 
-  defp put_payment_token({:error, reason, details}), do: {:error, reason, details}
-  defp put_payment_token({:ok, %Ecto.Changeset{} = changeset}) do
-    expires_in = Confex.get(:tokenizer_api, :payment_token_expires_in)
+  defp put_transfer_token({:error, reason, details}), do: {:error, reason, details}
+  defp put_transfer_token({:ok, %Ecto.Changeset{} = changeset}) do
+    expires_in = Confex.get(:tokenizer_api, :transfer_token_expires_in)
 
     expires_at = Timex.now
     |> Timex.shift(microseconds: expires_in)
 
     {:ok, changeset
-          |> Ecto.Changeset.put_change(:token, @payment_token_prefix <> "-" <> Ecto.UUID.generate)
+          |> Ecto.Changeset.put_change(:token, @transfer_token_prefix <> "-" <> Ecto.UUID.generate)
           |> Ecto.Changeset.put_change(:token_expires_at, expires_at)}
   end
 
-  # Store payment changes into DB
-  defp save_payment({:error, reason, details}), do: {:error, reason, details}
-  defp save_payment({:ok, %Ecto.Changeset{valid?: false} = changeset}), do: {:error, :invalid, changeset}
-  defp save_payment({:ok, %Ecto.Changeset{valid?: true} = changeset}) do
+  # Store transfer changes into DB
+  defp save_transfer({:error, reason, details}), do: {:error, reason, details}
+  defp save_transfer({:ok, %Ecto.Changeset{valid?: false} = changeset}), do: {:error, :invalid, changeset}
+  defp save_transfer({:ok, %Ecto.Changeset{valid?: true} = changeset}) do
     changeset
-    |> PaymentSchema.insert
+    |> TransferSchema.insert
   end
 
   @doc """
-  GET /payments/:id?token=token
+  GET /transfers/:id?token=token
   """
-  def show(%Plug.Conn{assigns: %{payment_token: token}} = conn, %{"id" => id}) do
-    PaymentSchema
+  def show(%Plug.Conn{assigns: %{transfer_token: token}} = conn, %{"id" => id}) do
+    TransferSchema
     |> Repo.get_by(id: id)
     |> check_query_result
     |> validate_token(token)
-    # |> update_payment_status TODO: get payment status and persist it
+    # |> update_transfer_status TODO: get transfer status and persist it
     |> send_response(:ok, conn)
   end
 
   defp check_query_result(nil), do: {:error, :not_found}
-  defp check_query_result(%PaymentSchema{} = payment), do: {:ok, payment}
+  defp check_query_result(%TransferSchema{} = transfer), do: {:ok, transfer}
 
   defp validate_token({:error, reason}, _), do: {:error, reason}
-  defp validate_token({:ok, %{token: payment_token} = payment}, user_token) when payment_token == user_token do
-    {:ok, payment}
+  defp validate_token({:ok, %{token: transfer_token} = transfer}, user_token) when transfer_token == user_token do
+    {:ok, transfer}
   end
 
   defp validate_token({:ok, _}, _) do
@@ -120,10 +120,10 @@ defmodule Tokenizer.Controllers.Payment do
   end
 
   # Responses
-  defp send_response({:ok, %PaymentSchema{} = payment}, status, conn) do
+  defp send_response({:ok, %TransferSchema{} = transfer}, status, conn) do
     conn
     |> put_status(status)
-    |> render(PaymentView, "payment.json", payment: payment)
+    |> render(TransferView, "transfer.json", transfer: transfer)
   end
 
   defp send_response({:error, :invalid, %Ecto.Changeset{} = changeset}, _, conn) do

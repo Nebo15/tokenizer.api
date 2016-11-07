@@ -27,15 +27,15 @@ defmodule Tokenizer.Router do
     post "/", Token, :create
   end
 
-  scope "/", Tokenizer.Controllers do
+  scope "/transfers", Tokenizer.Controllers do
     pipe_through :private_api
 
-    # Create and get payment
-    post "/payments", Payment, :create
-    get  "/payments/:id", Payment, :show
+    # Create and get transfer
+    post "/", Transfer, :create
+    get  "/:id", Transfer, :show
 
-    # Complete payments
-    # post "/payments/:id/auth", PaymentAuthorization, :authorize
-    # post "/payments/:id/claim", Payment, :claim
+    # Complete transfers
+    # post "/:id/auth", TransferAuthorization, :authorize
+    # post "/:id/claim", Transfer, :claim
   end
 end

@@ -1,6 +1,6 @@
 defmodule Tokenizer.DB.Types.Authorization do
   @moduledoc """
-  Dynamic embed type for `payment.auth` field.
+  Dynamic embed type for `transfer.auth` field.
   """
   use Tokenizer.DB.Types.DynamicEmbed
 

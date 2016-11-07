@@ -16,19 +16,22 @@ PROJECT_VERSION=$(sed -n 's/.*@version "\([^"]*\)".*/\1/pg' "${PROJECT_DIR}/mix.
 
 heroku plugins:install heroku-container-registry
 
-echo "Logging in into Heroku";
+echo "Logging in into Heroku"
 heroku container:login
 docker login --email=_ --username=_ --password=$(heroku auth:token) registry.heroku.com
 
 if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
   if [ "$TRAVIS_BRANCH" == "$RELEASE_BRANCH" ]; then
 
-    echo "Tagging container to a Heroku CE";
+    echo "Tagging container to a Heroku CE"
     docker tag "${PROJECT_NAME}:${PROJECT_VERSION}" "registry.heroku.com/${PROJECT_NAME}/web"
   fi;
 
   if [[ "$MAIN_BRANCHES" =~ "$TRAVIS_BRANCH" ]]; then
-    echo "Pushing container to a Heroku CE";
+    echo "Pushing container to a Heroku CE"
+    heroku container:push web
+
+    echo "Trying push existing image (for dev purposes)"
     docker push "registry.heroku.com/${PROJECT_NAME}/web"
   fi;
 fi;

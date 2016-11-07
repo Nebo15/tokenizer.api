@@ -217,8 +217,8 @@ For transfers in `waiting_for_claim` status (when recipient credential has `exte
 + code: 200 (number) - HTTP response code.
 + url: http://example.com/resource (string) - URL to requested resource.
 + type (enum) - Type of data that is located in `data` attribute.
-    - object (string) - `data` attribute is a JSON object.
-    - list (string) - `data` attribute is a list.
+    + object (string) - `data` attribute is a JSON object.
+    + list (string) - `data` attribute is a list.
 + code: 200 (number) - HTTP response code.
 + `idempotency_key`: `idemp-ssjssdjoa8308u0us0` (string, optional) - [Idempotency key](http://docs.apimanifest.apiary.io/#introduction/optional-features/idempotent-requests). Send it trough `X-Idempotency-Key` header.
 + `request_id`: `req-adasdoijasdojsda` (string) - [Request ID](http://docs.apimanifest.apiary.io/#introduction/interacting-with-api/request-id). Send it with `X-Request-ID` header.
@@ -235,11 +235,11 @@ For transfers in `waiting_for_claim` status (when recipient credential has `exte
 + type: validation_failed (string) - type of an error.
 + message: Validation failed. You can find validators description at our API Manifest: http://docs.apimanifest.apiary.io/#introduction/interacting-with-api/errors. (string)
 + invalid (array)
-  + `entry_type`: `json_data_proprty` (string) - Type of error.
-  + entry: $.cvv (string) - JSON Path to an invalid property.
-  + rules (array)
-    + rule: required (string) - String constant that represents validation rule type. List of all types can be found in [API Manifest](http://docs.apimanifest.apiary.io/#introduction/interacting-with-api/errors).
-    + params (array) - Validation Parameters.
+    + `entry_type`: `json_data_proprty` (string) - Type of error.
+    + entry: $.cvv (string) - JSON Path to an invalid property.
+    + rules (array)
+        + rule: required (string) - String constant that represents validation rule type. List of all types can be found in [API Manifest](http://docs.apimanifest.apiary.io/#introduction/interacting-with-api/errors).
+        + params (array) - Validation Parameters.
 
 ### `Response__Pagination`
 + limit: 20 (number) - A limit on the number of objects to be returned, between 1 and 100. Default: 50.
@@ -311,15 +311,15 @@ For transfers in `waiting_for_claim` status (when recipient credential has `exte
     + completed
     + declined
 + Include Transfer
-    + sender (Peer)
-        + One Of
-            + credential (Card)
-            + credential (CardToken_Full)
-    + recipient (Peer)
-        + One Of
-            + credential (CardNumber)
-            + credential (CardToken_Full)
-            + credential (ExternalCredential)
++ sender (Peer)
+    + One Of
+        + credential (Card)
+        + credential (CardToken_Full)
++ recipient (Peer)
+    + One Of
+        + credential (CardNumber)
+        + credential (CardToken_Full)
+        + credential (ExternalCredential)
 + token: `transfer-token-70eb3c2b-9ef0-41b9-989b-0d4bf1d10831` (string) - Access token that can be used to fetch transfer later.
 + `token_expires_at`: `2016-10-18T13:50:40.54502Z` (string) - ISO datetime that signals when token will be expired.
 + updated_at: `2016-10-18T13:50:39.677992` (string) - ISO datetime when there was last change in transfer.
@@ -367,8 +367,22 @@ For transfers in `waiting_for_claim` status (when recipient credential has `exte
 
 ### `Claim_FullWithTransfer`
 + Include Claim_Full
-+ transfer (Transfer_Full)
++ transfer (object)
+    + id: 1 (string) - Transfer ID that can be used to fetch it later.
+    + status: authorization (enum) - Transfer status.
+        + processing
+        + completed
+        + declined
+    + Include Transfer
+    + sender (Peer)
+        + One Of
+            + credential (Card)
+            + credential (CardToken_Full)
+    + recipient (Peer)
+        + One Of
+            + credential (ExternalCredential)
+    + updated_at: `2016-10-18T13:50:39.677992` (string) - ISO datetime when there was last change in transfer.
+    + created_at: `2016-10-18T13:50:39.677992` - ISO datetime when transfer was created.
 
 ### `Claim__Auth_Lookup`
 + type: `otp-code` (string) - Type of authorization.
-+ code: 123983 (string) - Code that was sent to recipients phone number.

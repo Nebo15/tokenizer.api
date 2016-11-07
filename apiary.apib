@@ -1,7 +1,7 @@
 FORMAT: 1A
-HOST: https://gateway.mbill.co/
+HOST: https://tokenizer-api.herokuapp.com/
 
-# Mbill Payment Tokenization Service
+# Mbill Transfer Tokenization Service
 
 # Authorization
 
@@ -9,401 +9,239 @@ We use BASIC HTTP authorization. You should provide access token as HTTP Basic u
 
 > curl -uAPI_TOKEN https://example.com/
 
-# Payment Flow
+# Transfer Flow
 
-1. Include tokenizer.js into your application and configure it to replace your card container.
-2. Exchange card details to a card token via tokenization iframe.
-3. Create payment from your back-end using token from st. 1
-4. Update payment status from your back-end whenever you need.
-
-# Payment Lifecycle
-
-Create -> Autorization Waiting -> Compelte (Lookup or 3D-Secure) -> Processing -> Read Status
-
-## Payment completion
-
-### For Non 3-D Secure Card
-
-API client should use complete this payment using ```/payments/{id}/complete``` method.
-Auth code will be send to card owners phone number by issuing bank.
-
-### For 3-D Secure Cards
-
-Client broser should create a ```application/x-www-form-urlencoded``` HTTP POST request to page specified in ```auth.acs_url``` response field.
-
-This request should contain following fields:
-
-- ```PaReq``` from ```auth.pa_req``` payment field.
-- ```TermUrl``` from ```auth.terminal_url``` payment field.
-- ```MD``` from ```auth.md``` payment field.
-
-If you want user to be redirected to a custom page after 3-D Secure page, you can add HTTP GET parameter to ```TermUrl```:
-
-> TermUrl = "https://p2y.com.ua/pay2you-ext/Confirm3D/input3d?arrival=https%3A%2F%2Fexample.com%2F%23!%2Fsend%2Fsuccess";
-
-<!--
-## Internal: Determine Auth Type
-
-This code is used to determine auth type:
-> ```
-    if(resp.data.secur3d && resp.data.secur3d.paReq) {
-      if (resp.data.secur3d.paReq === "lookup") { // alternatively look at state.code = 59.
-        // auth.type = "LOOKUP-CODE"
-      } else {
-        // auth.type = "3D-SECURE"
-      }
-    } else if(resp.data.secur3d == null && resp.data.state.code == 0) {
-      // status = "completed"
-    } else {
-      // status = "failed"
-    }
-```
-
-### Tricky part
-
-On payment read state you will receive one of following statuses:
-
-```
-  "55": "3DS_Waiting",
-  "56": "3DS_Waiting",
-  "59": "2DS_Waiting",
-
-```
-"3DS_Waiting" should be mapped to ```auth.type = "3D-SECURE"```
-and "2DS_Waiting" to ```auth.type = "LOOKUP-CODE"``` with payment status ```auth_waiting```.
-
-Also there are temporary statuses that should be mapped to "processing" state:
-```
-  "50": "2DS_Valid",
-  "62": "3DS_Valid",
-```
-
-Auth links should be stored internally, since client can get them only once.
-
-Status code ```0``` usually means that payment is in ```authorization_waiting``` stage.
-
-# Internal: Payment Declines
-
-Here is the list to map P2Y status codes into decline reasons:
-```
-{
-  "-1": "Internal_Error__Aquier",
-  "1": "Internal_Error__P2Y",
-  "4": "Amount_Invalid",
-  "5": "CVV_Invalid",
-  "6": "Card_Expired",
-  "7": "PAN_Invalid",
-  "8": "RecipientPAN_Invalid",
-  "9": "PAN_Empty",
-  "10": "RecipientPAN_Empty",
-  "11": "PAN_Invalid",
-  "12": "RecipientPAN_Invalid",
-  "13": "Phone_Invalid",
-  "14": "Internal_Error__P2Y",
-  "16": "Payment_NotFound__P2Y",
-  "17": "2DS_Failed",
-  "18": "2DS_Failed",
-  "19": "2DS_Failed",
-  "20": "2DS_Errored",
-  "21": "2DS_Errored",
-  "22": "Internal_Error__P2Y",
-  "23": "Limits_Exceeded__P2Y",
-  "24": "Internal_Error__P2Y",
-  "25": "PAN_Invalid",
-  "26": "RecipientPAN_Invalid",
-  "27": "APIVersion_Invalid",
-  "28": "Internal_Error__P2Y",
-  "29": "Internal_Error__P2Y",
-  "30": "Internal_Error__P2Y",
-  "31": "Internal_Error__P2Y",
-  "49": "2DS_Failed",
-  "50": "2DS_Valid",
-  "51": "Card_Expired",
-  "54": "Fee_Invalid",
-  "55": "3DS_Waiting",
-  "56": "3DS_Waiting",
-  "58": "Declined__Resipient",
-  "59": "2DS_Waiting",
-  "60": "Declined__Aquier",
-  "61": "3DS_Failed",
-  "62": "3DS_Valid",
-  "69": "Internal_Error__Aquier",
-  "74": "Declined__Aquier",
-  "75": "Card_Invalid",
-  "76": "Funds_Insufficient",
-  "78": "Declined__Aquier",
-  "82": "Limits_Count_Exceeded__Aquier",
-  "85": "Limits_Amount_Exceeded__Aquier",
-  "95": "Limits_Amount_Exceeded__Aquier",
-  "96": "Internal_Error__P2Y",
-  "100": "Declined__Emitent",
-  "101": "Card_Expired",
-  "103": "Declined__Emitent",
-  "104": "Declined__Emitent",
-  "105": "Declined__Emitent",
-  "107": "Declined__Emitent",
-  "108": "Declined__Emitent",
-  "109": "Internal_Error__P2Y",
-  "110": "Declined__Emitent",
-  "111": "Declined__Emitent",
-  "114": "Declined__P2Y",
-  "116": "Funds_Insufficient",
-  "118": "Internal_Error__P2Y",
-  "119": "Declined__P2Y",
-  "120": "Internal_Error__P2Y",
-  "121": "Limits_Exceeded__P2Y",
-  "122": "Declined__P2Y",
-  "123": "Limits_Exceeded__P2Y",
-  "124": "Declined__P2Y",
-  "125": "Card_Expired",
-  "129": "CVV_Invalid",
-  "130": "Limits_Exceeded__P2Y",
-  "200": "Card_Invalid",
-  "201": "Card_Expired",
-  "202": "Card_Invalid",
-  "203": "Declined__P2Y",
-  "204": "Declined__P2Y",
-  "205": "Declined__P2Y",
-  "207": "Declined__P2Y",
-  "208": "Declined__P2Y",
-  "209": "Declined__P2Y",
-  "210": "CVV_Invalid",
-  "211": "CVV_Invalid",
-  "290": "Declined__Aquier",
-  "291": "Internal_Error__P2Y",
-  "302": "Internal_Error__P2Y",
-  "306": "Internal_Error__P2Y",
-  "401": "Internal_Error__P2Y",
-  "402": "Internal_Error__P2Y",
-  "403": "Internal_Error__P2Y",
-  "404": "Internal_Error__P2Y",
-  "405": "Internal_Error__P2Y",
-  "406": "Limits_Exceeded__P2Y",
-  "407": "Internal_Error__P2Y",
-  "408": "Internal_Error__P2Y",
-  "409": "Internal_Error__P2Y",
-  "410": "Internal_Error__P2Y",
-  "411": "Declined__Aquier",
-  "412": "Declined__Aquier",
-  "413": "Declined__Aquier",
-  "420": "Limits_Amount_Exceeded__P2Y",
-  "421": "Limits_Amount_Exceeded__P2Y",
-  "430": "Declined__Emitent",
-  "431": "3DS_Failed",
-  "432": "Declined__P2Y",
-  "433": "Limits_Amount_Exceeded__P2Y",
-  "434": "Limits_Crossborder__P2Y",
-  "435": "Declined__P2Y",
-  "436": "Limits_Count_Exceeded__P2Y",
-  "437": "Limits_Amount_Exceeded__P2Y",
-  "438": "Internal_Error__P2Y",
-  "439": "Internal_Error__P2Y",
-  "440": "Internal_Error__P2Y",
-  "441": "Internal_Error__P2Y",
-  "450": "Internal_Error__P2Y",
-  "451": "Internal_Error__P2Y",
-  "452": "Internal_Error__P2Y",
-  "500": "Internal_Error__Aquier",
-  "501": "Internal_Error__P2Y",
-  "502": "Internal_Error__P2Y",
-  "503": "Internal_Error__P2Y",
-  "504": "Internal_Error__P2Y",
-  "505": "Internal_Error__P2Y",
-  "506": "Internal_Error__P2Y",
-  "507": "Internal_Error__P2Y",
-  "508": "Internal_Error__P2Y",
-  "509": "Internal_Error__P2Y",
-  "510": "Internal_Error__P2Y",
-  "511": "Internal_Error__P2Y",
-  "512": "Internal_Error__P2Y",
-  "567": "Declined__Emitent",
-  "568": "Declined__Emitent",
-  "571": "Declined__Emitent",
-  "574": "Card_Invalid",
-  "580": "CVV_Invalid",
-  "581": "CVV_Invalid",
-  "601": "Internal_Error__P2Y",
-  "800": "Internal_Error__P2Y",
-  "801": "Internal_Error__Aquier",
-  "803": "Payment_Duplicate__Aquier",
-  "809": "Internal_Error__Aquier",
-  "810": "Internal_Error__Aquier",
-  "811": "Internal_Error__Aquier",
-  "820": "Internal_Error__Aquier",
-  "880": "Internal_Error__Aquier",
-  "881": "Internal_Error__Aquier",
-  "882": "Internal_Error__Aquier",
-  "888": "Internal_Error__Aquier",
-  "897": "Internal_Error__Aquier",
-  "898": "Internal_Error__Aquier",
-  "899": "Internal_Error__Aquier",
-  "901": "Card_Expired",
-  "902": "Internal_Error__P2Y",
-  "903": "Internal_Error__P2Y",
-  "904": "Internal_Error__P2Y",
-  "905": "Internal_Error__P2Y",
-  "906": "Limits_Crossborder__Aquier",
-  "907": "Limits_Crossborder__Aquier",
-  "908": "Card_Invalid",
-  "909": "Internal_Error__P2Y",
-  "910": "Declined__Emitent",
-  "911": "Internal_Error__P2Y",
-  "912": "Internal_Error__P2Y",
-  "913": "Payment_Duplicate__P2Y",
-  "914": "Internal_Error__P2Y",
-  "915": "Internal_Error__P2Y",
-  "940": "Declined__Emitent",
-  "959": "Internal_Error__Aquier",
-  "998": "Payment_Duplicate__Aquier",
-  "1001": "Internal_Error__P2Y",
-  "10050": "Internal_Error__P2Y",
-  "100500": "Card_Invalid"
-}
-```
-
-# Internal: Rounding payment amount
-
-Multiply by 100 and trim everyting after ```.```.
-
-```
-  function toCentum(amount) {
-    return parseFloat((100 * amount).toFixed(0));
-  }
-```
-
-# Internal: Calculate the fee
-
-You can use this code to calculate the fee:
-
-```
-  function calcFee(amount, fixed, percent) {
-    amount = parseFloat(amount) || 0;
-    fixed = parseFloat(fixed) || 0;
-    return amount ? Math.round(amount * 100 * percent / 100 + fixed * 100) / 100 : 0;
-  }
-```
--->
+1. Include `https://transfers.mbill.co/tokenizer.js` into your page source and [configure it]() to replace your card container.
+2. Your card container will be replaced by a secured iframe that is served from our domain.
+3. User inputs card data in iframe and you receive `postMessage` with card token if card data is valid or validation errors.
+4. Create transfer using card token.
+5. Authorize transfer via 3-D Secure page or via Lookup code. (To authorize on this steps you must to add transfer token to authorization header)
+6. Fetch transfer status.
 
 # TODOs
 
 - card2phone and code2card transfers
-- payment status webhooks
+- transfer status webhooks
 
 # Group Tokens
 ## Tokens [/tokens]
 ### Create Card Token [POST]
 
-Exchange card data with **one-time** token that can be used to create payments.
+Exchange card data with **one-time** token that can be used to create transfers.
 
 Data will be stored in RAM and will be encrypted by AES cbc-128 encryption with HMAC signature.
 
 This token with all relative data is temporary and will be automatically removed in pre-defined time period. Usually **15 minutes**.
 
+**TODO: Remove basic auth from here**
+
 + Request (application/json)
+    + Headers
+            
+            Authorization: Basic REdSc01wWERDajoK
+            
     + Attributes(Card)
 
 + Response 201 (application/json)
-    + Attributes (Success_Response)
-        + meta (Response_Meta)
+    + Attributes (Response_OK)
+        + meta (Response__Meta)
             + code: 201
         + data (CardToken_Full)
 
-# Group Payments
-## Payments [/payments]
-### Create Payment [POST]
+# Group Transfer
+### Create [POST /transfers]
+
+Initiate a peer-to-peer transfer from `sender` peer credentials to `recipient`'s.
+
+Sender can be:
+- `card` - Deprecated. Full card data, including: number, cvv, expiration date.
+- `card-token` - Recommended. Token issues in [Create Token](#reference/tokens) endpoint.
+
+Recipient can be: 
+- `card-token` - Recommended. Token issues in [Create Token](#reference/tokens) endpoint.
+- `card-number`
+- `external-id` - whenever you want to send payment that can be claimed later. Currently supports only transfers with a system-generated recipient tokens.
+
+Transfer will be created in one of following statuses:
+Status | Description
+-------|-------
+`authorization` | You need to [authorize transfer](http://docs.tokenizerapi.apiary.io/#reference/transfers/transfer/authorize-transfer) with data from `auth` field.
+`completed` | Transfer is completed, money is sent to recipients issuing bank.
+`processing` | Transfer is processing and should be completed or declined within few seconds.
+`declined` | Transfer was declined. Reason could be found in `decline` object.
+`waiting_for_claim` | Transfer processing will be continued when recipient will claim it's rights on transaction.
 
 + Request (application/json)
-    + Attributes(Payment)
+    + Headers
+            
+            Authorization: Basic REdSc01wWERDajoK
+            
+    + Attributes(Transfer)
 
 + Response 201 (application/json)
-    + Attributes (Success_Response)
-        + meta (Response_Meta)
+    + Attributes (Response_OK)
+        + meta (Response__Meta)
             + code: 201
-        + data (Payment_FullWithAuth)
+        + data (Transfer_FullWithAuth)
 
-## Payment [/payment/{id}]
+### Get [GET /transfer/{id}]
+
+Read transfer data via it's `id`. Transfer access token must be sent via HTTP Basic Auth in **password** field.
 
 + Parameters
-    + id: 1 (string) - Payment ID
-
-### Get Payment [GET]
+    + id: 1 (string) - Transfer ID
 
 + Request (application/json)
     + Headers
     
-            Authorization: Basic base64(API_TOKEN:PAYMENT_TOKEN)
+            Authorization: Basic base64(TRANSFER_TOKEN)
     
-    + Attributes(Payment)
+    + Attributes(Transfer)
 
 + Response 200 (application/json)
-    + Attributes (Success_Response)
-        + meta (Response_Meta)
-        + data (Payment_FullWithAuth)
+    + Attributes (Response_OK)
+        + meta (Response__Meta)
+        + data (Transfer_FullWithAuth)
 
-### Authorize Payment [POST /payment/{id}/authorize]
+### Authorization [POST /transfer/{id}/auth]
+
+#### For 3-D Secure Cards
+
+For 3-D Secure cards you don't need to call this method. 
+
+Instead, client broser should create a `application/x-www-form-urlencoded` HTTP POST request to page specified in `auth.acs_url` response field.
+
+This request should contain following fields:
+
+Request Field | Transfer Field
+---|---|---
+`PaReq` | `auth.pa_req` | 
+`TermUrl` | `auth.terminal_url`
+`MD` | `auth.md`
+
+If you want browser to be redirected to a custom page after 3-D Secure page, you can add urlencoded redirect url as URI parameter `arrival` in `TermUrl`, example:
+
+> https://p2y.com.ua/pay2you-ext/Confirm3D/input3d?arrival=https%3A%2F%2Fexample.com%2F%23!%2Fsend%2Fsuccess
+
+#### For Non 3-D Secure Card
+
+OTP code will be sent to a user device. *Usually code is sent via issuing bank in SMS to a phone that is listed in bank, NOT a `recipient.phone` number*. 
+
+This code must be used to auhorize transfer via this method. All unathorized transfer will be declined in about 15 minutes.
+
++ Parameters
+    + id: 1 (string) - Transfer ID
 
 + Request (application/json)
     + Headers
     
-            Authorization: Basic base64(API_TOKEN:PAYMENT_TOKEN)
+            Authorization: Basic base64(TRANSFER_TOKEN)
             
     + Attributes(object)
         + code: 3382837 (string) - OTP code that was sent to peer's device.
 
 + Response 201 (application/json)
-    + Attributes (Success_Response)
-        + meta (Response_Meta)
-        + data (Payment_Full)
+    + Attributes (Response_OK)
+        + meta (Response__Meta)
+        + data (Transfer_Full)
             + status: completed
 
-## Data Structures
-<!-- General request and response structures -->
-### `Success_Response`
-+ meta (Response_Meta, fixed-type)
+# Group Claims
+
+### Create [POST /claims]
+
+For transfers in `waiting_for_claim` status (when recipient credential has `external-credential` type) our back-end is waiting for recipient to claim hes right to receive this transfer.
+
++ Request (application/json)
+    + Attributes(Claim)
+
++ Response 201 (application/json)
+    + Attributes (Response_OK)
+        + meta (Response__Meta)
+          + code: 201 (number)
+        + data (Claim_FullWithAuth)
+
+### Get [POST /claims/{id}]
+
++ Parameters
+    + id: 1 (string) - Claim ID
+
++ Request (application/json)
+    + Headers
+    
+            Authorization: Basic base64(CLAIM_TOKEN)
+    
+    + Attributes(Claim)
+
++ Response 200 (application/json)
+    + Attributes (Response_OK)
+        + meta (Response__Meta)
+        + data (Claim_FullWithAuth)
+
+### Authorization [POST /claims/{id}/auth]
+
++ Parameters
+    + id: 1 (string) - Claim ID
+
++ Request (application/json)
+    + Headers
+    
+            Authorization: Basic base64(CLAIM_TOKEN)
+            
+    + Attributes(object)
+        + code: 3382837 (string) - OTP code that was sent to peer's device.
+
++ Response 201 (application/json)
+    + Attributes (Response_OK)
+        + meta (Response__Meta)
+        + data (Claim_FullWithTransfer)
+            + status: completed
+
+# Data Structures
+## Responses
+### `Response_Collection`
++ meta (Response__Meta, fixed-type)
++ data (array[], fixed-type)
++ paging (Response__Pagination, fixed-type)
+
+### `Response_OK`
++ meta (Response__Meta, fixed-type)
 + data (object, fixed-type)
 
-### `Error_Response`
-+ meta (Response_Meta, fixed-type)
-+ error (Response_Error, fixed-type)
+### `Response_Error`
++ meta (Response__Meta, fixed-type)
+    + code: 400 (number)
++ error (Response__Error, fixed-type)
 
-### `Response_Meta`
+### `Response__Meta`
++ code: 200 (number) - HTTP response code.
 + url: http://example.com/resource (string) - URL to requested resource.
 + type (enum) - Type of data that is located in `data` attribute.
     - object (string) - `data` attribute is a JSON object.
     - list (string) - `data` attribute is a list.
 + code: 200 (number) - HTTP response code.
 + `idempotency_key`: `idemp-ssjssdjoa8308u0us0` (string, optional) - [Idempotency key](http://docs.apimanifest.apiary.io/#introduction/optional-features/idempotent-requests). Send it trough `X-Idempotency-Key` header.
-+ `request_id`: `req-adasdoijasdojsda` (string, optional) - [Request ID](http://docs.apimanifest.apiary.io/#introduction/interacting-with-api/request-id). Send it with `X-Request-ID` header.
++ `request_id`: `req-adasdoijasdojsda` (string) - [Request ID](http://docs.apimanifest.apiary.io/#introduction/interacting-with-api/request-id). Send it with `X-Request-ID` header.
 
-### `Response_Error`
+### `Response__Error`
 + type: type_atom (string) - Atom that represents error type.
 + message: Error description (string) - Human-readable error message. This is for developers, not end-users.
 
-### `Response_Error_DuplicateEntity`
-+ type: object_already_exists (string) - Atom that represents error type.
+### `Response__Error_DuplicateEntity`
++ type: `object_already_exists` (string) - Atom that represents error type.
 + message: This API already exists (string) - Human-readable error message. This is for developers, not end-users.
 
-### `Response_Error_ValidationFailed`
+### `Response__Error_ValidationFailed`
 + type: validation_failed (string) - type of an error.
 + message: Validation failed. You can find validators description at our API Manifest: http://docs.apimanifest.apiary.io/#introduction/interacting-with-api/errors. (string)
-+ invalid (array[Response_Error_ValidationFailed_Property])
++ invalid (array)
+  + `entry_type`: `json_data_proprty` (string) - Type of error.
+  + entry: $.cvv (string) - JSON Path to an invalid property.
+  + rules (array)
+    + rule: required (string) - String constant that represents validation rule type. List of all types can be found in [API Manifest](http://docs.apimanifest.apiary.io/#introduction/interacting-with-api/errors).
+    + params (array) - Validation Parameters.
 
-### `Response_Error_ValidationFailed_Property`
-+ entry_type: json_data_proprty (string) - Type of error.
-+ entry: #/cvv (string) - JSON Path to an invalid property.
-+ rules (array[Response_Error_ValidationFailed_Rule])
-
-### `Response_Error_ValidationFailed_Rule`
-+ params (array[object]) - Validation Parameters.
-+ rule: has invalid format (string) - String constant that represents validation rule type. List of all types can be found in [API Manifest](http://docs.apimanifest.apiary.io/#introduction/interacting-with-api/errors).
-
-### CollectionResponse
-+ meta (Response_Meta, fixed-type)
-    + type: list
-+ data (array[], fixed-type)
-+ paging (Response_CollectionWithPagination, fixed-type)
-
-### `Response_CollectionWithPagination`
+### `Response__Pagination`
 + limit: 20 (number) - A limit on the number of objects to be returned, between 1 and 100. Default: 50.
 + cursors (object)
     + `starting_after`: 56c31536a60ad644060041af (string) - A cursor for use in pagination. An object ID that defines your place in the list. For instance, if you make a list request and receive 100 objects, ending with `obj_foo`, your subsequent call can include `starting_after=obj_foo` in order to fetch the next page of the list.
@@ -411,7 +249,7 @@ This token with all relative data is temporary and will be automatically removed
 + size: 1000 (number) - Total number of objects in collection.
 + has_more: false (boolean) - Is this collection have more data to load in the same style as last request loaded it.
 
-<!-- Card -->
+## Cards
 ### `Card`
 + type: card (string)
 + number: 5591587543706253 (string) - Card number.
@@ -420,18 +258,23 @@ This token with all relative data is temporary and will be automatically removed
 + cvv: 160 (string) - CVV/CVC code.
 
 ### `CardNumber`
-+ type: card-number (string)
++ type: `card-number` (string)
 + number: 5591587543706253 (string) - Card number.
 
 ### `CardToken`
 + type: `card-token` (string) - Type. Simplifies futher requests that require it.
-+ token: `card-token-6253-8a6985e8247a194c58872d85d5ffad05742679fe` (string) - Token that can be used to create payment with this card. Followed by last 4 digits from card number.
++ token: `card-token-6253-8a6985e8247a194c58872d85d5ffad05742679fe` (string) - Token that can be used to create transfer with this card. Followed by last 4 digits from card number.
 
 ### `CardToken_Full`
 + Include CardToken
 + `token_expires_at`: `2016-10-29T17:35:28.274477Z` (string) - ISO datetime that signals when token will be expired.
 
-<!-- Peer -->
+### `ExternalCredential`
++ type: `external-credential` (string)
++ id: my_id (string) - Any ID that is relevant to an external system that will complete this transfer.
++ metadata (object) - Metadata object that can be used by your system to store additional recipients credential details.
+
+## Peers
 ### Peer
 + phone: +380631112233 (string, optional) - Peer phone number.
 + email: smith@example.com (string, optional) - Peer's email.
@@ -447,51 +290,85 @@ This token with all relative data is temporary and will be automatically removed
 + One Of
     + credential (CardNumber)
     + credential (CardToken)
+    + credential (ExternalCredential)
 
-<!-- Payment -->
-### Payment
-+ amount: 1000 (number) - Payment amount.
-+ fee: 10 (number) - Payment fee.
-+ description: some content (string, optional) - Payment description
-+ metadata (object, optional) - Metadata for payment. Can store any keys and values that match [specification](http://docs.apimanifest.apiary.io/#introduction/optional-features/metadata).
+## Transfers
+### Transfer
++ amount: 1000 (number) - Transfer amount.
++ fee: 10 (number) - Transfer fee.
++ description: some content (string, optional) - Transfer description
++ metadata (object, optional) - Metadata for transfer. Can store any keys and values that match [specification](http://docs.apimanifest.apiary.io/#introduction/optional-features/metadata).
 + sender (Peer_Sender)
 + recipient (Peer_Recipient)
 
-### `Payment_Full`
-+ id: 1 (string) - Payment ID that can be used to fetch it later.
-+ status: authorization (enum) - Payment status.
+### `Transfer_Full`
++ id: 1 (string) - Transfer ID that can be used to fetch it later.
++ external_id: 29384 (string) - ID generated by our transfer processing partner.
++ status: authorization (enum) - Transfer status.
     + authorization
-    + completed
+    + waiting_for_claim
     + processing
+    + completed
     + declined
-    + error
-+ Include Payment
-+ sender (Peer_Sender)
-    + One Of
-        + credential (Card)
-        + credential (CardToken_Full)
-+ recipient (Peer_Recipient)
-    + One Of
-        + credential (CardNumber)
-        + credential (CardToken_Full)
-+ token: `payment-token-70eb3c2b-9ef0-41b9-989b-0d4bf1d10831` (string) - Access token that can be used to fetch payment later.
++ Include Transfer
+    + sender (Peer)
+        + One Of
+            + credential (Card)
+            + credential (CardToken_Full)
+    + recipient (Peer)
+        + One Of
+            + credential (CardNumber)
+            + credential (CardToken_Full)
+            + credential (ExternalCredential)
++ token: `transfer-token-70eb3c2b-9ef0-41b9-989b-0d4bf1d10831` (string) - Access token that can be used to fetch transfer later.
 + `token_expires_at`: `2016-10-18T13:50:40.54502Z` (string) - ISO datetime that signals when token will be expired.
-+ updated_at: `2016-10-18T13:50:39.677992` (string) - ISO datetime when there was last change in payment.
-+ created_at: `2016-10-18T13:50:39.677992` - ISO datetime when payment was created.
++ updated_at: `2016-10-18T13:50:39.677992` (string) - ISO datetime when there was last change in transfer.
++ created_at: `2016-10-18T13:50:39.677992` - ISO datetime when transfer was created.
 
-### `Payment_FullWithAuth`
-+ Include Payment_Full
+### `Transfer_FullWithAuth`
++ Include Transfer_Full
 + One Of
-    + auth (Payment_Auth_3DS)
-    + auth (Payment_Auth_Lookup)
+    + auth (Transfer__Auth_3DS)
+    + auth (Transfer__Auth_Lookup)
 
-### `Payment_Auth_3DS`
-+ type: `3d-secure` (string) Type of authorization.
+### `Transfer__Auth_3DS`
++ type: `3d-secure` (string) - Type of authorization.
 + acs_url
 + md
 + pa_req
 + terminal_url
 
-### `Payment_Auth_Lookup`
-+ type: `lookup-code` (string) Type of authorization.
+### `Transfer__Auth_Lookup`
++ type: `lookup-code` (string) - Type of authorization.
 + md
+
+## Claims
+### Claim
++ id: 1239381 (string) - Claim ID, currently auto-generated and sent to recipient's phone number.
++ One Of
+    + credential (CardNumber)
+    + credential (CardToken_Full)
+
+### `Claim_Full`
++ Include Claim
++ status (enum) - Claim status
+    + authorization
+    + processing
+    + completed
+    + declined
++ token: `claim-token-70eb3c2b-9ef0-41b9-989b-0d4bf1d10831` (string) - Access token that can be used to fetch claim later.
++ `token_expires_at`: `2016-10-18T13:50:40.54502Z` (string) - ISO datetime that signals when token will be expired.
++ updated_at: `2016-10-18T13:50:39.677992` (string) - ISO datetime when there was last change in claim.
++ created_at: `2016-10-18T13:50:39.677992` - ISO datetime when claim was created.
+
+### `Claim_FullWithAuth`
++ Include Claim_Full
++ auth (Claim__Auth_Lookup)
+
+### `Claim_FullWithTransfer`
++ Include Claim_Full
++ transfer (Transfer_Full)
+
+### `Claim__Auth_Lookup`
++ type: `otp-code` (string) - Type of authorization.
++ code: 123983 (string) - Code that was sent to recipients phone number.

@@ -23,10 +23,10 @@ defmodule Tokenizer.Web do
       import Ecto
       import Ecto.Changeset
       import Ecto.Query
-      import EView.Changeset.CardNumberValidator
-      import EView.Changeset.EmailValidator
-      import EView.Changeset.PhoneNumberValidator
-      import EView.Changeset.MetadataValidator
+      import EView.Changeset.Validators.CardNumber
+      import EView.Changeset.Validators.Email
+      import EView.Changeset.Validators.PhoneNumber
+      import EView.Changeset.Validators.Metadata
     end
   end
 

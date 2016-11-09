@@ -54,7 +54,7 @@ defmodule Tokenizer.Mixfile do
      {:ecto_enum, github: "gjaldon/ecto_enum", branch: "ecto-2.0"},
      {:postgrex, "~> 0.12", override: true},
      {:confex, "~> 1.4"},
-     {:eview, "~> 0.2.1"},
+     {:eview, "~> 0.7.0"},
      {:cowboy, "~> 1.0"},
      {:poison, "~> 2.2"},
      {:httpoison, "~> 0.9.2"},

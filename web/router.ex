@@ -20,11 +20,11 @@ defmodule Tokenizer.Router do
     plug Tokenizer.HTTP.Plugs.Authorization
   end
 
-  scope "/tokens", Tokenizer.Controllers do
+  scope "/", Tokenizer.Controllers do
     pipe_through :public_api
 
     # Create card tokens
-    post "/", Token, :create
+    post "/tokens", Token, :create
   end
 
   scope "/transfers", Tokenizer.Controllers do
@@ -35,7 +35,6 @@ defmodule Tokenizer.Router do
     get  "/:id", Transfer, :show
 
     # Complete transfers
-    # post "/:id/auth", TransferAuthorization, :authorize
-    # post "/:id/claim", Transfer, :claim
+    post "/:id/auth", Transfer, :authentificate
   end
 end

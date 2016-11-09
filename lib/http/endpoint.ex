@@ -21,11 +21,11 @@ defmodule Tokenizer.HTTP.Endpoint do
   plug Plug.Logger
 
   plug EView
-  plug EView.IdempotencyPlug
+  plug EView.Plugs.Idempotency
 
   plug Plug.Parsers,
-    parsers: [:urlencoded, :multipart, :json],
-    pass: ["*/*"],
+    parsers: [:json],
+    pass: ["application/json"],
     json_decoder: Poison
 
   plug Plug.MethodOverride

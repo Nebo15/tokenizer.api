@@ -36,6 +36,6 @@ defmodule Tokenizer.Controllers.Token do
   defp send_response({:error, :invalid, %Ecto.Changeset{} = changeset}, conn) do
     conn
     |> put_status(422)
-    |> render(EView.ValidationErrorView, "422.json", changeset)
+    |> render(EView.Views.ValidationError, "422.json", changeset)
   end
 end

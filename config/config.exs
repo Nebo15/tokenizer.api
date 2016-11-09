@@ -44,7 +44,7 @@ config :tokenizer_api,
 config :tokenizer_api, Tokenizer.HTTP.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "GJq0cIAxm5Egzg5lpPOibBooSTLWa3qfgoDGRsMpXDCjFkLK3uyTf4wICdyJ6W0Y",
-  render_errors: [view: EView.ErrorView, accepts: ~w(json)]
+  render_errors: [view: EView.Views.PhoenixError, accepts: ~w(json)]
 
 # Configures Elixir's Logger
 config :logger, :console,

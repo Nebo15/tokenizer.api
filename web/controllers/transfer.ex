@@ -12,8 +12,6 @@ defmodule Tokenizer.Controllers.Transfer do
 
   @transfer_token_prefix "transfer-token"
 
-  # Actions
-
   @doc """
   POST /transfers
   """

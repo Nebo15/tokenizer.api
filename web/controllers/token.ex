@@ -2,14 +2,15 @@ defmodule Tokenizer.Controllers.Token do
   @moduledoc """
   Controller for `/cards` API requests.
   """
-
   use Tokenizer.Web, :controller
   alias Tokenizer.DB.Schemas.Card, as: CardModel
   alias Tokenizer.DB.Schemas.CardToken, as: CardTokenModel
   alias Tokenizer.Views.Token, as: TokenView
   alias Tokenizer.CardStorage.Supervisor, as: CardStorage
 
-  # Actions
+  @doc """
+  POST /cards
+  """
   def create(conn, params) when is_map(params) do
     %CardModel{}
     |> CardModel.changeset(params)

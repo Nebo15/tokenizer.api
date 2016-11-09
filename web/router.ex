@@ -37,4 +37,15 @@ defmodule Tokenizer.Router do
     # Complete transfers
     post "/:id/auth", Transfer, :authentificate
   end
+
+  # scope "/claims", Tokenizer.Controllers do
+  #   pipe_through :private_api
+
+  #   # Create and get transfer
+  #   post "/", Transfer, :create
+  #   get  "/:id", Transfer, :show
+
+  #   # Complete transfers
+  #   post "/:id/auth", Transfer, :authentificate
+  # end
 end

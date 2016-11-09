@@ -4,6 +4,9 @@ import EctoEnum
 defenum Tokenizer.DB.Enums.TransferStatuses,
   :transfer_status, ["authentication", "completed", "processing", "declined", "error"]
 
+defenum Tokenizer.DB.Enums.ClaimStatuses,
+  :transfer_status, ["authentication", "completed", "processing", "declined"]
+
 defenum Tokenizer.DB.Enums.AuthTypes,
   :auth_type, ["3d-secure", "lookup-code"]
 

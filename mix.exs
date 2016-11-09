@@ -51,7 +51,7 @@ defmodule Tokenizer.Mixfile do
      {:phoenix, "~> 1.2"},
      {:phoenix_ecto, "3.1.0-rc.0"}, # TODO: Update when Ecto will release v2.1
      {:ecto, "2.1.0-rc.3", override: true}, # TODO: Update when Ecto will release v2.1
-     {:ecto_enum, github: "gjaldon/ecto_enum", branch: "ecto-2.0"},
+     {:ecto_enum, "~> 1.0"},
      {:postgrex, "~> 0.12", override: true},
      {:confex, "~> 1.4"},
      {:eview, "~> 0.7.0"},

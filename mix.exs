@@ -24,7 +24,7 @@ defmodule Tokenizer.Mixfile do
   #
   # Type "mix help compile.app" for more information
   def application do
-    [applications: [:logger, :phoenix, :phoenix_ecto, :cowboy, :httpoison, :poison,
+    [applications: [:logger, :phoenix, :phoenix_ecto, :cowboy, :httpoison, :poison, :corsica,
                     :ecto, :postgrex, :ecto_enum, :timex, :credit_card, :confex, :eview],
      mod: {Tokenizer, []}]
   end
@@ -60,6 +60,7 @@ defmodule Tokenizer.Mixfile do
      {:httpoison, "~> 0.9.2"},
      {:credit_card, "~> 1.0"},
      {:timex, "~> 3.0"},
+     {:corsica, "~> 0.5"},
      {:ex_doc, ">= 0.0.0", only: [:dev, :test]},
      {:excoveralls, "~> 0.5", only: [:dev, :test]},
      {:dogma, "> 0.1.0", only: [:dev, :test]},

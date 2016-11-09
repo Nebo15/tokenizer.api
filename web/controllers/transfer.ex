@@ -20,7 +20,9 @@ defmodule Tokenizer.Controllers.Transfer do
   def create(conn, params) when is_map(params) do
     %TransferSchema{}
     |> TransferSchema.changeset(params)
+    |> map_changeset()
     |> resolve_sender_credentials()
+    |> resolve_recipient_credentials()
     |> get_transfer_autorization()
     |> put_transfer_token()
     |> create_transfer()
@@ -29,12 +31,19 @@ defmodule Tokenizer.Controllers.Transfer do
 
   # Transfer Gateway delegates
   # TODO: resolve recipients token
-  defp resolve_sender_credentials(%Changeset{valid?: false} = changeset), do: {:error, :invalid, changeset}
-  defp resolve_sender_credentials(%Changeset{valid?: true, changes: %{sender: %{
-                                                                changes: %{credential: %{
-                                                                  changes: %{token: token},
-                                                                  data: %{type: "card-token"}} = credential}
-                                                                } = sender}} = changeset) do
+  defp resolve_sender_credentials({:error, :invalid, changeset}), do: {:error, :invalid, changeset}
+  defp resolve_sender_credentials({:ok, %Changeset{valid?: true,
+                                                   changes: %{
+                                                     sender: %{
+                                                       changes: %{
+                                                         credential: %{
+                                                           changes: %{token: token},
+                                                           data: %{type: "card-token"}
+                                                         } = credential
+                                                       }
+                                                     } = sender
+                                                   }
+                                  } = changeset}) do
     case CardStorage.get_card(token) do
       {:ok, card_data} ->
         sender = sender
@@ -57,11 +66,44 @@ defmodule Tokenizer.Controllers.Transfer do
         {:error, :invalid, changeset}
     end
   end
-  defp resolve_sender_credentials(%Changeset{valid?: true, changes: %{sender: %{
-                                                                changes: %{credential: %{
-                                                                  data: %{type: _}}}}}} = changeset) do
-    {:ok, changeset}
+  defp resolve_sender_credentials({:ok, changeset}), do: {:ok, changeset}
+
+  defp resolve_recipient_credentials({:error, :invalid, changeset}), do: {:error, :invalid, changeset}
+  defp resolve_recipient_credentials({:ok, %Changeset{valid?: true,
+                                                   changes: %{
+                                                     recipient: %{
+                                                       changes: %{
+                                                         credential: %{
+                                                           changes: %{token: token},
+                                                           data: %{type: "card-token"}
+                                                         } = credential
+                                                       }
+                                                     } = recipient
+                                                   }
+                                  } = changeset}) do
+    case CardStorage.get_card(token) do
+      {:ok, card_data} ->
+        recipient = recipient
+        |> Changeset.put_embed(:credential, card_data)
+
+        changeset = changeset
+        |> Changeset.put_embed(:recipient, recipient)
+
+        {:ok, changeset}
+      {:error, _} ->
+        credential = credential
+        |> Changeset.add_error(:token, "is invalid", validation: :token)
+
+        recipient = recipient
+        |> Changeset.put_embed(:credential, credential)
+
+        changeset = changeset
+        |> Changeset.put_embed(:recipient, recipient)
+
+        {:error, :invalid, changeset}
+    end
   end
+  defp resolve_recipient_credentials({:ok, changeset}), do: {:ok, changeset}
 
   defp get_transfer_autorization({:error, reason, details}), do: {:error, reason, details}
   defp get_transfer_autorization({:ok, %Changeset{} = changeset}) do
@@ -149,6 +191,9 @@ defmodule Tokenizer.Controllers.Transfer do
   defp validate_token({:ok, %{token: transfer_token} = transfer}, %Plug.Conn{assigns: %{token: user_token}})
        when transfer_token == user_token, do: {:ok, transfer}
   defp validate_token({:ok, _transfer}, _conn), do: {:error, :access_denied}
+
+  defp map_changeset(%Changeset{valid?: false} = changeset), do: {:error, :invalid, changeset}
+  defp map_changeset(%Changeset{valid?: true} = changeset), do: {:ok, changeset}
 
   # Responses
   defp send_response({:ok, %TransferSchema{} = transfer}, status, conn) do

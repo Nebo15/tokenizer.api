@@ -30,6 +30,6 @@ defmodule Tokenizer.DB.Schemas.Peer do
     |> validate_required([:credential])
     |> validate_email(:email)
     |> validate_phone_number(:phone)
-    |> validate_embed_type(:credential, ["card-number", "external-credential"])
+    |> validate_embed_type(:credential, ["card-number", "card-token", "external-credential"])
   end
 end

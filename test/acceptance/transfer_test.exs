@@ -86,7 +86,7 @@ defmodule Tokenizer.Controllers.TransferTest do
       } = resp
     end
 
-    test "with card token" do
+    test "with sender card token" do
       %{"data" => %{"token" => token}} = "tokens"
       |> post!(@card_credential)
       |> get_body
@@ -101,6 +101,26 @@ defmodule Tokenizer.Controllers.TransferTest do
         },
         "data" => %{
           "recipient" => %{"credential" => %{"type" => "card-number", "number" => "473959******3611"}},
+          "sender" => %{"credential" => %{"type" => "card", "number" => "473959******3611"}}
+        }
+      } = resp
+    end
+
+    test "with recipient card token" do
+      %{"data" => %{"token" => token}} = "tokens"
+      |> post!(@card_credential)
+      |> get_body
+
+      resp = "transfers"
+      |> post!(construct_transfer(@card_credential, %{type: "card-token", token: token}))
+      |> assert_transfer()
+
+      assert %{
+        "meta" => %{
+          "code" => 201
+        },
+        "data" => %{
+          "recipient" => %{"credential" => %{"type" => "card", "number" => "473959******3611"}},
           "sender" => %{"credential" => %{"type" => "card", "number" => "473959******3611"}}
         }
       } = resp
@@ -139,7 +159,7 @@ defmodule Tokenizer.Controllers.TransferTest do
         "error" => %{
           "invalid" => [
             %{"entry" => "$.recipient.credential",
-              "rules" => [%{"params" => ["card-number", "external-credential"], "rule" => "inclusion"}]},
+              "rules" => [%{"params" => ["card-number", "card-token", "external-credential"], "rule" => "inclusion"}]},
             %{"entry" => "$.sender.credential",
               "rules" => [%{"params" => ["card", "card-token"], "rule" => "inclusion"}]}
           ],

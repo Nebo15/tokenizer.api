@@ -17,7 +17,7 @@ defmodule Tokenizer.Router do
   pipeline :private_api do
     plug :accepts, ["json"]
     plug :put_secure_browser_headers
-    plug Tokenizer.HTTP.Plugs.Authorization
+    plug Tokenizer.HTTP.Plugs.Authentification
   end
 
   scope "/", Tokenizer.Controllers do

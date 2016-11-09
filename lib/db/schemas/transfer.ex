@@ -33,6 +33,11 @@ defmodule Tokenizer.DB.Schemas.Transfer do
     |> Tokenizer.DB.Repo.insert
   end
 
+  def update(%Ecto.Changeset{} = changeset) do
+    changeset
+    |> Tokenizer.DB.Repo.update
+  end
+
   @doc """
   Builds a changeset based on the `struct` and `params`.
 

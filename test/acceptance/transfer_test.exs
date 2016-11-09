@@ -54,7 +54,7 @@ defmodule Tokenizer.Controllers.TransferTest do
         "auth" => %{"acs_url" => nil, "md" => nil, "pa_req" => nil, "terminal_url" => nil, "type" => "3d-secure"},
         "description" => "some content",
         "external_id" => _,
-        "status" => "authorization",
+        "status" => "authentication",
         "token" => _,
         "token_expires_at" => _,
         "type" => "transfer",
@@ -69,111 +69,111 @@ defmodule Tokenizer.Controllers.TransferTest do
     resp_body
   end
 
-  # describe "POST /transfers" do
-  #   test "with raw data" do
-  #     resp = "transfers"
-  #     |> post!(construct_transfer())
-  #     |> assert_transfer()
+  describe "POST /transfers" do
+    test "with raw data" do
+      resp = "transfers"
+      |> post!(construct_transfer())
+      |> assert_transfer()
 
-  #     assert %{
-  #       "meta" => %{
-  #         "code" => 201
-  #       },
-  #       "data" => %{
-  #         "recipient" => %{"credential" => %{"type" => "card-number", "number" => "473959******3611"}},
-  #         "sender" => %{"credential" => %{"type" => "card", "number" => "473959******3611"}}
-  #       }
-  #     } = resp
-  #   end
+      assert %{
+        "meta" => %{
+          "code" => 201
+        },
+        "data" => %{
+          "recipient" => %{"credential" => %{"type" => "card-number", "number" => "473959******3611"}},
+          "sender" => %{"credential" => %{"type" => "card", "number" => "473959******3611"}}
+        }
+      } = resp
+    end
 
-  #   test "with card token" do
-  #     %{"data" => %{"token" => token}} = "tokens"
-  #     |> post!(@card_credential)
-  #     |> get_body
+    test "with card token" do
+      %{"data" => %{"token" => token}} = "tokens"
+      |> post!(@card_credential)
+      |> get_body
 
-  #     resp = "transfers"
-  #     |> post!(construct_transfer(%{type: "card-token", token: token}))
-  #     |> assert_transfer()
+      resp = "transfers"
+      |> post!(construct_transfer(%{type: "card-token", token: token}))
+      |> assert_transfer()
 
-  #     assert %{
-  #       "meta" => %{
-  #         "code" => 201
-  #       },
-  #       "data" => %{
-  #         "recipient" => %{"credential" => %{"type" => "card-number", "number" => "473959******3611"}},
-  #         "sender" => %{"credential" => %{"type" => "card", "number" => "473959******3611"}}
-  #       }
-  #     } = resp
-  #   end
+      assert %{
+        "meta" => %{
+          "code" => 201
+        },
+        "data" => %{
+          "recipient" => %{"credential" => %{"type" => "card-number", "number" => "473959******3611"}},
+          "sender" => %{"credential" => %{"type" => "card", "number" => "473959******3611"}}
+        }
+      } = resp
+    end
 
-  #   test "with invalid card token" do
-  #     resp = "transfers"
-  #     |> post!(construct_transfer(%{type: "card-token", token: "invalid_token"}))
-  #     |> get_body()
+    test "with invalid card token" do
+      resp = "transfers"
+      |> post!(construct_transfer(%{type: "card-token", token: "invalid_token"}))
+      |> get_body()
 
-  #     assert %{
-  #       "meta" => %{
-  #         "code" => 422
-  #       },
-  #       "error" => %{
-  #         "invalid" => [
-  #           %{"entry" => "$.sender.credential.token",
-  #             "rules" => [%{"params" => [], "rule" => "token"}]}
-  #         ],
-  #       }
-  #     } = resp
-  #   end
+      assert %{
+        "meta" => %{
+          "code" => 422
+        },
+        "error" => %{
+          "invalid" => [
+            %{"entry" => "$.sender.credential.token",
+              "rules" => [%{"params" => [], "rule" => "token"}]}
+          ],
+        }
+      } = resp
+    end
 
-  #   test "with invalid credential type" do
-  #     resp = "transfers"
-  #     |> post!(construct_transfer(
-  #       %{type: "card-number", number: "5473959513413611"},
-  #       %{type: "card", number: "5473959513413611", cvv: "160", expiration_month: "01", expiration_year: "2020"}
-  #     ))
-  #     |> get_body
+    test "with invalid credential type" do
+      resp = "transfers"
+      |> post!(construct_transfer(
+        %{type: "card-number", number: "5473959513413611"},
+        %{type: "card", number: "5473959513413611", cvv: "160", expiration_month: "01", expiration_year: "2020"}
+      ))
+      |> get_body
 
-  #     assert %{
-  #       "meta" => %{
-  #         "code" => 422
-  #       },
-  #       "error" => %{
-  #         "invalid" => [
-  #           %{"entry" => "$.recipient.credential",
-  #             "rules" => [%{"params" => ["card-number", "external-credential"], "rule" => "inclusion"}]},
-  #           %{"entry" => "$.sender.credential",
-  #             "rules" => [%{"params" => ["card", "card-token"], "rule" => "inclusion"}]}
-  #         ],
-  #         "message" => _,
-  #         "type" => "validation_failed"
-  #       }
-  #     } = resp
-  #   end
+      assert %{
+        "meta" => %{
+          "code" => 422
+        },
+        "error" => %{
+          "invalid" => [
+            %{"entry" => "$.recipient.credential",
+              "rules" => [%{"params" => ["card-number", "external-credential"], "rule" => "inclusion"}]},
+            %{"entry" => "$.sender.credential",
+              "rules" => [%{"params" => ["card", "card-token"], "rule" => "inclusion"}]}
+          ],
+          "message" => _,
+          "type" => "validation_failed"
+        }
+      } = resp
+    end
 
-  #   test "with invalid card data" do
-  #     resp = "transfers"
-  #     |> post!(construct_transfer(
-  #       %{type: "card", number: "5473959513413611", cvv: "160", expiration_month: "01", expiration_year: "20"},
-  #       %{type: "card-number", number: "1473959513413611"}
-  #     ))
-  #     |> get_body
+    test "with invalid card data" do
+      resp = "transfers"
+      |> post!(construct_transfer(
+        %{type: "card", number: "5473959513413611", cvv: "160", expiration_month: "01", expiration_year: "20"},
+        %{type: "card-number", number: "1473959513413611"}
+      ))
+      |> get_body
 
-  #     assert %{
-  #       "meta" => %{
-  #         "code" => 422
-  #       },
-  #       "error" => %{
-  #         "invalid" => [
-  #           %{"entry" => "$.recipient.credential.number",
-  #             "rules" => [%{"params" => [], "rule" => "card_number"}]},
-  #           %{"entry" => "$.sender.credential.expiration_year",
-  #             "rules" => [%{"params" => ["~r/^20[12][0-9]$/"], "rule" => "format"}]}
-  #         ],
-  #         "message" => _,
-  #         "type" => "validation_failed"
-  #       }
-  #     } = resp
-  #   end
-  # end
+      assert %{
+        "meta" => %{
+          "code" => 422
+        },
+        "error" => %{
+          "invalid" => [
+            %{"entry" => "$.recipient.credential.number",
+              "rules" => [%{"params" => [], "rule" => "card_number"}]},
+            %{"entry" => "$.sender.credential.expiration_year",
+              "rules" => [%{"params" => ["~r/^20[12][0-9]$/"], "rule" => "format"}]}
+          ],
+          "message" => _,
+          "type" => "validation_failed"
+        }
+      } = resp
+    end
+  end
 
   describe "GET /transfers/:id" do
     test "200" do
@@ -185,64 +185,80 @@ defmodule Tokenizer.Controllers.TransferTest do
 
       path
       |> get!([{"authorization", "Basic " <> Base.encode64(token <> ":")}])
-      |> IO.inspect
       |> assert_transfer
     end
 
-    # test "401 when token is invalid" do
-    #   %{"data" => %{"id" => id}} = "transfers"
-    #   |> post!(construct_transfer())
-    #   |> get_body()
+    test "401 when token is invalid" do
+      %{"data" => %{"id" => id}} = "transfers"
+      |> post!(construct_transfer())
+      |> get_body()
 
-    #   path = "transfers/" <> to_string(id)
+      path = "transfers/" <> to_string(id)
 
-    #   %{"meta" => %{"code" => 401},
-    #     "error" => %{"type" => "access_denied"}} = path
-    #   |> get!([{"authorization", "Basic " <> Base.encode64("invalid_token")}])
-    #   |> get_body
-    # end
+      %{"meta" => %{"code" => 401},
+        "error" => %{"type" => "access_denied"}} = path
+      |> get!([{"authorization", "Basic " <> Base.encode64("invalid_token:")}])
+      |> get_body
+    end
 
-    # test "404 for non-existent transfers" do
-    #   path = "transfers/0"
+    test "404 for non-existent transfers" do
+      path = "transfers/0"
 
-    #   %{"meta" => %{"code" => 404}} = path
-    #   |> get!
-    #   |> get_body
-    # end
+      # With auth header
+      %{"meta" => %{"code" => 404}} = path
+      |> get!([{"authorization", "Basic " <> Base.encode64("invalid_token:")}])
+      |> get_body()
+
+      # Without auth header
+      %{"meta" => %{"code" => 404}} = path
+      |> get!()
+      |> get_body()
+    end
   end
 
-  # describe "POST /transfers/:id/auth" do
-  #   test "201" do
-  #     %{"data" => %{"id" => id, "token" => token}} = "transfers"
-  #     |> post!(construct_transfer())
-  #     |> get_body()
+  describe "POST /transfers/:id/auth" do
+    test "201" do
+      %{"data" => %{"id" => id, "token" => token}} = "transfers"
+      |> post!(construct_transfer())
+      |> get_body()
 
-  #     path = "transfers/" <> to_string(id) <> "/auth"
+      path = "transfers/" <> to_string(id) <> "/auth"
 
-  #     path
-  #     |> post!(%{"id" => 123, "otp-code" => 345}, [{"authorization", "Basic " <> Base.encode64(token)}])
-  #     |> assert_transfer
-  #   end
+      assert %{
+        "meta" => %{
+          "code" => _
+        },
+        "data" => %{"status" => "completed"}
+      } = path
+      |> post!(%{"id" => 123, "otp-code" => 345}, [{"authorization", "Basic " <> Base.encode64(token)}])
+      |> get_body()
+    end
 
-  #   test "401 when token is invalid" do
-  #     %{"data" => %{"id" => id}} = "transfers"
-  #     |> post!(construct_transfer())
-  #     |> get_body()
+    test "401 when token is invalid" do
+      %{"data" => %{"id" => id}} = "transfers"
+      |> post!(construct_transfer())
+      |> get_body()
 
-  #     path = "transfers/" <> to_string(id)
+      path = "transfers/" <> to_string(id)
 
-  #     %{"meta" => %{"code" => 401},
-  #       "error" => %{"type" => "access_denied"}} = path
-  #     |> get!([{"authorization", "Basic " <> Base.encode64("invalid_token")}])
-  #     |> get_body
-  #   end
+      %{"meta" => %{"code" => 401},
+        "error" => %{"type" => "access_denied"}} = path
+      |> get!([{"authorization", "Basic " <> Base.encode64("invalid_token")}])
+      |> get_body
+    end
 
-  #   test "404 for non-existent transfers" do
-  #     path = "transfers/0"
+    test "404 for non-existent transfers" do
+      path = "transfers/0/auth"
 
-  #     %{"meta" => %{"code" => 404}} = path
-  #     |> get!
-  #     |> get_body
-  #   end
-  # end
+      # With auth header
+      %{"meta" => %{"code" => 404}} = path
+      |> get!([{"authorization", "Basic " <> Base.encode64("invalid_token:")}])
+      |> get_body()
+
+      # Without auth header
+      %{"meta" => %{"code" => 404}} = path
+      |> get!()
+      |> get_body()
+    end
+  end
 end

@@ -13,7 +13,7 @@ defmodule Tokenizer.DB.Schemas.Transfer do
     field :amount, :decimal
     field :fee, :decimal
     field :description, :string
-    field :status, Tokenizer.DB.Enums.TransferStatuses, default: :authorization
+    field :status, Tokenizer.DB.Enums.TransferStatuses, default: :authentication
     field :auth, Tokenizer.DB.Types.Authorization
     field :metadata, :map
     embeds_one :sender, Tokenizer.DB.Schemas.Peer

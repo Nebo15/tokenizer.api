@@ -59,3 +59,4 @@ after_failure:
 after_success:
   - ./bin/ci/push.sh
   - ./bin/ci/deploy.sh
+  - docker logs tokenizer_api --details --since 5h

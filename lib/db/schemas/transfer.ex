@@ -53,7 +53,7 @@ defmodule Tokenizer.DB.Schemas.Transfer do
     |> cast_dynamic_embed(:auth)
     |> cast_embed(:sender, with: &Tokenizer.DB.Schemas.Peer.sender_changeset/2)
     |> cast_embed(:recipient, with: &Tokenizer.DB.Schemas.Peer.recipient_changeset/2)
-    |> validate_required([:amount, :fee, :description, :sender, :recipient])
+    |> validate_required([:amount, :fee, :sender, :recipient])
     |> validate_number(:amount,
         greater_than_or_equal_to: limits[:amount][:min],
         less_than_or_equal_to: limits[:amount][:max])

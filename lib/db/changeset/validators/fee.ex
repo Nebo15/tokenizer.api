@@ -9,12 +9,17 @@ defmodule Tokenizer.DB.Changeset.Validators.Fee do
 
   def validate_fee(changeset, amount_field, fee_field, [percent: percent, fix: fix, min: min, max: max] = opts) do
     validate_change changeset, amount_field, {:fee, opts}, fn _, value ->
-      valid_fee = calculate(value, percent, fix, min, max)
-      transfer_fee = get_field(changeset, fee_field)
-      case D.cmp(valid_fee, transfer_fee) do
-        :eq -> []
-        _ -> [{fee_field, {"is invalid, must be #{valid_fee}", [validation: :fee]}}]
-      end
+      value
+      |> calculate(percent, fix, min, max)
+      |> get_result(get_field(changeset, fee_field))
+    end
+  end
+
+  defp get_result(_valid_fee, nil), do: []
+  defp get_result(valid_fee, transfer_fee) do
+    case D.cmp(valid_fee, transfer_fee) do
+      :eq -> []
+      _ -> [{fee_field, {"is invalid, must be #{valid_fee}", [validation: :fee]}}]
     end
   end
 

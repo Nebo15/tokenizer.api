@@ -14,9 +14,9 @@ environment :default do
   set cookie: cookie
 end
 
-release :tokenizer_api do
-  set version: current_version(:tokenizer_api)
+release :gateway_api do
+  set version: current_version(:gateway_api)
   set applications: [
-    tokenizer_api: :permanent
+    gateway_api: :permanent
   ]
 end

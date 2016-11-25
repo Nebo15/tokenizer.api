@@ -1,2 +1,2 @@
-Ecto.Adapters.SQL.Sandbox.mode(Tokenizer.DB.Repo, :manual)
+Ecto.Adapters.SQL.Sandbox.mode(API.Repo, :manual)
 ExUnit.start()

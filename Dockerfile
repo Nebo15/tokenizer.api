@@ -5,7 +5,7 @@ MAINTAINER Nebo#15 support@nebo15.com
 
 # Configure environment variables and other settings
 ENV MIX_ENV=prod \
-    APP_NAME=tokenizer_api \
+    APP_NAME=gateway_api \
     APP_PORT=4000
 
 WORKDIR ${HOME}
@@ -58,10 +58,10 @@ RUN $APP_NAME/hooks/pre-run.sh
 
 # The command to run when this image starts up
 #  You can run it in one of the following ways:
-#    Interactive: tokenizer_api/bin/tokenizer_api console
-#    Foreground: tokenizer_api/bin/tokenizer_api foreground
-#    Daemon: tokenizer_api/bin/tokenizer_api start
+#    Interactive: gateway_api/bin/gateway_api console
+#    Foreground: gateway_api/bin/gateway_api foreground
+#    Daemon: gateway_api/bin/gateway_api start
 #  Also you can run migrations whenever container starts:
-#    tokenizer_api/bin/tokenizer_api command tokenizer_api_tasks migrate!
+#    gateway_api/bin/gateway_api command gateway_api_tasks migrate!
 #  Alternatively you can set env APP_MIGRATE=true and APP_RUN_SEED=true when starting container.
 CMD $APP_NAME/bin/$APP_NAME foreground

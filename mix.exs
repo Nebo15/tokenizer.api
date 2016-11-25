@@ -1,12 +1,10 @@
-defmodule Tokenizer.Mixfile do
+defmodule Gateway.Mixfile do
   use Mix.Project
 
   @version "0.1.0"
 
   def project do
-    [app: :tokenizer_api,
-     description: "Card tokenization service.",
-     package: package,
+    [app: :gateway_api,
      version: @version,
      elixir: "~> 1.3",
      elixirc_paths: elixirc_paths(Mix.env),
@@ -26,12 +24,12 @@ defmodule Tokenizer.Mixfile do
   def application do
     [applications: [:logger, :phoenix, :phoenix_ecto, :cowboy, :httpoison, :poison, :corsica,
                     :ecto, :postgrex, :ecto_enum, :timex, :credit_card, :confex, :eview],
-     mod: {Tokenizer, []}]
+     mod: {Gateway, []}]
   end
 
   # Specifies which paths to compile per environment.
-  defp elixirc_paths(:test), do: ["lib", "web", "test/support"]
-  defp elixirc_paths(_),     do: ["lib", "web"]
+  defp elixirc_paths(:test), do: ["lib", "test/support"]
+  defp elixirc_paths(_),     do: ["lib"]
 
   # Dependencies can be Hex packages:
   #
@@ -50,7 +48,7 @@ defmodule Tokenizer.Mixfile do
     [{:distillery, "~> 0.10"},
      {:phoenix, "~> 1.2"},
      {:phoenix_ecto, "3.1.0-rc.0"}, # TODO: Update when Ecto will release v2.1
-     {:ecto, "2.1.0-rc.3", override: true}, # TODO: Update when Ecto will release v2.1
+     {:ecto, "2.1.0-rc.4", override: true}, # TODO: Update when Ecto will release v2.1
      {:ecto_enum, "~> 1.0"},
      {:postgrex, "~> 0.12", override: true},
      {:confex, "~> 1.4"},
@@ -61,19 +59,9 @@ defmodule Tokenizer.Mixfile do
      {:credit_card, "~> 1.0"},
      {:timex, "~> 3.0"},
      {:corsica, "~> 0.5"},
-     {:ex_doc, ">= 0.0.0", only: [:dev, :test]},
      {:excoveralls, "~> 0.5", only: [:dev, :test]},
      {:dogma, "> 0.1.0", only: [:dev, :test]},
      {:credo, ">= 0.4.12", only: [:dev, :test]}]
-  end
-
-  # Settings for publishing in Hex package manager:
-  defp package do
-    [contributors: ["Nebo #15"],
-     maintainers: ["Nebo #15"],
-     licenses: ["LISENSE.md"],
-     links: %{github: "https://github.com/Nebo15/tokenizer.api"},
-     files: ~w(lib LICENSE.md mix.exs README.md)]
   end
 
   # Aliases are shortcuts or tasks specific to the current project.

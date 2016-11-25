@@ -10,11 +10,11 @@ use Mix.Config
 
 # You can configure for your application as:
 #
-#     config :tokenizer_api, key: :value
+#     config :gateway_api, key: :value
 #
 # And access this configuration in your application as:
 #
-#     Application.get_env(:tokenizer_api, :key)
+#     Application.get_env(:gateway_api, :key)
 #
 # Or configure a 3rd-party app:
 #
@@ -25,9 +25,9 @@ use Mix.Config
 #     :var_name, "${ENV_VAR_NAME}"
 
 # Configure your database
-config :tokenizer_api, Tokenizer.DB.Repo,
+config :gateway_api, API.Repo,
   adapter: Ecto.Adapters.Postgres,
-  database: "tokenizer_api_dev",
+  database: "gateway_api_dev",
   username: "postgres",
   password: "postgres",
   hostname: "localhost"
@@ -36,12 +36,12 @@ config :tokenizer_api, Tokenizer.DB.Repo,
 
 # General application configuration
 
-config :tokenizer_api,
-  namespace: Tokenizer,
-  ecto_repos: [Tokenizer.DB.Repo]
+config :gateway_api,
+  namespace: API,
+  ecto_repos: [API.Repo]
 
 # Configures the endpoint
-config :tokenizer_api, Tokenizer.HTTP.Endpoint,
+config :gateway_api, API.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "GJq0cIAxm5Egzg5lpPOibBooSTLWa3qfgoDGRsMpXDCjFkLK3uyTf4wICdyJ6W0Y",
   render_errors: [view: EView.Views.PhoenixError, accepts: ~w(json)]
@@ -52,22 +52,22 @@ config :logger, :console,
   metadata: [:request_id]
 
 # Card token life period
-config :tokenizer_api,
+config :gateway_api,
   card_token_expires_in: {:system, :integer, "CARD_TOKEN_EXPIRES_IN", 900_000} # 15 minutes
 
-config :tokenizer_api,
+config :gateway_api,
   card_data_encryption_key: {:system, "CARD_DATA_ENCRYPTION_KEY", "7AHw1Xitrf/YpLsL"}
 
-config :tokenizer_api,
+config :gateway_api,
   :transfer_token_expires_in, {:system, :integer, "PAYMENT_TOKEN_EXPIRES_IN", 900_000} # 15 minutes
 
-config :tokenizer_api, :limits, # TODO: Move to envs
+config :gateway_api, :limits, # TODO: Move to envs
   amount: [
     min: 1,
     max: 15000
   ]
 
-config :tokenizer_api, :fees, [ # TODO: Move to envs
+config :gateway_api, :fees, [ # TODO: Move to envs
     percent: 0.5,
     fix: 5,
     min: 5,
@@ -75,12 +75,12 @@ config :tokenizer_api, :fees, [ # TODO: Move to envs
   ]
 
 # Authorized consumers
-config :tokenizer_api, :consumer_tokens, [
+config :gateway_api, :consumer_tokens, [
     {:system, "CONSUMER_TOKEN", "DGRsMpXDCj"}
   ]
 
 # TODO: webhook updates on transfer status changes
-config :tokenizer_api, :webhooks,
+config :gateway_api, :webhooks,
   transfer_status: "http://example.com/"
 
 # It is also possible to import configuration files, relative to this

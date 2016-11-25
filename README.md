@@ -10,4 +10,4 @@ Currently supported processing back-ends:
 
 ## Installation
 
-Feel free to use [official docker container](https://hub.docker.com/r/nebo15/tokenizer_api/).
+Feel free to use [official docker container](https://hub.docker.com/r/nebo15/gateway_api/).

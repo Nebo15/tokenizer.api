@@ -1,4 +1,4 @@
-defmodule Tokenizer.DB.Repo.Migrations.Claims do
+defmodule Tokenizer.Repo.Migrations.Claims do
   use Ecto.Migration
 
   def change do

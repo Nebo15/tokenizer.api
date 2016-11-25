@@ -6,7 +6,7 @@ defmodule API.Controllers.Token do
   alias API.Repo.Schemas.Card, as: CardModel
   alias API.Repo.Schemas.CardToken, as: CardTokenModel
   alias API.Views.Token, as: TokenView
-  alias Tokenizer.Supervisor, as: CardStorage
+  alias Tokenizer.Supervisor, as: Tokenizer
 
   @doc """
   POST /tokens
@@ -25,7 +25,7 @@ defmodule API.Controllers.Token do
   defp save_card(%Ecto.Changeset{valid?: true} = changeset) do
     changeset
     |> Ecto.Changeset.apply_changes
-    |> CardStorage.save_card
+    |> Tokenizer.save_card
   end
 
   defp send_response({:ok, %CardTokenModel{} = card}, conn) do

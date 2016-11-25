@@ -6,7 +6,7 @@ defmodule API.Controllers.Claim do
 
   alias API.Repo.Schemas.Claim, as: ClaimSchema
   alias API.Views.Claim, as: ClaimView
-  alias Tokenizer.Supervisor, as: CardStorage
+  alias Tokenizer.Supervisor, as: Tokenizer
   alias API.Repo
   alias Ecto.Changeset
 
@@ -41,7 +41,7 @@ defmodule API.Controllers.Claim do
                                                      } = recipient
                                                    }
                                   } = changeset}) do
-    case CardStorage.get_card(token) do
+    case Tokenizer.get_card(token) do
       {:ok, card_data} ->
         recipient = recipient
         |> Changeset.put_embed(:credential, card_data)

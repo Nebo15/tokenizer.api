@@ -15,7 +15,6 @@ defmodule API.Web do
   Do NOT define functions inside the quoted expressions
   below.
   """
-
   def schema do
     quote do
       use Ecto.Schema
@@ -49,12 +48,6 @@ defmodule API.Web do
 
       import API.Router.Helpers
       import Phoenix.View
-    end
-  end
-
-  def router do
-    quote do
-      use Phoenix.Router
     end
   end
 

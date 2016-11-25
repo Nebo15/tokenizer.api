@@ -2,17 +2,14 @@ defmodule Gateway do
   @moduledoc """
   This is an entry point of gateway_api application.
   """
-
   use Application
 
   def start(_type, _args) do
     import Supervisor.Spec, warn: false
 
     children = [
-      # Start the Ecto repository
-      supervisor(API.Repo, []),
-      # Start the endpoint
-      supervisor(API.Endpoint, []),
+      # Start REST API
+      supervisor(API.Supervisor, []),
       # Start the card storage
       supervisor(Tokenizer.Supervisor, []),
     ]

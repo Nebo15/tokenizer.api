@@ -6,7 +6,7 @@ defmodule API.Controllers.Transfer do
 
   alias API.Repo.Schemas.Transfer, as: TransferSchema
   alias API.Views.Transfer, as: TransferView
-  alias Tokenizer.Supervisor, as: CardStorage
+  alias Tokenizer.Supervisor, as: Tokenizer
   alias API.Repo
   alias Ecto.Changeset
 
@@ -42,7 +42,7 @@ defmodule API.Controllers.Transfer do
                                                      } = sender
                                                    }
                                                   } = changeset}) do
-    case CardStorage.get_card(token) do
+    case Tokenizer.get_card(token) do
       {:ok, card_data} ->
         sender = sender
         |> Changeset.put_embed(:credential, card_data)
@@ -79,7 +79,7 @@ defmodule API.Controllers.Transfer do
                                                      } = recipient
                                                    }
                                                   } = changeset}) do
-    case CardStorage.get_card(token) do
+    case Tokenizer.get_card(token) do
       {:ok, card_data} ->
         recipient = recipient
         |> Changeset.put_embed(:credential, card_data)

@@ -6,8 +6,7 @@ defmodule API.Router do
 
   More info at: https://hexdocs.pm/phoenix/Phoenix.Router.html
   """
-
-  use API.Web, :router
+  use Phoenix.Router
 
   pipeline :public_api do
     plug :accepts, ["json"]

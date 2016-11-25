@@ -4,6 +4,5 @@ defmodule API.Repo do
 
   More info: https://hexdocs.pm/ecto/Ecto.Repo.html
   """
-
   use Ecto.Repo, otp_app: :gateway_api
 end

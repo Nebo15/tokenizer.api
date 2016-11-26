@@ -1,131 +1,105 @@
 defmodule API.Controllers.Claim do
   @moduledoc """
-  This controller implements REST API to send different kins of transfers and fetch information about them.
+  This controller implements REST API to claim right to receive claim by token.
   """
   use API.Web, :controller
-
+  import Ecto.Query, only: [from: 2]
   alias API.Repo.Schemas.Claim, as: ClaimSchema
+  alias API.Repo.Schemas.Transfer, as: TransferSchema
   alias API.Views.Claim, as: ClaimView
-  alias Tokenizer.Supervisor, as: Tokenizer
   alias API.Repo
   alias Ecto.Changeset
 
   @claim_token_prefix "claim-token"
 
-  # Actions
-
   @doc """
-  POST /transfers
+  POST /claims
   """
   def create(conn, params) when is_map(params) do
     %ClaimSchema{}
     |> ClaimSchema.changeset(params)
-    |> map_changeset()
-    |> resolve_recipient_credentials()
-    |> get_claim_autorization()
+    |> validate_id()
     |> put_claim_token()
-    |> create_transfer()
-    |> send_response(:created, conn)
+    |> create_claim()
+    |> render_response(conn, :created)
   end
 
-  defp resolve_recipient_credentials({:error, :invalid, changeset}), do: {:error, :invalid, changeset}
-  defp resolve_recipient_credentials({:ok, %Changeset{valid?: true,
-                                                   changes: %{
-                                                     recipient: %{
-                                                       changes: %{
-                                                         credential: %{
-                                                           changes: %{token: token},
-                                                           data: %{type: "card-token"}
-                                                         } = credential
-                                                       }
-                                                     } = recipient
-                                                   }
-                                  } = changeset}) do
-    case Tokenizer.get_card(token) do
-      {:ok, card_data} ->
-        recipient = recipient
-        |> Changeset.put_embed(:credential, card_data)
-
-        changeset = changeset
-        |> Changeset.put_embed(:recipient, recipient)
-
-        {:ok, changeset}
-      {:error, _} ->
-        credential = credential
-        |> Changeset.add_error(:token, "is invalid", validation: :token)
-
-        recipient = recipient
-        |> Changeset.put_embed(:credential, credential)
-
-        changeset = changeset
-        |> Changeset.put_embed(:recipient, recipient)
-
-        {:error, :invalid, changeset}
+  defp validate_id(changeset) do
+    case Changeset.fetch_field(changeset, :id) do
+      {_, id} ->
+        do_validate_id(changeset, id)
+      :error ->
+        changeset
     end
   end
-  defp resolve_recipient_credentials({:ok, changeset}), do: {:ok, changeset}
 
-  defp get_claim_autorization({:error, reason, details}), do: {:error, reason, details}
-  defp get_claim_autorization({:ok, %Changeset{} = changeset}) do
-    external_id = 10000
-    |> :rand.uniform()
-    |> to_string
+  defp do_validate_id(changeset, claim_id) do
+    result = Repo.one from t in TransferSchema,
+      where: fragment("(?)->'credential'->>'id' = ?", t.recipient, ^claim_id)
 
-    changeset = changeset
-    |> Changeset.put_change(:auth, %API.Repo.Schemas.Authorization3DS{})
-    |> Changeset.put_change(:external_id, external_id)
-
-    {:ok, changeset}
+    case result do
+      nil ->
+        changeset
+        |> Changeset.add_error(:id, "not found", validation: :claim_id)
+      %TransferSchema{id: transfer_id} ->
+        changeset
+        |> Changeset.put_change(:transfer_id, transfer_id)
+    end
   end
 
-  defp put_claim_token({:error, reason, details}), do: {:error, reason, details}
-  defp put_claim_token({:ok, %Changeset{} = changeset}) do
+  defp put_claim_token(%Changeset{valid?: false} = changeset), do: changeset
+  defp put_claim_token(%Changeset{valid?: true} = changeset) do
     expires_in = Confex.get(:gateway_api, :claim_token_expires_in)
 
     expires_at = Timex.now
     |> Timex.shift(microseconds: expires_in)
 
-    {:ok, changeset
-          |> Changeset.put_change(:token, @claim_token_prefix <> "-" <> Ecto.UUID.generate)
-          |> Changeset.put_change(:token_expires_at, expires_at)}
+    changeset
+    |> Changeset.put_change(:token, @claim_token_prefix <> "-" <> Ecto.UUID.generate)
+    |> Changeset.put_change(:token_expires_at, expires_at)
   end
 
-  # Store transfer changes into DB
-  defp create_transfer({:error, reason, details}), do: {:error, reason, details}
-  defp create_transfer({:ok, %Changeset{valid?: false} = changeset}), do: {:error, :invalid, changeset}
-  defp create_transfer({:ok, %Changeset{valid?: true} = changeset}) do
+  # Store claim changes into DB
+  defp create_claim(%Changeset{valid?: false} = changeset), do: {:error, changeset}
+  defp create_claim(%Changeset{valid?: true} = changeset) do
     changeset
     |> ClaimSchema.insert
   end
 
   @doc """
-  GET /transfers/:id
+  GET /claims/:id
   """
   def show(conn, %{"id" => id}) do
     ClaimSchema
     |> Repo.get_by(id: id)
-    |> check_query_result
+    |> Repo.preload(:transfer)
+    |> validate_query_result()
     |> validate_token(conn)
-    # |> receive_claim_status() TODO: get transfer status and persist it
-    |> send_response(:ok, conn)
+    # |> receive_transfer_status() TODO: get claim status and persist it
+    # |> update_claim()
+    |> render_response(conn)
   end
 
   @doc """
-  POST /transfers/:id/auth
+  POST /claims/:id/auth
   """
   def authentificate(conn, %{"id" => id} = params) do
     ClaimSchema
     |> Repo.get_by(id: id)
-    |> check_query_result
+    |> Repo.preload(:transfer)
+    |> validate_query_result()
     |> validate_token(conn)
     |> validate_otp_code(params)
-    |> update_transfer()
-    # |> receive_claim_status() TODO: get transfer status and persist it
-    |> send_response(:ok, conn)
+    # |> receive_claim_status() TODO: get claim status and persist it
+    |> update_claim()
+    |> render_response(conn)
   end
 
+  defp validate_query_result(nil), do: {:error, :not_found}
+  defp validate_query_result(%ClaimSchema{} = claim), do: {:ok, claim}
+
   defp validate_otp_code({:error, reason}, _params), do: {:error, reason}
-  defp validate_otp_code({:ok, transfer}, params) do
+  defp validate_otp_code({:ok, claim}, _params) do
     # TODO validate token via payment services
     # %{}
     # |> Changeset.change(params)
@@ -133,48 +107,48 @@ defmodule API.Controllers.Claim do
     # |> Changeset.validate_required([:"otp-code", :id])
     # |> IO.inspect
 
-    {:ok, transfer
-          |> Changeset.change()
-          |> Changeset.put_change(:status, :completed)}
+    claim = claim
+    |> Changeset.change()
+    |> Changeset.put_change(:status, :completed)
+
+    {:ok, claim}
   end
 
-  defp update_transfer({:error, reason}), do: {:error, reason}
-  defp update_transfer({:ok, changeset}) do
+  defp update_claim({:error, reason}), do: {:error, reason}
+  defp update_claim({:ok, changeset}) do
+    # TODO: Update payment after fetching changes
     changeset
     |> ClaimSchema.update
   end
 
-  defp check_query_result(nil), do: {:error, :not_found}
-  defp check_query_result(%ClaimSchema{} = transfer), do: {:ok, transfer}
-
   defp validate_token({:error, reason}, _conn), do: {:error, reason}
-  defp validate_token({:ok, %{token: claim_token} = transfer}, %Plug.Conn{assigns: %{token: user_token}})
-       when claim_token == user_token, do: {:ok, transfer}
-  defp validate_token({:ok, _transfer}, _conn), do: {:error, :access_denied}
-
-  defp map_changeset(%Changeset{valid?: false} = changeset), do: {:error, :invalid, changeset}
-  defp map_changeset(%Changeset{valid?: true} = changeset), do: {:ok, changeset}
+  defp validate_token({:ok, %{token: claim_token} = claim}, %Plug.Conn{assigns: %{token: user_token}})
+    when claim_token == user_token,
+    do: {:ok, claim}
+  defp validate_token({:ok, _claim}, _conn), do: {:error, :access_denied}
 
   # Responses
-  defp send_response({:ok, %ClaimSchema{} = transfer}, status, conn) do
+  defp render_response(state, conn, status \\ :ok)
+
+  defp render_response({:ok, %ClaimSchema{} = claim}, conn, status) do
     conn
     |> put_status(status)
-    |> render(ClaimView, "transfer.json", transfer: transfer)
+    |> render(ClaimView, "claim.json", claim: claim)
   end
 
-  defp send_response({:error, :invalid, %Changeset{} = changeset}, _status, conn) do
+  defp render_response({:error, %Changeset{valid?: false} = changeset}, conn, _status) do
     conn
     |> put_status(422)
     |> render(EView.Views.ValidationError, "422.json", changeset)
   end
 
-  defp send_response({:error, :not_found}, _status, conn) do
+  defp render_response({:error, :not_found}, conn, _status) do
     conn
     |> put_status(404)
     |> render(EView.Views.Error, "404.json", %{})
   end
 
-  defp send_response({:error, :access_denied}, _status, conn) do
+  defp render_response({:error, :access_denied}, conn, _status) do
     conn
     |> put_status(401)
     |> render(EView.Views.Error, "401.json", %{})

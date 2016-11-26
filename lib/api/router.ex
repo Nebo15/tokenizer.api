@@ -22,29 +22,22 @@ defmodule API.Router do
   scope "/", API.Controllers do
     pipe_through :public_api
 
-    # Create card tokens
     post "/tokens", Token, :create
   end
 
   scope "/transfers", API.Controllers do
     pipe_through :private_api
 
-    # Create and get transfer
     post "/", Transfer, :create
     get  "/:id", Transfer, :show
-
-    # Complete transfers
     post "/:id/auth", Transfer, :authentificate
   end
 
-  # scope "/claims", API.Controllers do
-  #   pipe_through :private_api
+  scope "/claims", API.Controllers do
+    pipe_through :private_api
 
-  #   # Create and get transfer
-  #   post "/", Transfer, :create
-  #   get  "/:id", Transfer, :show
-
-  #   # Complete transfers
-  #   post "/:id/auth", Transfer, :authentificate
-  # end
+    post "/", Claim, :create
+    get  "/:id", Claim, :show
+    post "/:id/auth", Claim, :authentificate
+  end
 end

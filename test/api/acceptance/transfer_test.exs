@@ -89,7 +89,7 @@ defmodule API.Controllers.TransferTest do
     test "with sender card token" do
       %{"data" => %{"token" => token}} = "tokens"
       |> post!(@card_credential)
-      |> get_body
+      |> get_body()
 
       resp = "transfers"
       |> post!(construct_transfer(%{type: "card-token", token: token}))
@@ -126,6 +126,7 @@ defmodule API.Controllers.TransferTest do
       } = resp
     end
 
+    # TODO with unknown token type it generates cast error with Elixir module name
     test "with invalid card token" do
       resp = "transfers"
       |> post!(construct_transfer(%{type: "card-token", token: "invalid_token"}))
@@ -150,7 +151,7 @@ defmodule API.Controllers.TransferTest do
         %{type: "card-number", number: "5473959513413611"},
         %{type: "card", number: "5473959513413611", cvv: "160", expiration_month: "01", expiration_year: "2020"}
       ))
-      |> get_body
+      |> get_body()
 
       assert %{
         "meta" => %{
@@ -175,7 +176,7 @@ defmodule API.Controllers.TransferTest do
         %{type: "card", number: "5473959513413611", cvv: "160", expiration_month: "01", expiration_year: "20"},
         %{type: "card-number", number: "1473959513413611"}
       ))
-      |> get_body
+      |> get_body()
 
       assert %{
         "meta" => %{
@@ -205,7 +206,7 @@ defmodule API.Controllers.TransferTest do
 
       path
       |> get!([{"authorization", "Basic " <> Base.encode64(token <> ":")}])
-      |> assert_transfer
+      |> assert_transfer()
     end
 
     test "401 when token is invalid" do
@@ -218,7 +219,7 @@ defmodule API.Controllers.TransferTest do
       %{"meta" => %{"code" => 401},
         "error" => %{"type" => "access_denied"}} = path
       |> get!([{"authorization", "Basic " <> Base.encode64("invalid_token:")}])
-      |> get_body
+      |> get_body()
     end
 
     test "404 for non-existent transfers" do
@@ -264,7 +265,7 @@ defmodule API.Controllers.TransferTest do
       %{"meta" => %{"code" => 401},
         "error" => %{"type" => "access_denied"}} = path
       |> get!([{"authorization", "Basic " <> Base.encode64("invalid_token")}])
-      |> get_body
+      |> get_body()
     end
 
     test "404 for non-existent transfers" do

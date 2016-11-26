@@ -50,7 +50,7 @@ defmodule API.Repo.Types.DynamicEmbed do
       # just return it to be stored in the schema struct.
       def load(params) do
         case resolve(params) do
-          {:ok, embed_type} -> {:ok, struct(embed_type, params)}
+          {:ok, embed_type} -> {:ok, struct(embed_type, to_atom_keys(params))}
           {:error, reason} -> {:error, reason}
         end
       end

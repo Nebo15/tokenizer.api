@@ -22,28 +22,6 @@ defmodule API.Repo.Schemas.Transfer do
     timestamps()
   end
 
-  def insert(%Ecto.Changeset{} = changeset) do
-    changeset
-    |> Ecto.Changeset.apply_changes()
-    |> API.Repo.insert
-  end
-
-  def insert(%API.Repo.Schemas.Transfer{} = struct) do
-    struct
-    |> API.Repo.insert
-  end
-
-  def update(%Ecto.Changeset{} = changeset) do
-    changeset
-    |> API.Repo.update
-  end
-
-  @doc """
-  Builds a changeset based on the `struct` and `params`.
-
-  It should be used to validate data that is sent by API consumers,
-  so we don't force them to send internally required fields.
-  """
   def changeset(struct, params \\ %{}) do
     limits = Confex.get(:gateway_api, :limits)
     fees = Confex.get(:gateway_api, :fees)
@@ -62,5 +40,21 @@ defmodule API.Repo.Schemas.Transfer do
     |> validate_fee(:amount, :fee, fees)
     |> validate_metadata(:metadata)
     |> unique_constraint(:external_id, name: :transfers_external_id_index)
+  end
+
+  def insert(%Ecto.Changeset{} = changeset) do
+    changeset
+    |> Ecto.Changeset.apply_changes()
+    |> Repo.insert
+  end
+
+  def insert(%API.Repo.Schemas.Transfer{} = struct) do
+    struct
+    |> Repo.insert
+  end
+
+  def update(%Ecto.Changeset{} = changeset) do
+    changeset
+    |> Repo.update
   end
 end

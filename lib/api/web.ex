@@ -26,6 +26,8 @@ defmodule API.Web do
       import EView.Changeset.Validators.Email
       import EView.Changeset.Validators.PhoneNumber
       import EView.Changeset.Validators.Metadata
+
+      alias API.Repo
     end
   end
 
@@ -33,11 +35,11 @@ defmodule API.Web do
     quote do
       use Phoenix.Controller, namespace: Tokenizer
 
-      alias API.Repo
       import Ecto
       import Ecto.Query
-
       import API.Router.Helpers
+
+      alias API.Repo
     end
   end
 

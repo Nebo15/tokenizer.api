@@ -28,7 +28,7 @@ defmodule API.Controllers.Transfer do
   # Transfer Gateway delegates
   defp get_transfer_autorization(%Changeset{valid?: false} = changeset), do: changeset
   defp get_transfer_autorization(%Changeset{valid?: true} = changeset) do
-    external_id = 10000
+    external_id = 10_000
     |> :rand.uniform()
     |> to_string
 

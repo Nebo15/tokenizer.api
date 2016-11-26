@@ -15,7 +15,11 @@ config :gateway_api, API.Endpoint,
   server: true
 
 # Print only warnings and errors during test
-config :logger, level: :warn
+config :logger, level: :debug
+config :ex_unit, capture_log: true
 
 # Run acceptance test in concurrent mode
 config :gateway_api, sql_sandbox: true
+
+# Fix acceptance tests race conditions
+config :hackney, use_default_pool: false

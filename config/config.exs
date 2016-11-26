@@ -61,10 +61,13 @@ config :gateway_api,
 config :gateway_api,
   :transfer_token_expires_in, {:system, :integer, "PAYMENT_TOKEN_EXPIRES_IN", 900_000} # 15 minutes
 
+config :gateway_api,
+  :claim_token_expires_in, {:system, :integer, "PAYMENT_TOKEN_EXPIRES_IN", 900_000} # 15 minutes
+
 config :gateway_api, :limits, # TODO: Move to envs
   amount: [
     min: 1,
-    max: 15000
+    max: 15_000
   ]
 
 config :gateway_api, :fees, [ # TODO: Move to envs

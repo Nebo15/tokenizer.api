@@ -33,7 +33,7 @@ defmodule API.Plugs.Authorization do
   end
 
   defp assert_consumer_token({conn, :unathorized}, _), do: render(conn, "401.json")
-  defp assert_consumer_token({conn, [consumer_token, _transfer_token] = credentials}, consumer_tokens) do
+  defp assert_consumer_token({conn, [consumer_token, _transfer_token]}, consumer_tokens) do
     case Enum.find(consumer_tokens, &(&1 == consumer_token)) do
       nil ->
         render(conn, "401.json")

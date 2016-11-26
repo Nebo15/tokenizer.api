@@ -5,9 +5,9 @@ defmodule API.Plugs.Authentification do
   alias Plug.Conn
 
   @auhtorization_type "Basic"
-  def init([]), do: Confex.get_map(:gateway_api, :consumer_tokens)
+  def init([]), do: []
 
-  def call(%Plug.Conn{} = conn, consumer_tokens) do
+  def call(%Plug.Conn{} = conn, _opts) do
     conn
     |> get_auth_header()
     |> get_credentials()

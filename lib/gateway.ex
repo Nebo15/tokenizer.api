@@ -8,10 +8,10 @@ defmodule Gateway do
     import Supervisor.Spec, warn: false
 
     children = [
+      # Start the card tokenization
+      supervisor(Tokenizer.Supervisor, []),
       # Start REST API
       supervisor(API.Supervisor, []),
-      # Start the card storage
-      supervisor(Tokenizer.Supervisor, []),
     ]
 
     opts = [strategy: :one_for_one, name: Gateway.Supervisor]

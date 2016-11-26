@@ -1,6 +1,6 @@
 defmodule API.Repo.Schemas.Authorization3DS do
   @moduledoc """
-  Model for 3D-Secure authorization response.
+  Schema for 3D-Secure authorization response.
   """
   use API.Web, :schema
 

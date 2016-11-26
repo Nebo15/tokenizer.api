@@ -1,6 +1,6 @@
 defmodule API.Repo.Schemas.CardToken do
   @moduledoc """
-  Model for sender cards.
+  Schema for sender cards.
   """
   use API.Web, :schema
   import API.Repo.Changeset.Validators.Expiration

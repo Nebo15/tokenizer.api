@@ -3,8 +3,8 @@ defmodule API.Controllers.Token do
   Controller for `/tokens` API requests.
   """
   use API.Web, :controller
-  alias API.Repo.Schemas.Card, as: CardModel
-  alias API.Repo.Schemas.CardToken, as: CardTokenModel
+  alias API.Repo.Schemas.Card, as: CardSchema
+  alias API.Repo.Schemas.CardToken, as: CardTokenSchema
   alias API.Views.Token, as: TokenView
   alias Tokenizer.Supervisor, as: Tokenizer
 
@@ -12,14 +12,14 @@ defmodule API.Controllers.Token do
   POST /tokens
   """
   def create(conn, params) when is_map(params) do
-    %CardModel{}
-    |> CardModel.changeset(params)
+    %CardSchema{}
+    |> CardSchema.changeset(params)
     |> save_card
     |> send_response(conn)
   end
 
   defp save_card(%Ecto.Changeset{valid?: false} = changeset) do
-    {:error, :invalid, changeset}
+    {:error, changeset}
   end
 
   defp save_card(%Ecto.Changeset{valid?: true} = changeset) do
@@ -28,13 +28,13 @@ defmodule API.Controllers.Token do
     |> Tokenizer.save_card
   end
 
-  defp send_response({:ok, %CardTokenModel{} = card}, conn) do
+  defp send_response({:ok, %CardTokenSchema{} = card}, conn) do
     conn
     |> put_status(:created)
     |> render(TokenView, "card.json", card: card)
   end
 
-  defp send_response({:error, :invalid, %Ecto.Changeset{} = changeset}, conn) do
+  defp send_response({:error, %Ecto.Changeset{} = changeset}, conn) do
     conn
     |> put_status(422)
     |> render(EView.Views.ValidationError, "422.json", changeset)

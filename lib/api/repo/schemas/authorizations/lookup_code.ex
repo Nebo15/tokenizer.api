@@ -1,6 +1,6 @@
 defmodule API.Repo.Schemas.AuthorizationLookupCode do
   @moduledoc """
-  Model for Lookup-Code authorization response.
+  Schema for Lookup-Code authorization response.
   """
   use API.Web, :schema
 

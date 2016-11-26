@@ -1,6 +1,6 @@
 defmodule API.Repo.Schemas.Peer do
   @moduledoc """
-  Model for transfer senders.
+  Schema for transfer senders.
   """
   use API.Web, :schema
   import API.Repo.Changeset.DynamicEmbeds

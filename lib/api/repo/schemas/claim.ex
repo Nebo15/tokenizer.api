@@ -1,6 +1,6 @@
 defmodule API.Repo.Schemas.Claim do
   @moduledoc """
-  Model for transfers.
+  Schema for transfers.
   """
   use API.Web, :schema
   import API.Repo.Changeset.DynamicEmbeds

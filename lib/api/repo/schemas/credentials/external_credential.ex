@@ -1,6 +1,6 @@
 defmodule API.Repo.Schemas.ExternalCredential do
   @moduledoc """
-  Model for sender cards.
+  Schema for sender cards.
   """
   use API.Web, :schema
 

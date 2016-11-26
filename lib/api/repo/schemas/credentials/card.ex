@@ -1,6 +1,6 @@
 defmodule API.Repo.Schemas.Card do
   @moduledoc """
-  Model for sender cards.
+  Schema for sender cards.
   """
   use API.Web, :schema
 

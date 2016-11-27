@@ -7,6 +7,7 @@ defmodule API.Controllers.Transfer do
   alias API.Repo.Schemas.Transfer, as: TransferSchema
   alias API.Repo.Schemas.Card, as: CardSchema
   alias API.Repo.Schemas.CardNumber, as: CardNumberSchema
+  alias API.Repo.Schemas.AuthorizationLookupCode
   alias API.Views.Transfer, as: TransferView
   alias API.Helpers.TokenResolver
   alias API.Repo
@@ -37,24 +38,6 @@ defmodule API.Controllers.Transfer do
 
     changeset
     |> Changeset.change(update)
-    # IO.inspect changeset
-
-    # amount = changeset |> Changeset.get_change(:amount)
-    # fee = changeset |> Changeset.get_change(:fee)
-    # sender_credential = changeset
-    # |> Changeset.get_change(:sender)
-    # |> Changeset.get_change(:credential)
-    # |> Changeset.apply_changes()
-    # sender_phone = changeset
-    # |> Changeset.get_change(:phone)
-    # recipient_credential = changeset
-    # |> Changeset.get_change(:recipient)
-    # |> Changeset.get_change(:credential)
-    # |> Changeset.apply_changes()
-
-
-    # IO.inspect TransferService.card2card(sender_credential, recipient_credential, amount, fee, sender_phone)
-
   end
 
   # Card2Card transfers
@@ -103,9 +86,19 @@ defmodule API.Controllers.Transfer do
     |> Repo.get_by(id: id)
     |> validate_query_result()
     |> validate_token(conn)
-    # |> receive_transfer_status() TODO: get transfer status and persist it
-    # |> update_transfer()
+    |> receive_transfer_status()
+    |> update_transfer()
     |> render_response(conn)
+  end
+
+  defp receive_transfer_status({:error, reason}), do: {:error, reason}
+  defp receive_transfer_status({:ok, %TransferSchema{external_id: external_id} = transfer}) do
+    {_, update} = Processing.Adapters.Pay2You.Status.get(external_id)
+
+    transfer = transfer
+    |> Changeset.change(update)
+
+    {:ok, transfer}
   end
 
   @doc """
@@ -117,7 +110,6 @@ defmodule API.Controllers.Transfer do
     |> validate_query_result()
     |> validate_token(conn)
     |> validate_otp_code(params)
-    # |> receive_transfer_status() TODO: get transfer status and persist it
     |> update_transfer()
     |> render_response(conn)
   end
@@ -126,32 +118,36 @@ defmodule API.Controllers.Transfer do
   defp validate_query_result(%TransferSchema{} = transfer), do: {:ok, transfer}
 
   defp validate_otp_code({:error, reason}, _params), do: {:error, reason}
-  defp validate_otp_code({:ok, transfer}, _params) do
-    # TODO validate token via payment services
-    # %{}
-    # |> Changeset.change(params)
-    # |> Changeset.cast([:"otp-code", :id])
-    # |> Changeset.validate_required([:"otp-code", :id])
-    # |> IO.inspect
-
-    transfer = transfer
-    |> Changeset.change()
-    |> Changeset.put_change(:status, "completed")
+  defp validate_otp_code({:ok, %TransferSchema{auth: %AuthorizationLookupCode{} = transfer_auth} = transfer}, params) do
+    transfer = case Processing.Adapters.Pay2You.LookupAuth.auth(transfer_auth, params["code"]) do
+      {:ok, update} ->
+        transfer
+        |> Changeset.change(update)
+      {:error, :invalid_otp_code} ->
+        transfer
+        |> Changeset.change()
+        |> Changeset.add_error(:code, "is invalid", validation: :otp_code)
+      {:error, %{status: _} = error_update} ->
+        transfer
+        |> Changeset.change(error_update)
+    end
 
     {:ok, transfer}
   end
-
-  defp update_transfer({:error, reason}), do: {:error, reason}
-  defp update_transfer({:ok, changeset}) do
-    changeset
-    |> TransferSchema.update
-  end
+  defp validate_otp_code({:ok, _transfer}, _params), do: {:error, :not_found}
 
   defp validate_token({:error, reason}, _conn), do: {:error, reason}
   defp validate_token({:ok, %{token: transfer_token} = transfer}, %Plug.Conn{assigns: %{token: user_token}})
     when transfer_token == user_token,
     do: {:ok, transfer}
   defp validate_token({:ok, _transfer}, _conn), do: {:error, :access_denied}
+
+  defp update_transfer({:error, reason}), do: {:error, reason}
+  defp update_transfer({:ok, %Changeset{valid?: false} = changeset}), do: {:error, changeset}
+  defp update_transfer({:ok, changeset}) do
+    changeset
+    |> TransferSchema.update
+  end
 
   # Responses
   defp render_response(state, conn, status \\ :ok)

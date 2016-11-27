@@ -1,68 +1,48 @@
-# defmodule Processing.Adapters.Pay2You.TransferStatus do
-#   alias Pay2You.Request
-#   alias Pay2You.ErrorMapper
+defmodule Processing.Adapters.Pay2You.Status do
+  @moduledoc """
+  This module implements lookup authorization for P2Y transfers.
+  """
+  require Logger
+  alias Processing.Adapters.Pay2You.Error
+  alias Processing.Adapters.Pay2You.Request
 
-#   use Pay2You.DictsMacro
+  @config Confex.get(:gateway_api, :pay2you)
+  @status_upstream_uri "/Info/GetPayStatus"
 
-#   @transfer_status_uri "/Info/GetPayStatus"
+  def get(id) do
+    %{
+      mPayNumber: id
+    }
+    |> get_status()
+    |> normalize_response()
+  end
 
-#   def get(id) when is_integer(id) do
-#     [
-#       mPayNumber: id
-#     ]
-#     |> Request.send_to(@transfer_status_uri)
-#     |> normalize_response
-#   end
+  defp get_status(params) do
+    case Request.post(@status_upstream_uri, params) do
+      {:ok, %{body: body}} -> {:ok, body}
+      {:error, reason} -> {:error, reason}
+    end
+  end
 
-#   # 3DS code is not sent yet
-#   defp normalize_response({:ok, %{"mErrCode" => status_code} = transaction})
-# when status_code == 55 or status_code == 56 do
-#     {:ok, %{
-#       id: transaction["mPayNumber"],
-#       status: @statuses[:auth_waiting],
-#       auth: %{
-#         type: @auth_types[:ds3]
-#       }
-#     }}
-#   end
+  defp normalize_response({:error, reason}) do
+    Logger.warn("Transfer failed with error: #{inspect reason}")
+    {:error, %{status: "error"}}
+  end
 
-#   # Lookup code is not sent yet
-#   defp normalize_response({:ok, %{"mErrCode" => status_code} = transaction})
-# when status_code == 49 or status_code == 59 do
-#     {:ok, %{
-#       id: transaction["mPayNumber"],
-#       status: @statuses[:auth_waiting],
-#       auth: %{
-#         type: @auth_types[:lookup]
-#       }
-#     }}
-#   end
+  defp normalize_response({:ok, %{"mErrCode" => 0}}),
+    do: {:ok, %{status: "completed"}}
 
-#   # Successful payment
-#   defp normalize_response({:ok, %{"mErrCode" => 0} = transaction}) do
-#     {:ok, %{
-#       id: transaction["mPayNumber"],
-#       status: @statuses[:completed]
-#     }}
-#   end
+  # 3DS or lookup code is not sent yet
+  defp normalize_response({:ok, %{"mErrCode" => status_code}}) when status_code in [55, 56, 49, 59],
+    do: {:ok, %{status: "authentication"}}
 
-#   # Everything else is an error
-#   defp normalize_response({:ok, %{"mErrCode" => _} = transaction}) do
-#     {:ok, %{
-#       id: transaction["mPayNumber"],
-#       status: @statuses[:declined],
-#       decline: %{
-#         reason: ErrorMapper.get_decline_reason(transaction["mErrCode"]),
-#         error_code: transaction["mErrCode"]
-#       }
-#     }}
-#   end
-
-#   defp normalize_response({:ok, %{"code" => code, "error" => err}}) do
-#     {:error, %{code: code, error: err}}
-#   end
-
-#   defp normalize_response({:error, reason}) do
-#     {:error, reason}
-#   end
-# end
+  defp normalize_response({:ok, %{"mErrCode" => status_code}}) do
+    {:ok, %{
+      status: "declined",
+      decline: %{
+        code: status_code,
+        reason: Error.get_error_group(status_code)
+      }
+    }}
+  end
+end

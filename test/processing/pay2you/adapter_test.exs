@@ -85,4 +85,17 @@ defmodule Processing.Adapters.Pay2You.AdapterTest do
       } = transfer_response
     end
   end
+
+  # describe "authorize transfer via lookup code" do
+  #   setup do
+  #     {:ok, transfer} = @lookup_card
+  #     |> Pay2You.Transfer.card2card(@card_number, Decimal.new(1), Decimal.new(5.01), "+380971112233")
+
+  #     %{transfer: transfer}
+  #   end
+
+  #   test "with valid code", %{transfer: transfer} do
+  #     Pay2You.LookupAuth.auth()
+  #   end
+  # end
 end

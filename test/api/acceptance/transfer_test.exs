@@ -261,7 +261,13 @@ defmodule API.Controllers.TransferTest do
   describe "POST /transfers/:id/auth" do
     test "201" do
       %{"data" => %{"id" => id, "token" => token}} = "transfers"
-      |> post!(construct_transfer())
+      |> post!(construct_transfer(%{
+        type: "card",
+        number: "5591587543706253",
+        cvv: "160",
+        expiration_month: "01",
+        expiration_year: "2020"
+      }))
       |> get_body()
 
       path = "transfers/" <> to_string(id) <> "/auth"
@@ -270,9 +276,9 @@ defmodule API.Controllers.TransferTest do
         "meta" => %{
           "code" => _
         },
-        "data" => %{"status" => "completed"}
+        "data" => %{"status" => "processing"}
       } = path
-      |> post!(%{"id" => 123, "otp-code" => 345}, [{"authorization", "Basic " <> Base.encode64(token)}])
+      |> post!(%{"code" => 123456}, [{"authorization", "Basic " <> Base.encode64(token)}])
       |> get_body()
     end
 

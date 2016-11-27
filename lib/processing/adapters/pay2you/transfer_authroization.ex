@@ -1,62 +1,60 @@
-# defmodule Processing.Adapters.Pay2You.TransferAuthorization do
-#   alias Processing.Adapters.Pay2You.Request
-#   alias Processing.Adapters.Pay2You.Error
+defmodule Processing.Adapters.Pay2You.LookupAuth do
+  @moduledoc """
+  This module implements lookup authorization for P2Y transfers.
+  """
+  require Logger
+  alias Processing.Adapters.Pay2You.Error
+  alias Processing.Adapters.Pay2You.Request
+  alias API.Repo.Schemas.AuthorizationLookupCode
 
-#         @statuses [
-#         auth_waiting: "auth_waiting",
-#         completed: "completed",
-#         processing: "processing",
-#         declined: "declined"
-#       ]
-#       @auth_types [
-#         lookup: "LOOKUP-CODE",
-#         ds3: "3D-SECURE"
-#       ]
+  @config Confex.get(:gateway_api, :pay2you)
+  @auth_upstream_uri "/ConfirmLookUp/finishlookup"
 
+  def auth(%AuthorizationLookupCode{md: md}, code) do
+    %{
+      md: md,
+      paRes: code,
+      cvv: "000"
+    }
+    |> post_auth()
+    |> normalize_response()
+  end
 
-#   @transfer_completion_uri "/ConfirmLookUp/finishlookup"
+  defp post_auth(params) do
+    case Request.post(@auth_upstream_uri, params) do
+      {:ok, %{body: body}} -> {:ok, body}
+      {:error, reason} -> {:error, reason}
+    end
+  end
 
-#   def send(md, code) when is_integer(md) and is_integer(code) do
-#     [
-#       md: md,
-#       paRes: code,
-#       cvv: "000"
-#     ]
-#     |> Request.send_to(@transfer_completion_uri)
-#     |> normalize_response
-#   end
+  defp normalize_response({:error, reason}) do
+    Logger.warn("Transfer failed with error: #{inspect reason}")
+    {:error, %{
+      status: "error"
+    }}
+  end
 
-#   defp normalize_response({:ok, %{"state" => %{"code" => 0}} = transaction}) do
-#     {:ok, %{
-#       id: transaction["idClient"],
-#       status: @statuses[:processing]
-#     }}
-#   end
+  defp normalize_response({:ok, %{"state" => %{"code" => 0}}}),
+    do: {:ok, %{status: "processing"}}
 
-#   # Lookup code is not sent yet
-#   defp normalize_response({:ok, %{"state" => %{"code" => status_code}}}) when status_code == 49
-# or status_code == 59 do
-#     {:error, {:validation, :code, "is invalid"}}
-#   end
+  defp normalize_response({:ok, %{"state" => %{"code" => status_code}}}) when status_code == 49 or status_code == 59,
+    do: {:error, :invalid_otp_code}
 
-#   # 3DS code is not sent yet
-#   defp normalize_response({:ok, %{"state" => %{"code" => status_code}}}) when status_code == 55
-# or status_code == 56 do
-#     {:error, {:validation, :auth_method, "not allowed for 3DS cards"}}
-#   end
+  defp normalize_response({:ok, %{"state" => %{"code" => status_code}}}) when status_code == 55 or status_code == 56,
+    do: {:error, :invalid_auth_type}
 
-#   # Everything else is an error
-#   defp normalize_response({:ok, %{"state" => %{"code" => _}} = transaction}) do
-#     {:ok, %{
-#       id: transaction["idClient"],
-#       status: @statuses[:declined],
-#       decline: %{
-#         reason: ErrorMapper.get_decline_reason(transaction["state"]["code"])
-#       }
-#     }}
-#   end
+  defp normalize_response({:ok, %{"state" => %{"code" => 0}}}),
+    do: {:ok, %{status: "processing"}}
 
-#   defp normalize_response({:error, reason}) do
-#     {:error, reason}
-#   end
-# end
+  defp normalize_response({:ok, %{"idClient" => id, "state" => %{"code" => status_code}}}) do
+    {:error, %{
+      external_id: to_string(id),
+      status: "declined",
+      decline: %{
+        code: status_code,
+        reason: Error.get_error_group(status_code)
+      }
+    }}
+  end
+end
+

@@ -77,6 +77,17 @@ config :gateway_api, :fees, [ # TODO: Move to envs
     max: :infinity
   ]
 
+config :gateway_api, :pay2you,
+  upstream_url: "http://p2y-dev.mbill.co/pay2you-ext",
+  upstream_version: "0.5.0.b",
+  project: [
+    name: "bluesky",
+    fee: [
+      percent: 0.5,
+      fix: 5
+    ]
+  ]
+
 # Authorized consumers
 config :gateway_api, :consumer_tokens, [
     {:system, "CONSUMER_TOKEN", "DGRsMpXDCj"}

@@ -24,11 +24,12 @@ defmodule API.Repo.Changeset.Validators.Fee do
   end
 
   def calculate(amount, percent, fix, min, max) do
-    D.set_context(%D.Context{D.get_context | precision: 3, rounding: :half_up})
-
-    amount
-    |> calculate_body(percent, fix)
-    |> apply_limits(min, max)
+    %D.Context{D.get_context | precision: 3, rounding: :half_up}
+    |> D.with_context(fn ->
+      amount
+      |> calculate_body(percent, fix)
+      |> apply_limits(min, max)
+    end)
   end
 
   defp calculate_body(amount, percent, fix) do

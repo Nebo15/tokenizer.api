@@ -16,6 +16,7 @@ defmodule API.Repo.Schemas.Transfer do
     field :status, :string, default: "authentication"
     field :auth, API.Repo.Types.Authorization
     field :metadata, :map
+    field :decline, :map
     embeds_one :sender, API.Repo.Schemas.Peer
     embeds_one :recipient, API.Repo.Schemas.Peer
 

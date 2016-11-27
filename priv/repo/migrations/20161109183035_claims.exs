@@ -10,6 +10,7 @@ defmodule Tokenizer.Repo.Migrations.Claims do
       add :token_expires_at, :utc_datetime
       add :credential, :map
       add :auth, :map
+      add :decline, :map
       add :transfer_id, references(:transfers)
       add :metadata, :map
 

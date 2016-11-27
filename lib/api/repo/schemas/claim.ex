@@ -16,6 +16,7 @@ defmodule API.Repo.Schemas.Claim do
     field :auth, :map, default: %{type: "otp-code"}
     belongs_to :transfer, API.Repo.Schemas.Transfer
     field :metadata, :map
+    field :decline, :map
 
     timestamps()
   end

@@ -51,7 +51,7 @@ defmodule API.Controllers.TransferTest do
         "id" => _,
         "amount" => _,
         "fee" => _,
-        "auth" => %{"acs_url" => nil, "md" => nil, "pa_req" => nil, "terminal_url" => nil, "type" => "3d-secure"},
+        "auth" => _, # TODO: check authorization
         "description" => "some content",
         "external_id" => _,
         "status" => "authentication",

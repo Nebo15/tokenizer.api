@@ -11,6 +11,7 @@ defmodule Mbill.Repo.Migrations.CreateTransfer do
       add :description, :string
       add :status, :string
       add :auth, :map
+      add :decline, :map
       add :metadata, :map
       add :sender, :map
       add :recipient, :map

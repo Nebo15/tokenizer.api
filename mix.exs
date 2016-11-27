@@ -54,7 +54,7 @@ defmodule Gateway.Mixfile do
      {:eview, "~> 0.7.0"},
      {:cowboy, "~> 1.0"},
      {:poison, "~> 2.2"},
-     {:httpoison, "~> 0.9.2"},
+     {:httpoison, "~> 0.10"},
      {:credit_card, "~> 1.0"},
      {:timex, "~> 3.0"},
      {:corsica, "~> 0.5"},

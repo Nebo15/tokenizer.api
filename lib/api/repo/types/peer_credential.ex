@@ -17,4 +17,9 @@ defmodule API.Repo.Types.PeerCredential do
     do: {:ok, API.Repo.Schemas.ExternalCredential}
   def resolve(_),
     do: {:error, :unkown_type}
+
+  @doc """
+  Returns list of supported `type`'s.
+  """
+  def types, do: ["card", "card-number", "card-token", "external-credential"]
 end

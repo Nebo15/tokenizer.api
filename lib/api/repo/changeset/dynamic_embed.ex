@@ -29,7 +29,7 @@ defmodule API.Repo.Changeset.DynamicEmbeds do
       {:ok, schema} ->
         run_embed_validator(changeset, field, change, schema)
       {:error, _reason} ->
-        put_invalid_error(changeset, key, type, opts)
+        put_invalid_type_error(changeset, key, type.types(), opts)
     end
   end
 
@@ -86,9 +86,17 @@ defmodule API.Repo.Changeset.DynamicEmbeds do
     end
   end
 
-  defp put_invalid_error(%{errors: errors} = changeset, key, type, opts) do
+  defp put_invalid_type_error(%{errors: errors} = changeset, key, types, opts) do
     %{changeset |
-      errors: [{key, {message(opts, :message, "is invalid"), [type: type, validation: :cast]}} | errors],
+      errors: [{key, {message(opts, :message, "have unknown type"),
+               [inclusion: types, validation: :inclusion]}} | errors],
+      valid?: false
+    }
+  end
+
+  defp put_invalid_error(%{errors: errors} = changeset, key, _type, opts) do
+    %{changeset |
+      errors: [{key, {message(opts, :message, "is invalid"), [type: :map, validation: :cast]}} | errors],
       valid?: false
     }
   end

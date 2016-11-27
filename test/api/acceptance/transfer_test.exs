@@ -126,7 +126,7 @@ defmodule API.Controllers.TransferTest do
       } = resp
     end
 
-    # TODO with unknown token type it generates cast error with Elixir module name
+
     test "with invalid card token" do
       resp = "transfers"
       |> post!(construct_transfer(%{type: "card-token", token: "invalid_token"}))
@@ -141,6 +141,27 @@ defmodule API.Controllers.TransferTest do
             %{"entry" => "$.sender.credential.token",
               "rules" => [%{"params" => [], "rule" => "token"}]}
           ],
+        }
+      } = resp
+    end
+
+    # TODO with unknown token type it generates cast error with Elixir module name
+    test "with unsupported credential type" do
+      resp = "transfers"
+      |> post!(construct_transfer(%{type: "bitcoin", number: "5473959513413611"}))
+      |> get_body()
+
+      assert %{
+        "meta" => %{
+          "code" => 422
+        },
+        "error" => %{
+          "invalid" => [
+            %{"entry" => "$.sender.credential",
+              "rules" => [%{"params" => ["card", "card-token"], "rule" => "inclusion"}]}
+          ],
+          "message" => _,
+          "type" => "validation_failed"
         }
       } = resp
     end

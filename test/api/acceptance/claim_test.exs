@@ -19,9 +19,7 @@ defmodule API.Controllers.ClaimTest do
     number: "5473959513413611"
   }
 
-  @valid_claim_id "123456"
-
-  defp construct_claim(id \\ @valid_claim_id, credential \\ @card_number_credential) do
+  defp construct_claim(id, credential \\ @card_number_credential) do
     %{
       id: id,
       credential: credential
@@ -69,7 +67,7 @@ defmodule API.Controllers.ClaimTest do
         email: "ivan@example.com",
         credential: %{
           type: "external-credential",
-          id: @valid_claim_id,
+          id: Ecto.UUID.generate(),
           metadata: %{
             phone: "+380631112233"
           }
@@ -77,13 +75,13 @@ defmodule API.Controllers.ClaimTest do
       }
     })
 
-    %{transfer: transfer}
+    %{transfer: transfer, claim_id: transfer.body["data"]["recipient"]["credential"]["id"]}
   end
 
   describe "POST /claims" do
-    test "with raw data" do
+    test "with raw data", %{claim_id: claim_id} do
       resp = "claims"
-      |> post!(construct_claim())
+      |> post!(construct_claim(claim_id))
       |> assert_claim()
 
       assert %{
@@ -114,9 +112,9 @@ defmodule API.Controllers.ClaimTest do
       } = resp
     end
 
-    test "with invalid credential type" do
+    test "with invalid credential type", %{claim_id: claim_id} do
       resp = "claims"
-      |> post!(construct_claim(@valid_claim_id, %{type: "card-token", token: "invalid_token"}))
+      |> post!(construct_claim(claim_id, %{type: "card-token", token: "invalid_token"}))
       |> get_body
 
       assert %{
@@ -134,9 +132,9 @@ defmodule API.Controllers.ClaimTest do
       } = resp
     end
 
-    test "with invalid card data" do
+    test "with invalid card data", %{claim_id: claim_id} do
       resp = "claims"
-      |> post!(construct_claim(@valid_claim_id, %{type: "card-number", number: "1473959513413611"}))
+      |> post!(construct_claim(claim_id, %{type: "card-number", number: "1473959513413611"}))
       |> get_body
 
       assert %{
@@ -156,9 +154,9 @@ defmodule API.Controllers.ClaimTest do
   end
 
   describe "GET /claims/:id" do
-    test "200" do
+    test "200", %{claim_id: claim_id} do
       %{"data" => %{"id" => id, "token" => token}} = "claims"
-      |> post!(construct_claim())
+      |> post!(construct_claim(claim_id))
       |> get_body()
 
       path = "claims/" <> to_string(id)
@@ -168,9 +166,9 @@ defmodule API.Controllers.ClaimTest do
       |> assert_claim()
     end
 
-    test "401 when token is invalid" do
+    test "401 when token is invalid", %{claim_id: claim_id} do
       %{"data" => %{"id" => id}} = "claims"
-      |> post!(construct_claim())
+      |> post!(construct_claim(claim_id))
       |> get_body()
 
       path = "claims/" <> to_string(id)
@@ -197,9 +195,9 @@ defmodule API.Controllers.ClaimTest do
   end
 
   describe "POST /claims/:id/auth" do
-    test "201" do
+    test "201", %{claim_id: claim_id} do
       %{"data" => %{"id" => id, "token" => token}} = "claims"
-      |> post!(construct_claim())
+      |> post!(construct_claim(claim_id))
       |> get_body()
 
       path = "claims/" <> to_string(id) <> "/auth"
@@ -214,9 +212,9 @@ defmodule API.Controllers.ClaimTest do
       |> get_body()
     end
 
-    test "401 when token is invalid" do
+    test "401 when token is invalid", %{claim_id: claim_id} do
       %{"data" => %{"id" => id}} = "claims"
-      |> post!(construct_claim())
+      |> post!(construct_claim(claim_id))
       |> get_body()
 
       path = "claims/" <> to_string(id)

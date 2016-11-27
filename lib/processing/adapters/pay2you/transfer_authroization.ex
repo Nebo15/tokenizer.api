@@ -57,4 +57,3 @@ defmodule Processing.Adapters.Pay2You.LookupAuth do
     }}
   end
 end
-

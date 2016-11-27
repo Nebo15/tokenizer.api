@@ -5,13 +5,13 @@ defmodule API.Views.Claim do
   use API.Web, :view
 
   def render("claim.json", %{claim: %{status: status} = claim})
-    when status in [:authentication, :processing, :declined, :error] do
+    when status in ["authentication", "processing", "declined", "error"] do
     claim
     |> render_claim()
   end
 
   def render("claim.json", %{claim: %{status: status, transfer: transfer} = claim})
-    when status in [:completed] do
+    when status in ["completed"] do
     claim
     |> render_claim()
     |> Map.put(:payment, %{

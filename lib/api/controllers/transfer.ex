@@ -95,7 +95,7 @@ defmodule API.Controllers.Transfer do
 
     transfer = transfer
     |> Changeset.change()
-    |> Changeset.put_change(:status, :completed)
+    |> Changeset.put_change(:status, "completed")
 
     {:ok, transfer}
   end

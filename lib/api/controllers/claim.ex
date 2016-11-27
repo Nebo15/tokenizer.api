@@ -109,7 +109,7 @@ defmodule API.Controllers.Claim do
 
     claim = claim
     |> Changeset.change()
-    |> Changeset.put_change(:status, :completed)
+    |> Changeset.put_change(:status, "completed")
 
     {:ok, claim}
   end

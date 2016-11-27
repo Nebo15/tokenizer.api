@@ -6,7 +6,7 @@ defmodule API.Repo.Schemas.CardNumber do
 
   @primary_key false
   embedded_schema do
-    field :type, API.Repo.Enums.AccountCredential, default: "card-number"
+    field :type, :string, default: "card-number"
     field :number, :string
   end
 

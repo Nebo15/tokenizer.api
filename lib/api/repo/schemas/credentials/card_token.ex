@@ -7,7 +7,7 @@ defmodule API.Repo.Schemas.CardToken do
 
   @primary_key false
   embedded_schema do
-    field :type, API.Repo.Enums.AccountCredential, default: "card-token"
+    field :type, :string, default: "card-token"
     field :token, :string
     field :token_expires_at, :utc_datetime
   end

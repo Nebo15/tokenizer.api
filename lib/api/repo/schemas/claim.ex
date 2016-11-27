@@ -9,7 +9,7 @@ defmodule API.Repo.Schemas.Claim do
   @primary_key {:id, :string, []}
   schema "claims" do
     field :external_id, :string
-    field :status, API.Repo.Enums.ClaimStatuses, default: :authentication
+    field :status, :string, default: "authentication"
     field :token, :string
     field :token_expires_at, :utc_datetime
     field :credential, API.Repo.Types.PeerCredential
@@ -28,6 +28,7 @@ defmodule API.Repo.Schemas.Claim do
     |> validate_metadata(:metadata)
     |> unique_constraint(:token, name: :claims_token_index)
     |> foreign_key_constraint(:transfer_id)
+    |> validate_inclusion(:status, ["authentication", "completed", "processing", "declined"])
     |> validate_embed_type(:credential, ["card-number"])
   end
 

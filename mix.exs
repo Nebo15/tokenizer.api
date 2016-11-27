@@ -23,7 +23,7 @@ defmodule Gateway.Mixfile do
   # Type "mix help compile.app" for more information
   def application do
     [applications: [:logger, :phoenix, :phoenix_ecto, :cowboy, :httpoison, :poison, :corsica,
-                    :ecto, :postgrex, :ecto_enum, :timex, :credit_card, :confex, :eview],
+                    :ecto, :postgrex, :timex, :credit_card, :confex, :eview],
      mod: {Gateway, []}]
   end
 
@@ -49,7 +49,6 @@ defmodule Gateway.Mixfile do
      {:phoenix, "~> 1.2"},
      {:phoenix_ecto, "3.1.0-rc.0"}, # TODO: Update when Ecto will release v2.1
      {:ecto, "2.1.0-rc.4", override: true}, # TODO: Update when Ecto will release v2.1
-     {:ecto_enum, "~> 1.0"},
      {:postgrex, "~> 0.12", override: true},
      {:confex, "~> 1.4"},
      {:eview, "~> 0.7.0"},

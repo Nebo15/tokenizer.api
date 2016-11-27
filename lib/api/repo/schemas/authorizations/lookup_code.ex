@@ -6,7 +6,7 @@ defmodule API.Repo.Schemas.AuthorizationLookupCode do
 
   @primary_key false
   embedded_schema do
-    field :type, API.Repo.Enums.AuthTypes, default: "lookup-code"
+    field :type, :string, default: "lookup-code"
     field :md, :string
   end
 

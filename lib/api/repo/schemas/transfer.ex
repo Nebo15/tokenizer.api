@@ -13,7 +13,7 @@ defmodule API.Repo.Schemas.Transfer do
     field :amount, :decimal
     field :fee, :decimal
     field :description, :string
-    field :status, API.Repo.Enums.TransferStatuses, default: :authentication
+    field :status, :string, default: "authentication"
     field :auth, API.Repo.Types.Authorization
     field :metadata, :map
     embeds_one :sender, API.Repo.Schemas.Peer
@@ -39,6 +39,7 @@ defmodule API.Repo.Schemas.Transfer do
     |> validate_length(:description, max: 250)
     |> validate_fee(:amount, :fee, fees)
     |> validate_metadata(:metadata)
+    |> validate_inclusion(:status, ["authentication", "completed", "processing", "declined", "error"])
     |> unique_constraint(:external_id, name: :transfers_external_id_index)
   end
 

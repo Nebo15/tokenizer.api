@@ -6,7 +6,7 @@ defmodule API.Repo.Schemas.Authorization3DS do
 
   @primary_key false
   embedded_schema do
-    field :type, API.Repo.Enums.AuthTypes, default: "3d-secure"
+    field :type, :string, default: "3d-secure"
     field :acs_url, :string
     field :pa_req, :string
     field :terminal_url, :string

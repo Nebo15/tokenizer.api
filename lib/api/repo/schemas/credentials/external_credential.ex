@@ -6,7 +6,7 @@ defmodule API.Repo.Schemas.ExternalCredential do
 
   @primary_key false
   embedded_schema do
-    field :type, API.Repo.Enums.AccountCredential, default: "external-credential"
+    field :type, :string, default: "external-credential"
     field :id, :string
     field :metadata, :map
   end

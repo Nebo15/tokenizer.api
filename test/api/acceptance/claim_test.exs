@@ -8,7 +8,7 @@ defmodule API.Controllers.ClaimTest do
 
   @card_credential %{
     type: "card",
-    number: "5473959513413611",
+    number: "5591587543706253",
     cvv: "160",
     expiration_month: "01",
     expiration_year: "2020"
@@ -49,7 +49,7 @@ defmodule API.Controllers.ClaimTest do
   end
 
   setup do
-    transfer = "transfers"
+    %{"data" => %{"id" => id, "token" => token}} = "transfers"
     |> post!(%{
       amount: 1000,
       fee: "10",
@@ -65,8 +65,15 @@ defmodule API.Controllers.ClaimTest do
         }
       }
     })
+    |> get_body()
 
-    %{transfer: transfer, claim_id: transfer.body["data"]["recipient"]["credential"]["id"]}
+    path = "transfers/" <> to_string(id) <> "/auth"
+
+    transfer = path
+    |> post!(%{"code" => 123456}, [{"authorization", "Basic " <> Base.encode64(token <> ":")}])
+    |> get_body()
+
+    %{transfer: transfer, claim_id: transfer["data"]["recipient"]["credential"]["id"]}
   end
 
   describe "POST /claims" do
@@ -193,13 +200,54 @@ defmodule API.Controllers.ClaimTest do
 
       path = "claims/" <> to_string(id) <> "/auth"
 
+      {claim_id, _} = Integer.parse(claim_id)
+
+      assert %{
+        "meta" => %{
+          "code" => _
+        },
+        "data" => %{"status" => "processing"}
+      } = path
+      |> post!(
+        %{"type" => "otp-code", "otp-code" => claim_id + 1},
+        [{"authorization", "Basic " <> Base.encode64(token <> ":")}]
+      )
+      |> get_body()
+
+      path = "claims/" <> to_string(id)
+
       assert %{
         "meta" => %{
           "code" => _
         },
         "data" => %{"status" => "completed"}
       } = path
-      |> post!(%{"type" => "otp-code", "otp-code" => 123456}, [{"authorization", "Basic " <> Base.encode64(token)}])
+      |> get!([{"authorization", "Basic " <> Base.encode64(token <> ":")}])
+      |> get_body()
+    end
+
+    test "422 for invalid otp tokens", %{claim_id: claim_id} do
+      %{"data" => %{"id" => id, "token" => token}} = "claims"
+      |> post!(construct_claim(claim_id))
+      |> get_body()
+
+      path = "claims/" <> to_string(id) <> "/auth"
+
+      assert %{
+        "meta" => %{
+          "code" => 422
+        },
+        "error" => %{
+          "invalid" => [
+            %{"entry" => "$.otp-code",
+              "rules" => [%{"params" => [], "rule" => "otp_code"}]}
+          ],
+        }
+      } = path
+      |> post!(
+        %{"type" => "otp-code", "otp-code" => 123123},
+        [{"authorization", "Basic " <> Base.encode64(token)}]
+      )
       |> get_body()
     end
 

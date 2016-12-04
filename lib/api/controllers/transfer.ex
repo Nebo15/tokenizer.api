@@ -32,7 +32,8 @@ defmodule API.Controllers.Transfer do
 
   # Transfer Gateway delegates
   defp init_transfer(%Changeset{valid?: false} = changeset), do: changeset
-  defp init_transfer(%Changeset{valid?: true, changes: %{amount: amount, fee: fee, sender: sender, recipient: recipient}} = changeset) do
+  defp init_transfer(%Changeset{valid?: true, changes: %{amount: amount, fee: fee, sender: sender, recipient: recipient}
+    } = changeset) do
     sender_credential_type = sender |> get_credential_schema()
     recipient_credetial_type = recipient |> get_credential_schema()
 
@@ -55,6 +56,7 @@ defmodule API.Controllers.Transfer do
     |> Changeset.change(update)
   end
 
+  # Card2Phone transfers
   defp do_init_transfer(changeset, amount, fee, {CardSchema, sender}, {ExternalCredentialSchema, recipient}) do
     sender_credential = sender |> Changeset.get_field(:credential)
     sender_phone = sender |> Changeset.get_field(:phone)
@@ -136,7 +138,8 @@ defmodule API.Controllers.Transfer do
   defp validate_query_result(%TransferSchema{} = transfer), do: {:ok, transfer}
 
   defp validate_otp_code({:error, reason}, _params), do: {:error, reason}
-  defp validate_otp_code({:ok, %TransferSchema{auth: %AuthorizationLookupCodeSchema{} = transfer_auth} = transfer}, params) do
+  defp validate_otp_code({:ok, %TransferSchema{auth: %AuthorizationLookupCodeSchema{} = transfer_auth} = transfer},
+    params) do
     transfer = case Processing.Adapters.Pay2You.LookupAuth.auth(transfer_auth, params["code"]) do
       {:ok, update} ->
         transfer

@@ -78,7 +78,7 @@ Status | Description
             + code: 201
         + data (Transfer_FullWithAuth)
 
-### Get [GET /transfer/{id}]
+### Get [GET /transfers/{id}]
 
 Read transfer data via it's `id`. Transfer access token must be sent via HTTP Basic Auth in **password** field.
 
@@ -88,16 +88,14 @@ Read transfer data via it's `id`. Transfer access token must be sent via HTTP Ba
 + Request (application/json)
     + Headers
     
-            Authorization: Basic base64(TRANSFER_TOKEN)
-    
-    + Attributes(Transfer)
+            Authorization: Basic base64(TRANSFER_TOKEN:)
 
 + Response 200 (application/json)
     + Attributes (Response_OK)
         + meta (Response__Meta)
         + data (Transfer_FullWithAuth)
 
-### Authentication [POST /transfer/{id}/auth]
+### Authentication [POST /transfers/{id}/auth]
 
 #### For 3-D Secure Cards
 
@@ -129,7 +127,7 @@ This code must be used to auhorize transfer via this method. All unathorized tra
 + Request (application/json)
     + Headers
     
-            Authorization: Basic base64(TRANSFER_TOKEN)
+            Authorization: Basic base64(TRANSFER_TOKEN:)
             
     + Attributes(object)
         + code: 3382837 (string) - OTP code that was sent to peer's device.
@@ -155,7 +153,7 @@ For transfers in `waiting_for_claim` status (when recipient credential has `exte
           + code: 201 (number)
         + data (Claim_FullWithAuth)
 
-### Get [POST /claims/{id}]
+### Get [GET /claims/{id}]
 
 + Parameters
     + id: 1 (string) - Claim ID
@@ -163,9 +161,7 @@ For transfers in `waiting_for_claim` status (when recipient credential has `exte
 + Request (application/json)
     + Headers
     
-            Authorization: Basic base64(CLAIM_TOKEN)
-    
-    + Attributes(Claim)
+            Authorization: Basic base64(CLAIM_TOKEN:)
 
 + Response 200 (application/json)
     + Attributes (Response_OK)
@@ -180,7 +176,7 @@ For transfers in `waiting_for_claim` status (when recipient credential has `exte
 + Request (application/json)
     + Headers
     
-            Authorization: Basic base64(CLAIM_TOKEN)
+            Authorization: Basic base64(CLAIM_TOKEN:)
             
     + Attributes(object)
         + code: 3382837 (string) - OTP code that was sent to peer's device.

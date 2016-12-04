@@ -43,9 +43,6 @@ defmodule Processing.Adapters.Pay2You.LookupAuth do
   defp normalize_response({:ok, %{"state" => %{"code" => status_code}}}) when status_code == 55 or status_code == 56,
     do: {:error, :invalid_auth_type}
 
-  defp normalize_response({:ok, %{"state" => %{"code" => 0}}}),
-    do: {:ok, %{status: "processing"}}
-
   defp normalize_response({:ok, %{"idClient" => id, "state" => %{"code" => status_code}}}) do
     {:error, %{
       external_id: to_string(id),

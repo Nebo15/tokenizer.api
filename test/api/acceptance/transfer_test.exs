@@ -277,7 +277,7 @@ defmodule API.Controllers.TransferTest do
         },
         "data" => %{"status" => "processing"}
       } = path
-      |> post!(%{"code" => 123456}, [{"authorization", "Basic " <> Base.encode64(token)}])
+      |> post!(%{"code" => 123456}, [{"authorization", "Basic " <> Base.encode64(token <> ":")}])
       |> get_body()
     end
 

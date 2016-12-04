@@ -5,43 +5,37 @@ defmodule Processing.Adapters.Pay2You.Receive do
   require Logger
   alias Processing.Adapters.Pay2You.Error
   alias Processing.Adapters.Pay2You.Request
-  alias API.Repo.Schemas.AuthorizationLookupCode
+  alias API.Repo.Schemas.CardNumber
 
   @config Confex.get(:gateway_api, :pay2you)
-  @auth_upstream_uri "/ConfirmLookUp/finishlookup"
+  @claim_upstream_uri "/Phone2Card/CreatePhone2CardOperation?otpcode="
 
-  def auth(%AuthorizationLookupCode{md: md}, code) do
+  def receive(external_id, %CardNumber{number: recipient_number}, recipient_phone, otp_code) do
     %{
-      md: md,
-      paRes: code,
-      cvv: "000"
+      cardTo: recipient_number,
+      socialNumber: recipient_phone,
+      operationNumber: external_id
     }
-    |> post_auth()
+    |> post_receive(otp_code)
     |> normalize_response()
   end
 
-  defp post_auth(params) do
-    case Request.post(@auth_upstream_uri, params) do
+  defp post_receive(params, otp_code) do
+    case Request.post(@claim_upstream_uri <> to_string(otp_code), params) do
       {:ok, %{body: body}} -> {:ok, body}
       {:error, reason} -> {:error, reason}
     end
   end
 
   defp normalize_response({:error, reason}) do
-    Logger.warn("Transfer failed with error: #{inspect reason}")
+    Logger.warn("Transfer receive failed with error: #{inspect reason}")
     {:error, %{
       status: "error"
     }}
   end
 
-  defp normalize_response({:ok, %{"state" => %{"code" => 0}}}),
-    do: {:ok, %{status: "processing"}}
-
-  defp normalize_response({:ok, %{"state" => %{"code" => status_code}}}) when status_code == 49 or status_code == 59,
+  defp normalize_response({:ok, %{"state" => %{"code" => 19}}}),
     do: {:error, :invalid_otp_code}
-
-  defp normalize_response({:ok, %{"state" => %{"code" => status_code}}}) when status_code == 55 or status_code == 56,
-    do: {:error, :invalid_auth_type}
 
   defp normalize_response({:ok, %{"state" => %{"code" => 0}}}),
     do: {:ok, %{status: "processing"}}

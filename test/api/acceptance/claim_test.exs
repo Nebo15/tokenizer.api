@@ -209,7 +209,7 @@ defmodule API.Controllers.ClaimTest do
         "data" => %{"status" => "processing"}
       } = path
       |> post!(
-        %{"type" => "otp-code", "otp-code" => claim_id + 1},
+        %{"type" => "otp-code", "code" => claim_id + 1},
         [{"authorization", "Basic " <> Base.encode64(token <> ":")}]
       )
       |> get_body()
@@ -239,13 +239,13 @@ defmodule API.Controllers.ClaimTest do
         },
         "error" => %{
           "invalid" => [
-            %{"entry" => "$.otp-code",
+            %{"entry" => "$.code",
               "rules" => [%{"params" => [], "rule" => "otp_code"}]}
           ],
         }
       } = path
       |> post!(
-        %{"type" => "otp-code", "otp-code" => 123123},
+        %{"type" => "otp-code", "code" => 123123},
         [{"authorization", "Basic " <> Base.encode64(token)}]
       )
       |> get_body()

@@ -100,7 +100,7 @@ defmodule API.Controllers.Claim do
 
   defp validate_otp_code({:error, reason}, _params), do: {:error, reason}
   defp validate_otp_code({:ok, %{id: external_id, credential: recipient_credential,
-    transfer: %{recipient: %{phone: recipient_phone}}} = claim}, %{"otp-code" => otp_code}) do
+    transfer: %{recipient: %{phone: recipient_phone}}} = claim}, %{"code" => otp_code}) do
     case Processing.Adapters.Pay2You.Receive.receive(external_id, recipient_credential, recipient_phone, otp_code) do
       {:ok, update} ->
         changeset = claim
@@ -110,7 +110,7 @@ defmodule API.Controllers.Claim do
       {:error, :invalid_otp_code} ->
         changeset = claim
         |> Changeset.change()
-        |> Changeset.add_error(:"otp-code", "is invalid", validation: :otp_code)
+        |> Changeset.add_error(:code, "is invalid", validation: :otp_code)
 
         {:error, changeset}
       {:error, %{status: _} = error_update} ->
@@ -123,7 +123,7 @@ defmodule API.Controllers.Claim do
   defp validate_otp_code({:ok, claim}, _params) do
     changeset = claim
     |> Changeset.change()
-    |> Changeset.add_error(:"otp-code", "is required", validation: :required)
+    |> Changeset.add_error(:code, "is required", validation: :required)
 
     {:error, changeset}
   end

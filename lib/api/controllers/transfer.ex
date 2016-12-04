@@ -7,7 +7,7 @@ defmodule API.Controllers.Transfer do
   alias API.Repo.Schemas.Transfer, as: TransferSchema
   alias API.Repo.Schemas.Card, as: CardSchema
   alias API.Repo.Schemas.CardNumber, as: CardNumberSchema
-  alias API.Repo.Schemas.AuthorizationLookupCode
+  alias API.Repo.Schemas.AuthorizationLookupCode, as: AuthorizationLookupCodeSchema
   alias API.Views.Transfer, as: TransferView
   alias API.Helpers.TokenResolver
   alias API.Repo
@@ -118,7 +118,7 @@ defmodule API.Controllers.Transfer do
   defp validate_query_result(%TransferSchema{} = transfer), do: {:ok, transfer}
 
   defp validate_otp_code({:error, reason}, _params), do: {:error, reason}
-  defp validate_otp_code({:ok, %TransferSchema{auth: %AuthorizationLookupCode{} = transfer_auth} = transfer}, params) do
+  defp validate_otp_code({:ok, %TransferSchema{auth: %AuthorizationLookupCodeSchema{} = transfer_auth} = transfer}, params) do
     transfer = case Processing.Adapters.Pay2You.LookupAuth.auth(transfer_auth, params["code"]) do
       {:ok, update} ->
         transfer

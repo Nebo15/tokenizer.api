@@ -106,26 +106,25 @@ defmodule API.Controllers.TransferTest do
       } = resp
     end
 
-    test "with recipient card token" do
-      %{"data" => %{"token" => token}} = "tokens"
-      |> post!(@card_credential)
-      |> get_body
+    # test "with recipient card token" do
+    #   %{"data" => %{"token" => token}} = "tokens"
+    #   |> post!(@card_credential)
+    #   |> get_body
 
-      resp = "transfers"
-      |> post!(construct_transfer(@card_credential, %{type: "card-token", token: token}))
-      |> assert_transfer()
+    #   resp = "transfers"
+    #   |> post!(construct_transfer(@card_credential, %{type: "card-token", token: token}))
+    #   |> assert_transfer()
 
-      assert %{
-        "meta" => %{
-          "code" => 201
-        },
-        "data" => %{
-          "recipient" => %{"credential" => %{"type" => "card", "number" => "473959******3611"}},
-          "sender" => %{"credential" => %{"type" => "card", "number" => "473959******3611"}}
-        }
-      } = resp
-    end
-
+    #   assert %{
+    #     "meta" => %{
+    #       "code" => 201
+    #     },
+    #     "data" => %{
+    #       "recipient" => %{"credential" => %{"type" => "card", "number" => "473959******3611"}},
+    #       "sender" => %{"credential" => %{"type" => "card", "number" => "473959******3611"}}
+    #     }
+    #   } = resp
+    # end
 
     test "with invalid card token" do
       resp = "transfers"

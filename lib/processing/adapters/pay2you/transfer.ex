@@ -9,11 +9,11 @@ defmodule Processing.Adapters.Pay2You.Transfer do
 
   @config Confex.get(:gateway_api, :pay2you)
   @card2card_upstream_uri "/Card2Card/CreateCard2CardOperation"
+  @card2phone_upstream_uri "/Card2Phone/CreateCard2PhoneOperation"
 
-  def card2card(%Card{number: sender_number, cvv: sender_cvv,
-                      expiration_month: sender_exp_month, expiration_year: sender_exp_year},
-                %CardNumber{number: recipient_number}, %Decimal{} = amount, %Decimal{} = fee,
-                sender_phone) do
+  def send(%Card{number: sender_number, cvv: sender_cvv,
+                 expiration_month: sender_exp_month, expiration_year: sender_exp_year},
+           %CardNumber{number: recipient_number}, %Decimal{} = amount, %Decimal{} = fee, sender_phone) do
     %{
       cardFrom: %{
         cardNumber: sender_number,
@@ -29,7 +29,29 @@ defmodule Processing.Adapters.Pay2You.Transfer do
       socialNumber: sender_phone,
       version: @config[:upstream_version]
     }
-    |> post_transfer()
+    |> post_transfer(@card2card_upstream_uri)
+    |> normalize_response()
+  end
+
+  def send(%Card{number: sender_number, cvv: sender_cvv,
+                 expiration_month: sender_exp_month, expiration_year: sender_exp_year},
+           recipient_phone, %Decimal{} = amount, %Decimal{} = fee, sender_phone) when is_binary(recipient_phone) do
+    %{
+      cardFrom: %{
+        cardNumber: sender_number,
+        dateValid: get_card_expiration(sender_exp_month, sender_exp_year),
+        cvv: sender_cvv
+      },
+      ammount: %{
+        summa: to_cents(amount),
+        commission: to_cents(fee),
+        type: @config[:project][:name]
+      },
+      socialTo: recipient_phone,
+      socialNumber: sender_phone,
+      version: @config[:upstream_version]
+    }
+    |> post_transfer(@card2phone_upstream_uri)
     |> normalize_response()
   end
 
@@ -48,8 +70,8 @@ defmodule Processing.Adapters.Pay2You.Transfer do
     |> Decimal.to_integer()
   end
 
-  defp post_transfer(params) do
-    case Request.post(@card2card_upstream_uri, params) do
+  defp post_transfer(params, upstream_uri) do
+    case Request.post(upstream_uri, params) do
       {:ok, %{body: body}} -> {:ok, body}
       {:error, reason} -> {:error, reason}
     end
@@ -59,6 +81,17 @@ defmodule Processing.Adapters.Pay2You.Transfer do
     Logger.warn("Transfer failed with error: #{inspect reason}")
     {:error, %{
       status: "error"
+    }}
+  end
+
+  defp normalize_response({:ok, %{"mPayNumber" => id, "mErrCode" => status_code}}) do
+    {:error, %{
+      external_id: to_string(id),
+      status: "declined",
+      decline: %{
+        code: status_code,
+        reason: Error.get_error_group(status_code)
+      }
     }}
   end
 

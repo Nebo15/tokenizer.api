@@ -18,6 +18,7 @@ defmodule Processing.Adapters.Pay2You.Status do
   end
 
   defp get_status(params) do
+    Logger.debug("Receiving new payment status, params: #{inspect params}")
     case Request.post(@status_upstream_uri, params) do
       {:ok, %{body: body}} -> {:ok, body}
       {:error, reason} -> {:error, reason}
@@ -44,5 +45,10 @@ defmodule Processing.Adapters.Pay2You.Status do
         reason: Error.get_error_group(status_code)
       }
     }}
+  end
+
+  defp normalize_response(resp) do
+    Logger.warn("Transfer response did not match any patterns: #{inspect resp}")
+    {:error, %{status: "error"}}
   end
 end

@@ -13,8 +13,7 @@ defmodule API.Repo.Schemas.ExternalCredential do
 
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:id, :metadata])
-    |> validate_required([:id])
+    |> cast(params, [:metadata])
     |> validate_metadata(:metadata)
   end
 end

@@ -53,27 +53,19 @@ defmodule API.Controllers.ClaimTest do
     |> post!(%{
       amount: 1000,
       fee: "10",
-      description: "some content",
-      metadata: %{
-        feel_free: "to set any metadata"
-      },
       sender: %{
         phone: "+380631112233",
-        email: "ivan@example.com",
         credential: @card_credential
       },
       recipient: %{
         phone: "+380631112233",
         email: "ivan@example.com",
         credential: %{
-          type: "external-credential",
-          id: Ecto.UUID.generate(),
-          metadata: %{
-            phone: "+380631112233"
-          }
+          type: "external-credential"
         }
       }
     })
+    |> IO.inspect
 
     %{transfer: transfer, claim_id: transfer.body["data"]["recipient"]["credential"]["id"]}
   end

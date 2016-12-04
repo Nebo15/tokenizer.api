@@ -3,6 +3,7 @@ defmodule Processing.Adapters.Pay2You.Request do
   This is helper module that creates HTTP interface to request upstream back-end.
   """
   use HTTPoison.Base
+  require Logger
 
   upstream_url = Confex.get(:gateway_api, :pay2you)[:upstream_url]
   unless upstream_url do
@@ -13,6 +14,7 @@ defmodule Processing.Adapters.Pay2You.Request do
   @transfer_uri "/Card2Card/CreateCard2CardOperation"
 
   def process_url(url) do
+    Logger.debug("Request will be sent to: " <> @upstream_url <> url)
     @upstream_url <> url
   end
 

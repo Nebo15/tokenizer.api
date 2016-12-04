@@ -7,6 +7,7 @@ defmodule API.Controllers.Transfer do
   alias API.Repo.Schemas.Transfer, as: TransferSchema
   alias API.Repo.Schemas.Card, as: CardSchema
   alias API.Repo.Schemas.CardNumber, as: CardNumberSchema
+  alias API.Repo.Schemas.ExternalCredential, as: ExternalCredentialSchema
   alias API.Repo.Schemas.AuthorizationLookupCode, as: AuthorizationLookupCodeSchema
   alias API.Views.Transfer, as: TransferView
   alias API.Helpers.TokenResolver
@@ -23,42 +24,59 @@ defmodule API.Controllers.Transfer do
     |> TransferSchema.changeset(params)
     |> TokenResolver.resolve_credentials(:sender)
     |> TokenResolver.resolve_credentials(:recipient)
-    |> send_transfer()
+    |> init_transfer()
     |> put_transfer_token()
     |> create_transfer()
     |> render_response(conn, :created)
   end
 
   # Transfer Gateway delegates
-  defp send_transfer(%Changeset{valid?: false} = changeset), do: changeset
-  defp send_transfer(%Changeset{valid?: true} = changeset) do
-    update = changeset
-    |> Changeset.apply_changes()
-    |> do_send_transfer()
+  defp init_transfer(%Changeset{valid?: false} = changeset), do: changeset
+  defp init_transfer(%Changeset{valid?: true, changes: %{amount: amount, fee: fee, sender: sender, recipient: recipient}} = changeset) do
+    sender_credential_type = sender |> get_credential_schema()
+    recipient_credetial_type = recipient |> get_credential_schema()
+
+    changeset
+    |> do_init_transfer(amount, fee, {sender_credential_type, sender}, {recipient_credetial_type, recipient})
+  end
+
+  defp get_credential_schema(%{changes: %{credential: %{data: %{__struct__: struct}}}}),
+    do: struct
+
+  # Card2Card transfers
+  defp do_init_transfer(changeset, amount, fee, {CardSchema, sender}, {CardNumberSchema, recipient}) do
+    sender_credential = sender |> Changeset.get_field(:credential)
+    sender_phone = sender |> Changeset.get_field(:phone)
+    recipient_credential = recipient |> Changeset.get_field(:credential)
+
+    {_state, update} = TransferService.send(sender_credential, recipient_credential, amount, fee, sender_phone)
 
     changeset
     |> Changeset.change(update)
   end
 
-  # Card2Card transfers
-  defp do_send_transfer(%{amount: amount, fee: fee,
-                          sender: %{credential: %CardSchema{} = sender_credential, phone: sender_phone},
-                          recipient: %{credential: %CardNumberSchema{} = recipient_credential}}) do
-    case TransferService.card2card(sender_credential, recipient_credential, amount, fee, sender_phone) do
-      {:ok, update} -> update
-      {:error, update} -> update
+  defp do_init_transfer(changeset, amount, fee, {CardSchema, sender}, {ExternalCredentialSchema, recipient}) do
+    sender_credential = sender |> Changeset.get_field(:credential)
+    sender_phone = sender |> Changeset.get_field(:phone)
+    recipient_credential = recipient |> Changeset.get_field(:credential)
+    recipient_phone = recipient |> Changeset.get_field(:phone)
+
+    case TransferService.send(sender_credential, recipient_phone, amount, fee, sender_phone) do
+      {:ok, update} ->
+        recipient_credential = recipient
+        |> Changeset.get_change(:credential)
+        |> Changeset.put_change(:id, update.external_id)
+
+        recipient = recipient
+        |> Changeset.put_embed(:credential, recipient_credential)
+
+        changeset
+        |> Changeset.change(update)
+        |> Changeset.put_embed(:recipient, recipient)
+      {:error, update} ->
+        changeset
+        |> Changeset.change(update)
     end
-  end
-
-  defp do_send_transfer(_) do
-    external_id = 10_000
-    |> :rand.uniform()
-    |> to_string
-
-    %{
-      auth: %API.Repo.Schemas.Authorization3DS{},
-      external_id: external_id
-    }
   end
 
   defp put_transfer_token(%Changeset{valid?: false} = changeset), do: changeset

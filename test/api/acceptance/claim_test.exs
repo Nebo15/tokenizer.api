@@ -65,7 +65,6 @@ defmodule API.Controllers.ClaimTest do
         }
       }
     })
-    |> IO.inspect
 
     %{transfer: transfer, claim_id: transfer.body["data"]["recipient"]["credential"]["id"]}
   end

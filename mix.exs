@@ -51,7 +51,7 @@ defmodule Gateway.Mixfile do
      {:ecto, "2.1.0-rc.4", override: true}, # TODO: Update when Ecto will release v2.1
      {:postgrex, "~> 1.0.0-rc.1", override: true},
      {:confex, "~> 1.4"},
-     {:eview, "~> 0.7.0"},
+     {:eview, "~> 0.8.0"},
      {:cowboy, "~> 1.0"},
      {:poison, "~> 2.2"},
      {:httpoison, "~> 0.10"},

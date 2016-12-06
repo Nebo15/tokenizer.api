@@ -59,6 +59,8 @@ defmodule Processing.Adapters.Pay2You.Transfer do
     do: expiration_month |> to_string() |> get_card_expiration(expiration_year)
   defp get_card_expiration(expiration_month, expiration_year) when is_number(expiration_year),
     do: expiration_month |> get_card_expiration(to_string(expiration_year))
+  defp get_card_expiration(<<expiration_month::bytes-size(1)>>, expiration_year),
+    do: get_card_expiration("0" <> expiration_month, expiration_year)
   defp get_card_expiration(<<expiration_month::bytes-size(2)>>, <<expiration_year::bytes-size(2)>>),
     do: expiration_month <> "/" <> expiration_year
   defp get_card_expiration(<<expiration_month::bytes-size(2)>>, <<_::bytes-size(2), expiration_year::bytes-size(2)>>),

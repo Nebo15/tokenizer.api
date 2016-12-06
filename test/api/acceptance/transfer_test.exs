@@ -207,7 +207,8 @@ defmodule API.Controllers.TransferTest do
             %{"entry" => "$.recipient.credential.number",
               "rules" => [%{"params" => [], "rule" => "card_number"}]},
             %{"entry" => "$.sender.credential.expiration_year",
-              "rules" => [%{"params" => ["~r/^20[12][0-9]$/"], "rule" => "format"}]}
+              "rules" => [%{"params" => %{"greater_than_or_equal_to" => 2016,  "less_than_or_equal_to" => 2030},
+                            "rule" => "number"}]}
           ],
           "message" => _,
           "type" => "validation_failed"

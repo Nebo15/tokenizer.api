@@ -3,7 +3,7 @@ defmodule API.Repo.Schemas.CardToken do
   Schema for sender cards.
   """
   use API.Web, :schema
-  import API.Repo.Changeset.Validators.Expiration
+  import API.Repo.Changeset.Validators.TokenExpiration
 
   @primary_key false
   embedded_schema do
@@ -16,6 +16,6 @@ defmodule API.Repo.Schemas.CardToken do
     struct
     |> cast(params, [:token, :token_expires_at])
     |> validate_required([:token])
-    |> validate_expiration(:token_expires_at)
+    |> validate_token_expiration(:token_expires_at)
   end
 end

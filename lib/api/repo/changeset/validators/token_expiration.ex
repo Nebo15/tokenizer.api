@@ -1,10 +1,10 @@
-defmodule API.Repo.Changeset.Validators.Expiration do
+defmodule API.Repo.Changeset.Validators.TokenExpiration do
   @moduledoc """
-  This helper validates phone numbers in international format (with `+:country_code`).
+  Validates tokens `expires_at` values.
   """
   import Ecto.Changeset
 
-  def validate_expiration(changeset, field, opts \\ []) do
+  def validate_token_expiration(changeset, field, opts \\ []) do
     validate_change changeset, field, :token_expiration, fn _, value ->
       case Timex.compare(Timex.now, value) do
         -1 -> []

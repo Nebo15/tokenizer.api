@@ -5,7 +5,7 @@ defmodule Processing.Adapters.Pay2You.Request do
   use HTTPoison.Base
   require Logger
 
-  upstream_url = Confex.get(:gateway_api, :pay2you)[:upstream_url]
+  upstream_url = Confex.get_map(:gateway_api, :pay2you)[:upstream_url]
   unless upstream_url do
     raise "Pay2You upstream URL is not set!"
   end

@@ -28,8 +28,11 @@ if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
   fi;
 
   if [[ "$MAIN_BRANCHES" =~ "$TRAVIS_BRANCH" ]]; then
-    echo "Pushing container to a Heroku CE"
+    echo "Pushing container to a Heroku CE - Dev"
     heroku container:push web --app tokenizer-api
+
+    echo "Pushing container to a Heroku CE - PreProd"
+    heroku container:push web --app tokenizer-api-prod
 
     echo "Trying push existing image (for dev purposes)"
     docker push "registry.heroku.com/${PROJECT_NAME}/web"

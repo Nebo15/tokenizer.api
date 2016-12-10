@@ -78,10 +78,10 @@ config :gateway_api, :fees, [ # TODO: Move to envs
   ]
 
 config :gateway_api, :pay2you,
-  upstream_url: "http://p2y-dev.mbill.co/pay2you-ext",
+  upstream_url: {:system, "PAY2YOU_UPSTREAM_URL", "http://p2y-dev.mbill.co/pay2you-ext"},
   upstream_version: "0.5.0.b",
   project: [
-    name: "bluesky",
+    name: {:system, "PAY2YOU_PROJECT_NAME", "bluesky"},
     fee: [
       percent: 0.5,
       fix: 5

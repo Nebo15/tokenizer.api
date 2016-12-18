@@ -168,6 +168,7 @@ defmodule API.Controllers.Transfer do
   defp validate_token({:ok, _transfer}, _conn), do: {:error, :access_denied}
 
   defp update_transfer({:error, reason}), do: {:error, reason}
+  defp update_transfer({:ok, %TransferSchema{} = transfer}), do: {:ok, transfer}
   defp update_transfer({:ok, %Changeset{valid?: false} = changeset}), do: {:error, changeset}
   defp update_transfer({:ok, changeset}) do
     changeset

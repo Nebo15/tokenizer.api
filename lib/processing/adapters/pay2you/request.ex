@@ -5,17 +5,17 @@ defmodule Processing.Adapters.Pay2You.Request do
   use HTTPoison.Base
   require Logger
 
-  upstream_url = Confex.get_map(:gateway_api, :pay2you)[:upstream_url]
-  unless upstream_url do
-    raise "Pay2You upstream URL is not set!"
-  end
-
-  @upstream_url upstream_url
   @transfer_uri "/Card2Card/CreateCard2CardOperation"
 
   def process_url(url) do
-    Logger.debug("Request will be sent to: " <> @upstream_url <> url)
-    @upstream_url <> url
+    upstream_url = Confex.get_map(:gateway_api, :pay2you)[:upstream_url]
+
+    unless upstream_url do
+      raise "Pay2You upstream URL is not set!"
+    end
+    Logger.debug("Request will be sent to: " <> upstream_url <> url)
+
+    upstream_url <> url
   end
 
   defp process_request_headers(headers) do

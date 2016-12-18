@@ -28,7 +28,11 @@ defmodule Processing.Adapters.Pay2You.Request do
   end
 
   defp process_response_body(body) do
-    body
-    |> Poison.decode!
+    case body |> Poison.decode do
+      {:ok, resp} -> resl
+      {:error, _} ->
+        Logger.warn("Received corrupted body: #{inspect body}")
+        %{:error, :corrupted_body}
+    end
   end
 end

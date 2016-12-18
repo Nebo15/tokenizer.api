@@ -9,6 +9,7 @@ defmodule Processing.Adapters.Pay2You.Receive do
 
   @config Confex.get(:gateway_api, :pay2you)
   @claim_upstream_uri "/Phone2Card/CreatePhone2CardOperation"
+  @timeout 60_000
 
   def receive(external_id, %CardNumber{number: recipient_number}, recipient_phone) do
     %{
@@ -31,14 +32,16 @@ defmodule Processing.Adapters.Pay2You.Receive do
   end
 
   defp post_receive(params) do
-    case Request.post(@claim_upstream_uri, params) do
+    opts = [connect_timeout: @timeout, recv_timeout: @timeout, timeout: @timeout]
+    case Request.post(@claim_upstream_uri, params, [], opts) do
       {:ok, %{body: body}} -> {:ok, body}
       {:error, reason} -> {:error, reason}
     end
   end
 
   defp post_auth(params, otp_code) do
-    case Request.post(@claim_upstream_uri <> "?otpcode=" <> to_string(otp_code), params) do
+    opts = [connect_timeout: @timeout, recv_timeout: @timeout, timeout: @timeout]
+    case Request.post(@claim_upstream_uri <> "?otpcode=" <> to_string(otp_code), params, [], opts) do
       {:ok, %{body: body}} -> {:ok, body}
       {:error, reason} -> {:error, reason}
     end

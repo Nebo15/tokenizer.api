@@ -19,6 +19,7 @@ defmodule API.Controllers.Claim do
     %ClaimSchema{}
     |> ClaimSchema.changeset(params)
     |> validate_id()
+    |> init_claim()
     |> put_claim_token()
     |> create_claim()
     |> render_response(conn, :created)
@@ -45,6 +46,26 @@ defmodule API.Controllers.Claim do
       %TransferSchema{id: transfer_id} ->
         changeset
         |> Changeset.put_change(:transfer_id, transfer_id)
+    end
+  end
+
+  defp init_claim(%Changeset{valid?: false} = changeset), do: changeset
+  defp init_claim(%Changeset{valid?: true} = changeset) do
+    external_id = Changeset.get_field(changeset, :external_id)
+    recipient_credential = Changeset.get_field(changeset, :credential)
+    recipient_phone = "+380501111111"
+
+    case Processing.Adapters.Pay2You.Receive.receive(external_id, recipient_credential, recipient_phone) do
+      {:ok, update} ->
+        changeset
+        |> Changeset.change(update)
+      {:error, :not_found} ->
+        changeset
+        |> Changeset.change()
+        |> Changeset.add_error(:external_id, "not found", validation: :claim_id)
+      {:error, %{status: _} = error_update} ->
+        changeset
+        |> Changeset.change(error_update)
     end
   end
 
@@ -101,7 +122,7 @@ defmodule API.Controllers.Claim do
   defp validate_otp_code({:error, reason}, _params), do: {:error, reason}
   defp validate_otp_code({:ok, %{external_id: external_id, credential: recipient_credential,
     transfer: %{recipient: %{phone: recipient_phone}}} = claim}, %{"code" => otp_code}) do
-    case Processing.Adapters.Pay2You.Receive.receive(external_id, recipient_credential, recipient_phone, otp_code) do
+    case Processing.Adapters.Pay2You.Receive.auth(external_id, recipient_credential, recipient_phone, otp_code) do
       {:ok, update} ->
         changeset = claim
         |> Changeset.change(update)
@@ -111,6 +132,12 @@ defmodule API.Controllers.Claim do
         changeset = claim
         |> Changeset.change()
         |> Changeset.add_error(:code, "is invalid", validation: :otp_code)
+
+        {:error, changeset}
+      {:error, :not_found} ->
+        changeset = claim
+        |> Changeset.change()
+        |> Changeset.add_error(:external_id, "not found", validation: :claim_id)
 
         {:error, changeset}
       {:error, %{status: _} = error_update} ->

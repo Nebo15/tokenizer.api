@@ -8,39 +8,59 @@ defmodule Processing.Adapters.Pay2You.Receive do
   alias API.Repo.Schemas.CardNumber
 
   @config Confex.get(:gateway_api, :pay2you)
-  @claim_upstream_uri "/Phone2Card/CreatePhone2CardOperation?otpcode="
+  @claim_upstream_uri "/Phone2Card/CreatePhone2CardOperation"
 
-  def receive(external_id, %CardNumber{number: recipient_number}, recipient_phone, otp_code) do
+  def receive(external_id, %CardNumber{number: recipient_number}, recipient_phone) do
     %{
       cardTo: recipient_number,
       socialNumber: recipient_phone,
       operationNumber: external_id
     }
-    |> post_receive(otp_code)
-    |> normalize_response()
+    |> post_receive()
+    |> normalize_response("authentication")
   end
 
-  defp post_receive(params, otp_code) do
-    case Request.post(@claim_upstream_uri <> to_string(otp_code), params) do
+  def auth(external_id, %CardNumber{number: recipient_number}, recipient_phone, otp_code) do
+    %{
+      cardTo: recipient_number,
+      socialNumber: recipient_phone,
+      operationNumber: external_id
+    }
+    |> post_auth(otp_code)
+    |> normalize_response("processing")
+  end
+
+  defp post_receive(params) do
+    case Request.post(@claim_upstream_uri, params) do
       {:ok, %{body: body}} -> {:ok, body}
       {:error, reason} -> {:error, reason}
     end
   end
 
-  defp normalize_response({:error, reason}) do
+  defp post_auth(params, otp_code) do
+    case Request.post(@claim_upstream_uri <> "?otpcode=" <> to_string(otp_code), params) do
+      {:ok, %{body: body}} -> {:ok, body}
+      {:error, reason} -> {:error, reason}
+    end
+  end
+
+  defp normalize_response({:error, reason}, _next_status) do
     Logger.warn("Transfer receive failed with error: #{inspect reason}")
     {:error, %{
       status: "error"
     }}
   end
 
-  defp normalize_response({:ok, %{"state" => %{"code" => 19}}}),
+  defp normalize_response({:ok, %{"state" => %{"code" => 19}}}, _next_status),
     do: {:error, :invalid_otp_code}
 
-  defp normalize_response({:ok, %{"state" => %{"code" => 0}}}),
-    do: {:ok, %{status: "processing"}}
+  defp normalize_response({:ok, %{"state" => %{"code" => 16}}}, _next_status),
+    do: {:error, :not_found}
 
-  defp normalize_response({:ok, %{"idClient" => id, "state" => %{"code" => status_code}}}) do
+  defp normalize_response({:ok, %{"state" => %{"code" => 0}}}, next_status),
+    do: {:ok, %{status: next_status}}
+
+  defp normalize_response({:ok, %{"idClient" => id, "state" => %{"code" => status_code}}}, _next_status) do
     {:error, %{
       external_id: to_string(id),
       status: "declined",

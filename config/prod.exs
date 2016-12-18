@@ -35,7 +35,7 @@ config :gateway_api, API.Endpoint,
   code_reloader: false
 
 # Do not print debug messages in production
-config :logger, level: :info
+config :logger, level: :debug
 
 config :gateway_api,
   card_data_encryption_key: {:system, "CARD_DATA_ENCRYPTION_KEY"}

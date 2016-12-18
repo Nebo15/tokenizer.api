@@ -29,10 +29,10 @@ defmodule Processing.Adapters.Pay2You.Request do
 
   defp process_response_body(body) do
     case body |> Poison.decode do
-      {:ok, resp} -> resl
+      {:ok, resp} -> resp
       {:error, _} ->
         Logger.warn("Received corrupted body: #{inspect body}")
-        %{:error, :corrupted_body}
+        {:error, :corrupted_body}
     end
   end
 end

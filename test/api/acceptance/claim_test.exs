@@ -19,9 +19,9 @@ defmodule API.Controllers.ClaimTest do
     number: "5473959513413611"
   }
 
-  defp construct_claim(id, credential \\ @card_number_credential) do
+  defp construct_claim(external_id, credential \\ @card_number_credential) do
     %{
-      id: id,
+      external_id: external_id,
       credential: credential
     }
   end
@@ -103,7 +103,7 @@ defmodule API.Controllers.ClaimTest do
         },
         "error" => %{
           "invalid" => [
-            %{"entry" => "$.id",
+            %{"entry" => "$.external_id",
               "rules" => [%{"params" => [], "rule" => "claim_id"}]}
           ],
         }

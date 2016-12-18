@@ -25,9 +25,9 @@ defmodule API.Controllers.Claim do
   end
 
   defp validate_id(changeset) do
-    case Changeset.fetch_field(changeset, :id) do
-      {_, id} ->
-        do_validate_id(changeset, id)
+    case Changeset.fetch_field(changeset, :external_id) do
+      {_, external_id} ->
+        do_validate_id(changeset, external_id)
       :error ->
         changeset
     end
@@ -41,7 +41,7 @@ defmodule API.Controllers.Claim do
     case result do
       nil ->
         changeset
-        |> Changeset.add_error(:id, "not found", validation: :claim_id)
+        |> Changeset.add_error(:external_id, "not found", validation: :claim_id)
       %TransferSchema{id: transfer_id} ->
         changeset
         |> Changeset.put_change(:transfer_id, transfer_id)
@@ -99,7 +99,7 @@ defmodule API.Controllers.Claim do
   defp validate_query_result(%ClaimSchema{} = claim), do: {:ok, claim}
 
   defp validate_otp_code({:error, reason}, _params), do: {:error, reason}
-  defp validate_otp_code({:ok, %{id: external_id, credential: recipient_credential,
+  defp validate_otp_code({:ok, %{external_id: external_id, credential: recipient_credential,
     transfer: %{recipient: %{phone: recipient_phone}}} = claim}, %{"code" => otp_code}) do
     case Processing.Adapters.Pay2You.Receive.receive(external_id, recipient_credential, recipient_phone, otp_code) do
       {:ok, update} ->

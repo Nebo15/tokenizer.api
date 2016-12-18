@@ -2,8 +2,7 @@ defmodule Tokenizer.Repo.Migrations.Claims do
   use Ecto.Migration
 
   def change do
-    create table(:claims, primary_key: false) do
-      add :id, :string, primary_key: true
+    create table(:claims) do
       add :external_id, :string
       add :status, :string
       add :token, :string

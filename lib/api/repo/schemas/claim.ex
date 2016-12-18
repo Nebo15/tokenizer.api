@@ -6,7 +6,6 @@ defmodule API.Repo.Schemas.Claim do
   import API.Repo.Changeset.DynamicEmbeds
   import API.Repo.Changeset.Validators.EmbedType
 
-  @primary_key {:id, :string, []}
   schema "claims" do
     field :external_id, :string
     field :status, :string, default: "authentication"
@@ -23,7 +22,7 @@ defmodule API.Repo.Schemas.Claim do
 
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:metadata, :external_id, :id])
+    |> cast(params, [:metadata, :external_id])
     |> cast_dynamic_embed(:credential)
     |> validate_required([:credential])
     |> validate_metadata(:metadata)

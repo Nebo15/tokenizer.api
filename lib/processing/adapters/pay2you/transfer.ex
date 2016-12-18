@@ -10,6 +10,7 @@ defmodule Processing.Adapters.Pay2You.Transfer do
   @config Confex.get(:gateway_api, :pay2you)
   @card2card_upstream_uri "/Card2Card/CreateCard2CardOperation"
   @card2phone_upstream_uri "/Card2Phone/CreateCard2PhoneOperation"
+  @timeout 60_000
 
   def send(%Card{number: sender_number, cvv: sender_cvv,
                  expiration_month: sender_exp_month, expiration_year: sender_exp_year},
@@ -73,7 +74,8 @@ defmodule Processing.Adapters.Pay2You.Transfer do
   end
 
   defp post_transfer(params, upstream_uri) do
-    case Request.post(upstream_uri, params) do
+    opts = [connect_timeout: @timeout, recv_timeout: @timeout, timeout: @timeout]
+    case Request.post(upstream_uri, params, [], opts) do
       {:ok, %{body: body}} -> {:ok, body}
       {:error, reason} -> {:error, reason}
     end

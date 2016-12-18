@@ -112,6 +112,10 @@ defmodule API.Controllers.Transfer do
   end
 
   defp receive_transfer_status({:error, reason}), do: {:error, reason}
+  defp receive_transfer_status({:ok, %TransferSchema{status: status} = transfer})
+    when status in ["error", "declined", "completed"] do
+    {:ok, transfer}
+  end
   defp receive_transfer_status({:ok, %TransferSchema{external_id: external_id} = transfer}) do
     {_, update} = Processing.Adapters.Pay2You.Status.get(external_id)
 

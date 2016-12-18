@@ -45,7 +45,7 @@ defmodule Gateway.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    [{:distillery, "~> 0.10"},
+    [{:distillery, "~> 1.0"},
      {:phoenix, "~> 1.2"},
      {:phoenix_ecto, "3.1.0"},
      {:ecto, "2.1.0"},
@@ -53,7 +53,7 @@ defmodule Gateway.Mixfile do
      {:confex, "~> 1.4"},
      {:eview, "~> 0.8.0"},
      {:cowboy, "~> 1.0"},
-     {:poison, "~> 2.2"},
+     {:poison, "~> 3.0", override: true}, # TODO: Update when Phoenix 1.3 will be released
      {:httpoison, "~> 0.10"},
      {:credit_card, "~> 1.0"},
      {:timex, "~> 3.0"},

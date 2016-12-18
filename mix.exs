@@ -47,9 +47,9 @@ defmodule Gateway.Mixfile do
   defp deps do
     [{:distillery, "~> 0.10"},
      {:phoenix, "~> 1.2"},
-     {:phoenix_ecto, "3.1.0-rc.0"}, # TODO: Update when Ecto will release v2.1
-     {:ecto, "2.1.0-rc.4", override: true}, # TODO: Update when Ecto will release v2.1
-     {:postgrex, "~> 1.0.0-rc.1", override: true},
+     {:phoenix_ecto, "3.1.0"},
+     {:ecto, "2.1.0"},
+     {:postgrex, "~> 0.13.0"},
      {:confex, "~> 1.4"},
      {:eview, "~> 0.8.0"},
      {:cowboy, "~> 1.0"},

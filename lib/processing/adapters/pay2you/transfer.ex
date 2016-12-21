@@ -84,7 +84,10 @@ defmodule Processing.Adapters.Pay2You.Transfer do
   defp normalize_response({:error, reason}) do
     Logger.warn("Transfer failed with error: #{inspect reason}")
     {:error, %{
-      status: "error"
+      status: "declined",
+      decline: %{
+        code: "1"
+      }
     }}
   end
 

@@ -27,7 +27,7 @@ defmodule Processing.Adapters.Pay2You.Status do
 
   defp normalize_response({:error, reason}) do
     Logger.warn("Transfer failed with error: #{inspect reason}")
-    {:error, %{status: "error"}}
+    {:error, %{status: "declined"}}
   end
 
   defp normalize_response({:ok, %{"mErrCode" => 0}}),
@@ -49,6 +49,6 @@ defmodule Processing.Adapters.Pay2You.Status do
 
   defp normalize_response(resp) do
     Logger.warn("Transfer response did not match any patterns: #{inspect resp}")
-    {:error, %{status: "error"}}
+    {:error, %{status: "declined"}}
   end
 end

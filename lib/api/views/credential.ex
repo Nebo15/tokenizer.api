@@ -15,6 +15,6 @@ defmodule API.Views.Credential do
   end
 
   defp hide_card_number(card_number) do
-    String.slice(card_number, 1..6) <> String.duplicate("*", 6) <> String.slice(card_number, -4..-1)
+    String.slice(card_number, 0..5) <> String.duplicate("*", 6) <> String.slice(card_number, -4..-1)
   end
 end

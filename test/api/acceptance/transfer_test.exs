@@ -80,8 +80,8 @@ defmodule API.Controllers.TransferTest do
           "code" => 201
         },
         "data" => %{
-          "recipient" => %{"credential" => %{"type" => "card-number", "number" => "473959******3611"}},
-          "sender" => %{"credential" => %{"type" => "card", "number" => "473959******3611"}}
+          "recipient" => %{"credential" => %{"type" => "card-number", "number" => "547395******3611"}},
+          "sender" => %{"credential" => %{"type" => "card", "number" => "547395******3611"}}
         }
       } = resp
     end
@@ -100,8 +100,8 @@ defmodule API.Controllers.TransferTest do
           "code" => 201
         },
         "data" => %{
-          "recipient" => %{"credential" => %{"type" => "card-number", "number" => "473959******3611"}},
-          "sender" => %{"credential" => %{"type" => "card", "number" => "473959******3611"}}
+          "recipient" => %{"credential" => %{"type" => "card-number", "number" => "547395******3611"}},
+          "sender" => %{"credential" => %{"type" => "card", "number" => "547395******3611"}}
         }
       } = resp
     end
@@ -120,8 +120,8 @@ defmodule API.Controllers.TransferTest do
     #       "code" => 201
     #     },
     #     "data" => %{
-    #       "recipient" => %{"credential" => %{"type" => "card", "number" => "473959******3611"}},
-    #       "sender" => %{"credential" => %{"type" => "card", "number" => "473959******3611"}}
+    #       "recipient" => %{"credential" => %{"type" => "card", "number" => "547395******3611"}},
+    #       "sender" => %{"credential" => %{"type" => "card", "number" => "547395******3611"}}
     #     }
     #   } = resp
     # end

@@ -87,7 +87,7 @@ defmodule API.Controllers.ClaimTest do
           "code" => 201
         },
         "data" => %{
-          "credential" => %{"type" => "card-number", "number" => "473959******3611"}
+          "credential" => %{"type" => "card-number", "number" => "547395******3611"}
         }
       } = resp
     end

@@ -16,6 +16,14 @@ defmodule API.Endpoint do
     plug Phoenix.CodeReloader
   end
 
+  # Serve at "/" the static files from "priv/static" directory.
+  #
+  # You should set gzip to true if you are running phoenix.digest
+  # when deploying your static files in production.
+  # plug Plug.Static,
+  #   at: "/", from: :saturn, gzip: false,
+  #   only: ~w(css fonts images js favicon.ico robots.txt)
+
   plug Plug.RequestId
   plug Plug.Logger
 

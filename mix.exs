@@ -48,10 +48,10 @@ defmodule Gateway.Mixfile do
     [{:distillery, "~> 1.0"},
      {:phoenix, "~> 1.2"},
      {:phoenix_ecto, "3.1.0"},
-     {:ecto, "2.1.0"},
+     {:ecto, "~> 2.1"},
      {:postgrex, "~> 0.13.0"},
      {:confex, "~> 1.4"},
-     {:eview, "~> 0.8.0"},
+     {:eview, "~> 0.9.0"},
      {:cowboy, "~> 1.0"},
      {:poison, "~> 3.0", override: true}, # TODO: Update when Phoenix 1.3 will be released
      {:httpoison, "~> 0.10"},

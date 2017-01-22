@@ -1,4 +1,4 @@
-defmodule API.Repo.Changeset.Validators.Fee do
+defmodule Repo.Changeset.Validators.Fee do
   @moduledoc """
   This helper validates phone numbers in international format (with `+:country_code`).
   """

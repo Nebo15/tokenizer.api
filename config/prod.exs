@@ -5,7 +5,7 @@ use Mix.Config
 
 
 # Configure your database
-config :gateway_api, API.Repo,
+config :gateway_api, Repo,
   adapter: Ecto.Adapters.Postgres,
   database: "${DB_NAME}",
   username: "${DB_USER}",

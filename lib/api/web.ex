@@ -27,7 +27,7 @@ defmodule API.Web do
       import EView.Changeset.Validators.PhoneNumber
       import EView.Changeset.Validators.Metadata
 
-      alias API.Repo
+      alias Repo
     end
   end
 
@@ -39,7 +39,7 @@ defmodule API.Web do
       import Ecto.Query
       import API.Router.Helpers
 
-      alias API.Repo
+      alias Repo
     end
   end
 

@@ -1,4 +1,4 @@
-defmodule API.Repo.Changeset.Validators.TokenExpiration do
+defmodule Repo.Changeset.Validators.TokenExpiration do
   @moduledoc """
   Validates tokens `expires_at` values.
   """

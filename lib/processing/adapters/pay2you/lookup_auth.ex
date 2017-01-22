@@ -5,7 +5,7 @@ defmodule Processing.Adapters.Pay2You.LookupAuth do
   require Logger
   alias Processing.Adapters.Pay2You.Error
   alias Processing.Adapters.Pay2You.Request
-  alias API.Repo.Schemas.AuthorizationLookupCode
+  alias Repo.Schemas.AuthorizationLookupCode
 
   @config Confex.get(:gateway_api, :pay2you)
   @auth_upstream_uri "/ConfirmLookUp/finishlookup"

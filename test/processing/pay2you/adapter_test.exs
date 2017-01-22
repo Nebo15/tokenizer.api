@@ -1,7 +1,7 @@
 defmodule Processing.Adapters.Pay2You.AdapterTest do
   use ExUnit.Case, async: true
   alias Processing.Adapters.Pay2You
-  alias API.Repo.Schemas.{Card, CardNumber}
+  alias Repo.Schemas.{Card, CardNumber}
 
   @lookup_card %Card{
     number: "5591587543706253",
@@ -28,7 +28,7 @@ defmodule Processing.Adapters.Pay2You.AdapterTest do
 
       assert {:ok, transfer_response} = transfer
       assert %{
-        auth: %API.Repo.Schemas.AuthorizationLookupCode{
+        auth: %Repo.Schemas.AuthorizationLookupCode{
           md: _,
           type: "lookup-code"
         },
@@ -43,7 +43,7 @@ defmodule Processing.Adapters.Pay2You.AdapterTest do
 
       assert {:ok, transfer_response} = transfer
       assert %{
-        auth: %API.Repo.Schemas.Authorization3DS{
+        auth: %Repo.Schemas.Authorization3DS{
           acs_url: "http://p2y-dev.mbill.co/pay2you-external/3ds",
           md: _,
           pa_req: _,
@@ -93,7 +93,7 @@ defmodule Processing.Adapters.Pay2You.AdapterTest do
 
       assert {:ok, transfer_response} = transfer
       assert %{
-        auth: %API.Repo.Schemas.AuthorizationLookupCode{
+        auth: %Repo.Schemas.AuthorizationLookupCode{
           md: _,
           type: "lookup-code"
         },
@@ -108,7 +108,7 @@ defmodule Processing.Adapters.Pay2You.AdapterTest do
 
       assert {:ok, transfer_response} = transfer
       assert %{
-        auth: %API.Repo.Schemas.Authorization3DS{
+        auth: %Repo.Schemas.Authorization3DS{
           acs_url: "http://p2y-dev.mbill.co/pay2you-external/3ds",
           md: _,
           pa_req: _,

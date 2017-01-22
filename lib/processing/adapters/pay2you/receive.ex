@@ -5,7 +5,7 @@ defmodule Processing.Adapters.Pay2You.Receive do
   require Logger
   alias Processing.Adapters.Pay2You.Error
   alias Processing.Adapters.Pay2You.Request
-  alias API.Repo.Schemas.CardNumber
+  alias Repo.Schemas.CardNumber
 
   @config Confex.get(:gateway_api, :pay2you)
   @claim_upstream_uri "/Phone2Card/CreatePhone2CardOperation"

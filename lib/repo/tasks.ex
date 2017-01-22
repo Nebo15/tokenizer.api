@@ -1,16 +1,16 @@
-defmodule :tokenizer_repo_tasks do
+defmodule :repo_tasks do
   @moduledoc """
   Nice way to apply migrations inside a released application.
 
   Example:
 
-      gateway_api/bin/gateway_api command tokenizer_repo_tasks migrate!
+      gateway_api/bin/gateway_api command repo_tasks migrate!
   """
 
   import Mix.Ecto
 
   @priv_dir "priv"
-  @repo API.Repo
+  @repo Repo
 
   def migrate! do
     # Migrate

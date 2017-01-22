@@ -1,4 +1,4 @@
-defmodule API.Repo.Schemas.AuthorizationLookupCode do
+defmodule Repo.Schemas.AuthorizationLookupCode do
   @moduledoc """
   Schema for Lookup-Code authorization response.
   """

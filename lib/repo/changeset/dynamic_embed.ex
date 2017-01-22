@@ -1,4 +1,4 @@
-defmodule API.Repo.Changeset.DynamicEmbeds do
+defmodule Repo.Changeset.DynamicEmbeds do
   @moduledoc """
   This module provides validation function that can inject `DynamicEmbed` type as embed schema in changeset.
 

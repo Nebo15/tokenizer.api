@@ -1,16 +1,16 @@
-defmodule API.Repo.Schemas.Peer do
+defmodule Repo.Schemas.Peer do
   @moduledoc """
   Schema for transfer senders.
   """
   use API.Web, :schema
-  import API.Repo.Changeset.DynamicEmbeds
-  import API.Repo.Changeset.Validators.EmbedType
+  import Repo.Changeset.DynamicEmbeds
+  import Repo.Changeset.Validators.EmbedType
 
   @primary_key false
   embedded_schema do
     field :phone, :string
     field :email, :string
-    field :credential, API.Repo.Types.PeerCredential
+    field :credential, Repo.Types.PeerCredential
   end
 
   def sender_changeset(struct, params \\ %{}) do

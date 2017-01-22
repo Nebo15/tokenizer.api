@@ -1,4 +1,4 @@
-defmodule API.Repo.Schemas.ExternalCredential do
+defmodule Repo.Schemas.ExternalCredential do
   @moduledoc """
   Schema for sender cards.
   """

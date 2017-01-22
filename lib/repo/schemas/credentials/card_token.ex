@@ -1,9 +1,9 @@
-defmodule API.Repo.Schemas.CardToken do
+defmodule Repo.Schemas.CardToken do
   @moduledoc """
   Schema for sender cards.
   """
   use API.Web, :schema
-  import API.Repo.Changeset.Validators.TokenExpiration
+  import Repo.Changeset.Validators.TokenExpiration
 
   @primary_key false
   embedded_schema do

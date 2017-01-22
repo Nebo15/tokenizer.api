@@ -4,10 +4,10 @@ defmodule API.Controllers.Claim do
   """
   use API.Web, :controller
   import Ecto.Query, only: [from: 2]
-  alias API.Repo.Schemas.Claim, as: ClaimSchema
-  alias API.Repo.Schemas.Transfer, as: TransferSchema
+  alias Repo.Schemas.Claim, as: ClaimSchema
+  alias Repo.Schemas.Transfer, as: TransferSchema
   alias API.Views.Claim, as: ClaimView
-  alias API.Repo
+  alias Repo
   alias Ecto.Changeset
 
   @claim_token_prefix "claim-token"

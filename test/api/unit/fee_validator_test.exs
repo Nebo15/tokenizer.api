@@ -1,6 +1,6 @@
-defmodule API.Repo.Changeset.Validators.FeeTest do
+defmodule Repo.Changeset.Validators.FeeTest do
   use ExUnit.Case, async: true
-  alias API.Repo.Changeset.Validators.Fee
+  alias Repo.Changeset.Validators.Fee
 
   @fees [
     {1, 5.01}, {1.5, 5.01}, {2, 5.01}, {2.5, 5.01}, {3, 5.02}, {3.5, 5.02}, {4, 5.02}, {4.5, 5.02}, {5, 5.03},

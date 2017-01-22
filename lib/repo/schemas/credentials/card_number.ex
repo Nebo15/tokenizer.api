@@ -1,4 +1,4 @@
-defmodule API.Repo.Schemas.CardNumber do
+defmodule Repo.Schemas.CardNumber do
   @moduledoc """
   Schema for sender cards.
   """

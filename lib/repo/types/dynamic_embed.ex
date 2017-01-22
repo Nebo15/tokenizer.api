@@ -1,4 +1,4 @@
-defmodule API.Repo.Types.DynamicEmbed do
+defmodule Repo.Types.DynamicEmbed do
   @moduledoc """
   This module provides common interface and helper function for types that can be embedded dynamically into schema.
   """

@@ -1,4 +1,4 @@
-defmodule API.Repo do
+defmodule Repo do
   @moduledoc """
   Repo for Ecto database.
 

@@ -1,4 +1,4 @@
-defmodule API.Repo.Changeset.Validators.EmbedType do
+defmodule Repo.Changeset.Validators.EmbedType do
   @moduledoc """
   This validator allows to check embed type inclusion in a whitelist.
   """

@@ -3,7 +3,7 @@ defmodule API.Controllers.ClaimTest do
     async: true,
     otp_app: :gateway_api,
     endpoint: API.Endpoint,
-    repo: API.Repo,
+    repo: Repo,
     headers: [{"content-type", "application/json"}]
 
   @card_credential %{

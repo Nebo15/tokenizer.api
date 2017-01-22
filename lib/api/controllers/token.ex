@@ -3,8 +3,8 @@ defmodule API.Controllers.Token do
   Controller for `/tokens` API requests.
   """
   use API.Web, :controller
-  alias API.Repo.Schemas.Card, as: CardSchema
-  alias API.Repo.Schemas.CardToken, as: CardTokenSchema
+  alias Repo.Schemas.Card, as: CardSchema
+  alias Repo.Schemas.CardToken, as: CardTokenSchema
   alias API.Views.Token, as: TokenView
   alias Tokenizer.Supervisor, as: Tokenizer
 

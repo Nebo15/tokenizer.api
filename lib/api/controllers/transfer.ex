@@ -4,14 +4,14 @@ defmodule API.Controllers.Transfer do
   """
   use API.Web, :controller
   alias Processing.Adapters.Pay2You.Transfer, as: TransferService
-  alias API.Repo.Schemas.Transfer, as: TransferSchema
-  alias API.Repo.Schemas.Card, as: CardSchema
-  alias API.Repo.Schemas.CardNumber, as: CardNumberSchema
-  alias API.Repo.Schemas.ExternalCredential, as: ExternalCredentialSchema
-  alias API.Repo.Schemas.AuthorizationLookupCode, as: AuthorizationLookupCodeSchema
+  alias Repo.Schemas.Transfer, as: TransferSchema
+  alias Repo.Schemas.Card, as: CardSchema
+  alias Repo.Schemas.CardNumber, as: CardNumberSchema
+  alias Repo.Schemas.ExternalCredential, as: ExternalCredentialSchema
+  alias Repo.Schemas.AuthorizationLookupCode, as: AuthorizationLookupCodeSchema
   alias API.Views.Transfer, as: TransferView
   alias API.Helpers.TokenResolver
-  alias API.Repo
+  alias Repo
   alias Ecto.Changeset
 
   @transfer_token_prefix "transfer-token"

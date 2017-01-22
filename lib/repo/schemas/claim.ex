@@ -1,19 +1,19 @@
-defmodule API.Repo.Schemas.Claim do
+defmodule Repo.Schemas.Claim do
   @moduledoc """
   Schema for transfers.
   """
   use API.Web, :schema
-  import API.Repo.Changeset.DynamicEmbeds
-  import API.Repo.Changeset.Validators.EmbedType
+  import Repo.Changeset.DynamicEmbeds
+  import Repo.Changeset.Validators.EmbedType
 
   schema "claims" do
     field :external_id, :string
     field :status, :string, default: "authentication"
     field :token, :string
     field :token_expires_at, :utc_datetime
-    field :credential, API.Repo.Types.PeerCredential
+    field :credential, Repo.Types.PeerCredential
     field :auth, :map, default: %{type: "otp-code"}
-    belongs_to :transfer, API.Repo.Schemas.Transfer
+    belongs_to :transfer, Repo.Schemas.Transfer
     field :metadata, :map
     field :decline, :map
 
@@ -38,7 +38,7 @@ defmodule API.Repo.Schemas.Claim do
     |> Repo.insert
   end
 
-  def insert(%API.Repo.Schemas.Transfer{} = struct) do
+  def insert(%Repo.Schemas.Transfer{} = struct) do
     struct
     |> Repo.insert
   end

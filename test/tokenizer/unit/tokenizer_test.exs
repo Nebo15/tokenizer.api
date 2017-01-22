@@ -1,6 +1,6 @@
 defmodule Tokenizer.SupervisorTest do
   use ExUnit.Case
-  alias API.Repo.Schemas.Card
+  alias Repo.Schemas.Card
   alias Tokenizer.Supervisor, as: Tokenizer
 
   @card %Card{

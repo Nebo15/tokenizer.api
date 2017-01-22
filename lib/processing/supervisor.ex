@@ -12,7 +12,7 @@ defmodule Processing.Supervisor do
   def init(_) do
     children = [
       # Start the Ecto repository
-      # supervisor(API.Repo, []),
+      # supervisor(Repo, []),
       # # Start the endpoint
       # supervisor(API.Endpoint, []),
     ]

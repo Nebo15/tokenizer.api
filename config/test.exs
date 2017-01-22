@@ -4,7 +4,7 @@ use Mix.Config
 
 
 # Configure your database
-config :gateway_api, API.Repo,
+config :gateway_api, Repo,
   pool: Ecto.Adapters.SQL.Sandbox,
   database: "gateway_api_test"
 

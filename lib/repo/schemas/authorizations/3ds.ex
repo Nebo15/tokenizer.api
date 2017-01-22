@@ -1,4 +1,4 @@
-defmodule API.Repo.Schemas.Authorization3DS do
+defmodule Repo.Schemas.Authorization3DS do
   @moduledoc """
   Schema for 3D-Secure authorization response.
   """

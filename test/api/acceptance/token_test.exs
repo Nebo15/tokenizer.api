@@ -3,9 +3,9 @@ defmodule API.Controllers.TokenTest do
     async: true,
     otp_app: :gateway_api,
     endpoint: API.Endpoint,
-    repo: API.Repo
+    repo: Repo
 
-  alias API.Repo.Schemas.Card
+  alias Repo.Schemas.Card
 
   @token_prefix "card-token"
 

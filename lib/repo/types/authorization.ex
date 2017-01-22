@@ -1,16 +1,16 @@
-defmodule API.Repo.Types.Authorization do
+defmodule Repo.Types.Authorization do
   @moduledoc """
   Dynamic embed type for `transfer.auth` field.
   """
-  use API.Repo.Types.DynamicEmbed
+  use Repo.Types.DynamicEmbed
 
   @doc """
   Returns related struct based on data structure.
   """
   def resolve(%{type: "3d-secure"}),
-    do: {:ok, API.Repo.Schemas.Authorization3DS}
+    do: {:ok, Repo.Schemas.Authorization3DS}
   def resolve(%{type: "lookup-code"}),
-    do: {:ok, API.Repo.Schemas.AuthorizationLookupCode}
+    do: {:ok, Repo.Schemas.AuthorizationLookupCode}
   def resolve(_),
     do: {:error, :unkown_type}
 

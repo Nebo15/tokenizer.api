@@ -5,7 +5,7 @@ defmodule Processing.Adapters.Pay2You.Transfer do
   require Logger
   alias Processing.Adapters.Pay2You.Error
   alias Processing.Adapters.Pay2You.Request
-  alias API.Repo.Schemas.{Card, CardNumber}
+  alias Repo.Schemas.{Card, CardNumber}
 
   @config Confex.get(:gateway_api, :pay2you)
   @card2card_upstream_uri "/Card2Card/CreateCard2CardOperation"
@@ -135,9 +135,9 @@ defmodule Processing.Adapters.Pay2You.Transfer do
 
   # Lookup code
   defp normalize_authentication(%{"md" => md, "paReq" => "lookup"}),
-    do: %API.Repo.Schemas.AuthorizationLookupCode{md: md}
+    do: %Repo.Schemas.AuthorizationLookupCode{md: md}
 
   # 3D Secure
   defp normalize_authentication(%{"acsUrl" => asc_url, "paReq" => pa_req, "termUrl" => terminal_url, "md" => md}),
-    do: %API.Repo.Schemas.Authorization3DS{acs_url: asc_url, pa_req: pa_req, terminal_url: terminal_url, md: md}
+    do: %Repo.Schemas.Authorization3DS{acs_url: asc_url, pa_req: pa_req, terminal_url: terminal_url, md: md}
 end

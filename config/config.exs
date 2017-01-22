@@ -25,7 +25,7 @@ use Mix.Config
 #     :var_name, "${ENV_VAR_NAME}"
 
 # Configure your database
-config :gateway_api, API.Repo,
+config :gateway_api, Repo,
   adapter: Ecto.Adapters.Postgres,
   database: "gateway_api_dev",
   username: "postgres",
@@ -38,7 +38,7 @@ config :gateway_api, API.Repo,
 
 config :gateway_api,
   namespace: API,
-  ecto_repos: [API.Repo]
+  ecto_repos: [Repo]
 
 # Configures the endpoint
 config :gateway_api, API.Endpoint,

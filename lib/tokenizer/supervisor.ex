@@ -32,7 +32,7 @@ defmodule Tokenizer.Supervisor do
     |> Poison.encode!
     |> Encryptor.encrypt(get_encryption_keys(token))
 
-    child_name = get_card_process_name(token)
+    child_name = get_card_process_via_tuple(token)
     expires_in = Confex.get(:gateway_api, :card_token_expires_in)
 
     {:ok, _pid} = Supervisor.start_child(__MODULE__, [[
@@ -59,19 +59,19 @@ defmodule Tokenizer.Supervisor do
   For a single card this method can be called only once, because card data will destroy itself after decryption.
   """
   def get_card(token) do
-    token
-    |> get_card_process_name
-    |> Process.whereis
+    name = token
+    |> get_card_process_name()
+
+    Tokenizer.Registry
+    |> Registry.lookup(name)
     |> get_card_data(token)
   end
 
-  defp get_card_data(nil, _token) do
-    {:error, :card_not_found}
-  end
-
-  defp get_card_data(card_pid, token) do
-    message = card_pid
-    |> Tokenizer.Card.get_data
+  defp get_card_data([], _token),
+    do: {:error, :card_not_found}
+  defp get_card_data([{pid, _}], token) do
+    message = pid
+    |> Tokenizer.Card.get_data()
     |> Encryptor.decrypt(get_decryption_keys(token))
 
     case message do
@@ -130,9 +130,11 @@ defmodule Tokenizer.Supervisor do
     |> Enum.reverse
   end
 
-  def get_card_process_name(token) do
-    String.to_atom("Cards." <> token)
-  end
+  def get_card_process_via_tuple(token),
+    do: {:via, Registry, {Tokenizer.Registry, get_card_process_name(token)}}
+
+  def get_card_process_name(token),
+    do: "Cards." <> token
 
   @doc false
   def init(_) do

@@ -10,6 +10,7 @@ defmodule Gateway do
     children = [
       # Start the card tokenization
       supervisor(Tokenizer.Supervisor, []),
+      supervisor(Registry, [:unique, Tokenizer.Registry]),
       # Start REST API
       supervisor(API.Supervisor, []),
     ]

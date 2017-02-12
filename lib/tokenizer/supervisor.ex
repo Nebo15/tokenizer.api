@@ -14,6 +14,15 @@ defmodule Tokenizer.Supervisor do
     Supervisor.start_link(__MODULE__, [], name: __MODULE__)
   end
 
+  @doc false
+  def init(_) do
+    children = [
+      supervisor(Tokenizer.Card, [], restart: :transient)
+    ]
+
+    supervise(children, strategy: :simple_one_for_one)
+  end
+
   @doc """
   Save card to a GenServer process that will allow to read it's data only once.
 
@@ -130,18 +139,9 @@ defmodule Tokenizer.Supervisor do
     |> Enum.reverse
   end
 
-  def get_card_process_via_tuple(token),
+  defp get_card_process_via_tuple(token),
     do: {:via, Registry, {Tokenizer.Registry, get_card_process_name(token)}}
 
-  def get_card_process_name(token),
+  defp get_card_process_name(token),
     do: "Cards." <> token
-
-  @doc false
-  def init(_) do
-    children = [
-      supervisor(Tokenizer.Card, [], restart: :transient)
-    ]
-
-    supervise(children, strategy: :simple_one_for_one)
-  end
 end

@@ -2,10 +2,11 @@ defmodule Processing.Adapters.Pay2You.Transfer do
   @moduledoc """
   This module implements card2card and card2phone tranfsers interfaces.
   """
-  require Logger
   alias Processing.Adapters.Pay2You.Error
   alias Processing.Adapters.Pay2You.Request
-  alias Repo.Schemas.{Card, CardNumber}
+  alias Repo.Schemas.Card
+  alias Repo.Schemas.CardNumber
+  require Logger
 
   @config Confex.get(:gateway_api, :pay2you)
   @card2card_upstream_uri "/Card2Card/CreateCard2CardOperation"

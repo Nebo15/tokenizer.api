@@ -5,8 +5,6 @@ defmodule Processing.Adapters.Pay2You.Request do
   use HTTPoison.Base
   require Logger
 
-  @transfer_uri "/Card2Card/CreateCard2CardOperation"
-
   def process_url(url) do
     upstream_url = Confex.get_map(:gateway_api, :pay2you)[:upstream_url]
 

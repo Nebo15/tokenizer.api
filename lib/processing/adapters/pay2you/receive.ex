@@ -7,7 +7,6 @@ defmodule Processing.Adapters.Pay2You.Receive do
   alias Processing.Adapters.Pay2You.Request
   alias Repo.Schemas.CardNumber
 
-  @config Confex.get(:gateway_api, :pay2you)
   @claim_upstream_uri "/Phone2Card/CreatePhone2CardOperation"
   @timeout 60_000
 

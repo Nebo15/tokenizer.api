@@ -20,6 +20,7 @@ defmodule Tokenizer.SupervisorTest do
   test "stores card data" do
     assert {:ok, %{token: token, token_expires_at: _}} = Tokenizer.save_card(@card)
     assert {:ok, @card} = Tokenizer.get_card(token)
+    :timer.sleep(100)
     assert {:error, :card_not_found} = Tokenizer.get_card(token)
   end
 

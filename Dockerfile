@@ -1,4 +1,4 @@
-FROM nebo15/alpine-elixir:latest
+FROM nebo15/alpine-elixir:1.4.1-r0
 
 # Maintainers
 MAINTAINER Nebo#15 support@nebo15.com

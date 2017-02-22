@@ -38,7 +38,10 @@ defmodule API.Endpoint do
   plug Plug.MethodOverride
   plug Plug.Head
 
-  plug Corsica, origins: "*"
+  plug Corsica,
+    origins: "*",
+    allow_credentials: true,
+    allow_headers: ["authorization"]
 
   # The session will be stored in the cookie and signed,
   # this means its contents can be read but not tampered with.

@@ -1,7 +1,7 @@
 {
   "skip_files": [
     "test/*",
-    "/lib/db/tasks.ex"
+    "/lib/repo/tasks.ex"
   ],
   "custom_stop_words": [
     "field",

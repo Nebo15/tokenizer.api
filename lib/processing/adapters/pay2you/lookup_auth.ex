@@ -7,7 +7,6 @@ defmodule Processing.Adapters.Pay2You.LookupAuth do
   alias Processing.Adapters.Pay2You.Request
   alias Repo.Schemas.AuthorizationLookupCode
 
-  @config Confex.get(:gateway_api, :pay2you)
   @auth_upstream_uri "/ConfirmLookUp/finishlookup"
 
   def auth(%AuthorizationLookupCode{md: md}, code) do

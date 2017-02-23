@@ -7,8 +7,6 @@ defmodule :repo_tasks do
       gateway_api/bin/gateway_api command repo_tasks migrate!
   """
 
-  import Mix.Ecto
-
   @priv_dir "priv"
   @repo Repo
 
@@ -29,7 +27,7 @@ defmodule :repo_tasks do
     seed_script = Path.join([@priv_dir, "repo", "seeds.exs"])
 
     # Run seed script
-    repo = start_repo(@repo)
+    start_repo(@repo)
 
     Code.require_file(seed_script)
 

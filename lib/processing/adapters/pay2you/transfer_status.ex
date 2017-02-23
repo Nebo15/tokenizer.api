@@ -6,7 +6,6 @@ defmodule Processing.Adapters.Pay2You.Status do
   alias Processing.Adapters.Pay2You.Error
   alias Processing.Adapters.Pay2You.Request
 
-  @config Confex.get(:gateway_api, :pay2you)
   @status_upstream_uri "/Info/GetPayStatus"
 
   def get(id) do

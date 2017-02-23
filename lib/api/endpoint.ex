@@ -41,7 +41,11 @@ defmodule API.Endpoint do
   plug Corsica,
     origins: "*",
     allow_credentials: true,
-    allow_headers: ["authorization"]
+    allow_headers: ["authorization", "content-type", "accept", "origin",
+                    "user-agent", "DNT", "cache-control", "keep-alive",
+                    "if-modified-since", "x-project-id", "x-date", "x-accept-charset",
+                    "x-application-id", "x-device-information", "x-application-secret-hash",
+                    "x-device-push-token", "x-application"]
 
   # The session will be stored in the cookie and signed,
   # this means its contents can be read but not tampered with.

@@ -9,9 +9,9 @@ services:
 addons:
   postgresql: "9.5"
 elixir:
-  - 1.4
+  - 1.4.1
 otp_release:
-  - 19.0
+  - 19.1
 env:
   global:
     - MIX_ENV=test

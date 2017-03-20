@@ -8,6 +8,7 @@ defmodule Processing.Adapters.Pay2You.LookupAuth do
   alias Repo.Schemas.AuthorizationLookupCode
 
   @auth_upstream_uri "/ConfirmLookUp/finishlookup"
+  @timeout 60_000
 
   def auth(%AuthorizationLookupCode{md: md}, code) do
     %{
@@ -20,7 +21,8 @@ defmodule Processing.Adapters.Pay2You.LookupAuth do
   end
 
   defp post_auth(params) do
-    case Request.post(@auth_upstream_uri, params) do
+    opts = [connect_timeout: @timeout, recv_timeout: @timeout, timeout: @timeout]
+    case Request.post(@auth_upstream_uri, params, [], opts) do
       {:ok, %{body: body}} -> {:ok, body}
       {:error, reason} -> {:error, reason}
     end

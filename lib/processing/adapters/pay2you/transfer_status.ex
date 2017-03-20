@@ -7,6 +7,7 @@ defmodule Processing.Adapters.Pay2You.Status do
   alias Processing.Adapters.Pay2You.Request
 
   @status_upstream_uri "/Info/GetPayStatus"
+  @timeout 60_000
 
   def get(id) do
     %{
@@ -18,7 +19,8 @@ defmodule Processing.Adapters.Pay2You.Status do
 
   defp get_status(params) do
     Logger.debug("Receiving new payment status, params: #{inspect params}")
-    case Request.post(@status_upstream_uri, params) do
+    opts = [connect_timeout: @timeout, recv_timeout: @timeout, timeout: @timeout]
+    case Request.post(@status_upstream_uri, params, [], opts) do
       {:ok, %{body: body}} -> {:ok, body}
       {:error, reason} -> {:error, reason}
     end

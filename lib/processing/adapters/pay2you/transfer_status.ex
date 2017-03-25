@@ -35,7 +35,7 @@ defmodule Processing.Adapters.Pay2You.Status do
     do: {:ok, %{status: "completed"}}
 
   # 3DS or lookup code is not sent yet
-  defp normalize_response({:ok, %{"mErrCode" => status_code}}) when status_code in [55, 56, 49, 59],
+  defp normalize_response({:ok, %{"mErrCode" => status_code}}) when status_code in [56, 49, 59],
     do: {:ok, %{status: "authentication"}}
 
   defp normalize_response({:ok, %{"mErrCode" => status_code}}) do

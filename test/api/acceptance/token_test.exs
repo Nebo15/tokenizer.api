@@ -36,6 +36,19 @@ defmodule API.Controllers.TokenTest do
     } = "tokens"
     |> post!(@card)
     |> get_body
+
+    assert %{
+      "meta" => %{
+        "code" => 201
+      },
+      "data" => %{
+        "type" => "card-token",
+        "token" => @token_prefix <> _,
+        "token_expires_at" => _
+      }
+    } = "/gateway/tokens"
+    |> post!(@card)
+    |> get_body
   end
 
   test "create invalid card" do

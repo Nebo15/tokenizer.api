@@ -40,4 +40,27 @@ defmodule API.Router do
     get  "/:id", Claim, :show
     post "/:id/auth", Claim, :authentificate
   end
+
+  # Fixed paths for Amazon ELB
+  scope "/gateway/", API.Controllers do
+    pipe_through :public_api
+
+    post "/tokens", Token, :create
+  end
+
+  scope "/gateway/transfers", API.Controllers do
+    pipe_through :private_api
+
+    post "/", Transfer, :create
+    get  "/:id", Transfer, :show
+    post "/:id/auth", Transfer, :authentificate
+  end
+
+  scope "/gateway/claims", API.Controllers do
+    pipe_through :private_api
+
+    post "/", Claim, :create
+    get  "/:id", Claim, :show
+    post "/:id/auth", Claim, :authentificate
+  end
 end

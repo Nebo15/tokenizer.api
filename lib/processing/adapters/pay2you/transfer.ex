@@ -8,7 +8,7 @@ defmodule Processing.Adapters.Pay2You.Transfer do
   alias Repo.Schemas.CardNumber
   require Logger
 
-  @config Confex.get(:gateway_api, :pay2you)
+  @config Confex.get_map(:gateway_api, :pay2you)
   @card2card_upstream_uri "/Card2Card/CreateCard2CardOperation"
   @card2phone_upstream_uri "/Card2Phone/CreateCard2PhoneOperation"
   @timeout 60_000

@@ -42,13 +42,13 @@ script:
   # Install dependencies
   - "mix deps.get"
   # Run all tests except pending ones
-  #- "mix test --exclude pending --trace"
+  - "mix test --exclude pending --trace"
   # Submit code coverage report to Coveralls
-  #- "mix coveralls.travis"
+  - "mix coveralls.travis"
   # Run static code analysis
-  #- "mix credo"
+  - "mix credo"
   # Check code style
-  #- "mix dogma"
+  - "mix dogma"
   # Build Docker container
   - "./bin/build.sh"
   # Initialize DB for Docker container

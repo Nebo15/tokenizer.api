@@ -71,8 +71,8 @@ config :gateway_api, :limits, # TODO: Move to envs
   ]
 
 config :gateway_api, :fees, [ # TODO: Move to envs
-    percent: 0.5,
-    fix: 5,
+    percent: 1,
+    fix: 0,
     min: 5,
     max: :infinity
   ]

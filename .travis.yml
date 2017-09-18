@@ -38,13 +38,13 @@ before_install:
   - sudo ./bin/ci/init-db.sh
 script:
   # Increment version in mix.exs
-  - "./bin/version-increment.sh"
+  #- "./bin/version-increment.sh"
   # Install dependencies
-  - "mix deps.get"
+  #- "mix deps.get"
   # Run all tests except pending ones
   #- "mix test --exclude pending --trace"
   # Submit code coverage report to Coveralls
-  - "mix coveralls.travis"
+  #- "mix coveralls.travis"
   # Run static code analysis
   #- "mix credo"
   # Check code style

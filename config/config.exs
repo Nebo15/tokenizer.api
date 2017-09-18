@@ -78,12 +78,14 @@ config :gateway_api, :fees, [ # TODO: Move to envs
   ]
 
 config :gateway_api, :pay2you,
-  upstream_url: {:system, "PAY2YOU_UPSTREAM_URL", "http://p2y-dev.mbill.co/pay2you-ext"},
+#  upstream_url: {:system, "PAY2YOU_UPSTREAM_URL", "http://p2y-dev.mbill.co/pay2you-ext"},
+  upstream_url: {:system, "PAY2YOU_UPSTREAM_URL", "https://api.p2y.com.ua"},
   upstream_version: "0.5.0.b",
+  token: {:system, "PAY2YOU_CLIENT_TOKEN", "eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJ7XCJjdXN0b21lcklkXCI6XCIyM2E4ZmIyZS0zYjg2LTQ5YTItYjUxNy04ZmYyNGU0OTg4MjBcIixcIm5hbWVcIjpcInAyeVwiLFwic3RhdHVzXCI6XCJBQ1RJVkVcIn0ifQ.UIhpsswkXM32W9_aQ7PPn0J4DNSMbGHXOyuYl7AT7nio_zxMduUBqrTfm-MTh66ptCctA0xE2vSaIoIaahjuQQ"},
   project: [
-    name: {:system, "PAY2YOU_PROJECT_NAME", "mbill_tas"},
+    name: {:system, "PAY2YOU_PROJECT_NAME", "mbill"},
     fee: [
-      percent: 0.5,
+      percent: 1,
       fix: 5
     ]
   ]

@@ -1,12 +1,22 @@
-# defmodule Processing.Adapters.Pay2You.Pay2YouTest do
-#   use ExUnit.Case, async: true
+defmodule Processing.Adapters.Pay2You.Pay2YouTest do
+  use ExUnit.Case, async: true
 
-#   alias Pay2You
-#   alias Pay2You.Structs.SenderPeer
-#   alias Pay2You.Structs.SenderCard
-#   alias Pay2You.Structs.RecipientPeer
-#   alias Pay2You.Structs.RecipientCard
+  alias Repo.Schemas.Card
+  alias Pay2You.Structs.SenderCard
+  alias Pay2You.Structs.RecipientPeer
+  alias Pay2You.Structs.RecipientCard
+  alias Processing.Adapters.Pay2You.Transfer
 
+  test "send card2card" do
+    card = %Card{cvv: "190", expiration_month: "12", expiration_year: "18",
+      number: "4242424242424242", type: "card"}
+    recipient = %Repo.Schemas.CardNumber{number: "5363542306736662"}
+    amount = Decimal.new(1)
+    fee = Decimal.new(1)
+    phone = "+380631817386"
+
+    Transfer.send(card, recipient, amount, fee, phone)
+  end
 #   setup do
 #     [
 #       peer_2ds: %SenderPeer{
@@ -221,4 +231,4 @@
 #       }
 #     }} = Pay2You.get_transfer_status(payment.id)
 #   end
-# end
+end

@@ -6,21 +6,19 @@ defmodule Processing.Adapters.Pay2You.Status do
   alias Processing.Adapters.Pay2You.Error
   alias Processing.Adapters.Pay2You.Request
 
-  @status_upstream_uri "/Info/GetPayStatus"
+  @status_upstream_uri "/transfer/status"
   @timeout 60_000
 
   def get(id) do
-    %{
-      mPayNumber: id
-    }
+    id
     |> get_status()
     |> normalize_response()
   end
 
-  defp get_status(params) do
-    Logger.debug("Receiving new payment status, params: #{inspect params}")
+  defp get_status(transactiontId) do
+    Logger.debug("Receiving new payment status, transactionId: #{transactiontId}")
     opts = [connect_timeout: @timeout, recv_timeout: @timeout, timeout: @timeout]
-    case Request.post(@status_upstream_uri, params, [], opts) do
+    case Request.get(@status_upstream_uri <> "?transactionId=#{transactiontId}", [], opts) do
       {:ok, %{body: body}} -> {:ok, body}
       {:error, reason} -> {:error, reason}
     end
@@ -50,6 +48,7 @@ defmodule Processing.Adapters.Pay2You.Status do
 
   defp normalize_response(resp) do
     Logger.warn("Transfer response did not match any patterns: #{inspect resp}")
-    {:error, %{status: "declined"}}
+#    {:error, %{status: "declined"}}
+    resp
   end
 end

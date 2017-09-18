@@ -5,8 +5,10 @@ defmodule Processing.Adapters.Pay2You.Request do
   use HTTPoison.Base
   require Logger
 
+  @config Confex.get_map(:gateway_api, :pay2you)
+
   def process_url(url) do
-    upstream_url = Confex.get_map(:gateway_api, :pay2you)[:upstream_url]
+    upstream_url = @config[:upstream_url]
 
     unless upstream_url do
       raise "Pay2You upstream URL is not set!"
@@ -17,12 +19,11 @@ defmodule Processing.Adapters.Pay2You.Request do
   end
 
   defp process_request_headers(headers) do
-    [{"content-type", "application/json"}] ++ headers
+    [{"content-type", "application/json"}, {"token", @config[:token]}] ++ headers
   end
 
   defp process_request_body(body) do
-    body
-    |> Poison.encode!
+    Poison.encode!(body)
   end
 
   defp process_response_body(body) do

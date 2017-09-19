@@ -5,7 +5,7 @@ defmodule API.Views.Transfer do
 
   use API.Web, :view
 
-  def render("transfer.json", %{transfer: %{status: "SECURE"} = transfer}) do
+  def render("transfer.json", %{transfer: %{status: "authentication"} = transfer}) do
     transfer
     |> render_transfer()
     |> Map.put(:auth, transfer.auth)

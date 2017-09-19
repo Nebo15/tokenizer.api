@@ -133,8 +133,9 @@ defmodule Processing.Adapters.Pay2You.Transfer do
   end
 
   # Lookup code
-  defp normalize_authentication(%{"md" => md, "paReq" => "lookup"}),
-    do: %Repo.Schemas.AuthorizationLookupCode{md: md}
+  defp normalize_authentication(%{"status" => "LOOKUP", "transactiontId" => transactiont_id}) do
+    %Repo.Schemas.AuthorizationLookupCode{md: transactiont_id}
+  end
 
   # 3D Secure
   defp normalize_authentication(%{"status" => "SECURE", "secureParams" => %{"acsUrl" => asc_url,

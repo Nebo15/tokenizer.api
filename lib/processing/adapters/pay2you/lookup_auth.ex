@@ -7,14 +7,13 @@ defmodule Processing.Adapters.Pay2You.LookupAuth do
   alias Processing.Adapters.Pay2You.Request
   alias Repo.Schemas.AuthorizationLookupCode
 
-  @auth_upstream_uri "/ConfirmLookUp/finishlookup"
+  @auth_upstream_uri "/transfer/confirm/lookup"
   @timeout 60_000
 
   def auth(%AuthorizationLookupCode{md: md}, code) do
     %{
-      md: md,
-      paRes: code,
-      cvv: "000"
+      transactiontId: md,
+      code: code
     }
     |> post_auth()
     |> normalize_response()

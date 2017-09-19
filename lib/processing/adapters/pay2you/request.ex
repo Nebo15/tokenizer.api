@@ -26,12 +26,15 @@ defmodule Processing.Adapters.Pay2You.Request do
     Poison.encode!(body)
   end
 
-  defp process_response_body(body) do
+  defp process_response_body(body) when is_binary(body) and byte_size(body) > 0 do
     case body |> Poison.decode do
       {:ok, resp} -> resp
       {:error, _} ->
         Logger.warn("Received corrupted body: #{inspect body}")
         {:error, :corrupted_body}
     end
+  end
+  defp process_response_body(body) when is_binary(body) do
+    body
   end
 end

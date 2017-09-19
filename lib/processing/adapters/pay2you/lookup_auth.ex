@@ -22,7 +22,8 @@ defmodule Processing.Adapters.Pay2You.LookupAuth do
   defp post_auth(params) do
     opts = [connect_timeout: @timeout, recv_timeout: @timeout, timeout: @timeout]
     case Request.post(@auth_upstream_uri, params, [], opts) do
-      {:ok, %{body: body}} -> {:ok, body}
+      {:ok, %{status_code: 200, body: body}} -> {:ok, body}
+      {:ok, %{status_code: 400}} ->{:error, "400 Bad Request"}
       {:error, reason} -> {:error, reason}
     end
   end
@@ -36,9 +37,6 @@ defmodule Processing.Adapters.Pay2You.LookupAuth do
       }
     }}
   end
-
-  defp normalize_response({:ok, %{"state" => %{"code" => 0}}}),
-    do: {:ok, %{status: "processing"}}
 
   defp normalize_response({:ok, %{"state" => %{"code" => status_code}}}) when status_code == 49 or status_code == 59,
     do: {:error, :invalid_otp_code}
@@ -55,5 +53,14 @@ defmodule Processing.Adapters.Pay2You.LookupAuth do
         reason: Error.get_error_group(status_code)
       }
     }}
+  end
+
+  defp normalize_response({:ok, ""}) do
+    {:ok, %{status: "processing"}}
+  end
+
+  defp normalize_response({:ok, data}) do
+    Logger.warn("LookupAuth.normalize_response/1 data not mapped: #{inspect data}")
+    {:error, :invalid_otp_code}
   end
 end

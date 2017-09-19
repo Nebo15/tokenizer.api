@@ -9,6 +9,24 @@ defmodule Processing.Adapters.Pay2You.Status do
   @status_upstream_uri "/transfer/status"
   @timeout 60_000
 
+  def recursive_get(id, attempt \\ 1) do
+    id
+    |> get()
+    |> check_transfer_status(attempt)
+    |> case do
+         :repeat -> recursive_get(id, attempt + 1)
+         res -> res
+       end
+  end
+
+  defp check_transfer_status({:ok, %{"status" => "CREATED"}}, attempt) when attempt <= 5 do
+    :timer.sleep(1_000)
+    :repeat
+  end
+  defp check_transfer_status(res, _attempt) do
+    res
+  end
+
   def get(id) do
     id
     |> get_status()

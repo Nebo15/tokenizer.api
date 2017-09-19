@@ -116,13 +116,22 @@ defmodule Processing.Adapters.Pay2You.Transfer do
   end
 
   defp normalize_response({:ok, %{"transactionId" => id}}) do
-    :timer.sleep(4_000) # ToDo: Remove this shit
-    {:ok, status} = Status.get(id)
-    {:ok, %{
-      external_id: to_string(id),
-      auth: normalize_authentication(status),
-      status: "authentication"
-    }}
+    case Status.recursive_get(id) do
+      {:ok, status} -> {:ok, %{
+          external_id: to_string(id),
+          auth: normalize_authentication(status),
+          status: "authentication"
+        }}
+
+      {:error, reason} ->
+        Logger.warn("Transfer failed with error: #{inspect reason}")
+        {:error, %{
+          status: "declined",
+          decline: %{
+            code: "1"
+          }
+        }}
+    end
   end
 
   defp normalize_response({:ok, data}) do

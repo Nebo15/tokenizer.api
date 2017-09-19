@@ -15,10 +15,10 @@ defmodule Processing.Adapters.Pay2You.Status do
     |> normalize_response()
   end
 
-  defp get_status(transactiontId) do
-    Logger.debug("Receiving new payment status, transactionId: #{transactiontId}")
+  defp get_status(transactionId) do
+    Logger.debug("Receiving new payment status, transactionId: #{transactionId}")
     opts = [connect_timeout: @timeout, recv_timeout: @timeout, timeout: @timeout]
-    case Request.get(@status_upstream_uri <> "?transactionId=#{transactiontId}", [], opts) do
+    case Request.get(@status_upstream_uri <> "?transactionId=#{transactionId}", [], opts) do
       {:ok, %{body: body}} -> {:ok, body}
       {:error, reason} -> {:error, reason}
     end

@@ -13,7 +13,7 @@ defmodule Processing.Adapters.Pay2You.LookupAuth do
   def auth(%AuthorizationLookupCode{md: md}, code) do
     %{
       transactionId: md,
-      code: code
+      code: to_string(code)
     }
     |> post_auth()
     |> normalize_response()

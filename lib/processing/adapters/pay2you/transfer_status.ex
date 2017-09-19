@@ -46,6 +46,18 @@ defmodule Processing.Adapters.Pay2You.Status do
     }}
   end
 
+  defp normalize_response({:ok, %{"status" => "PROCESSED"}}) do
+    {:ok, %{status: "completed"}}
+  end
+
+  defp normalize_response({:ok, %{"status" => "ABORTED"}}) do
+    {:ok, %{status: "declined"}}
+  end
+
+  defp normalize_response({:ok, %{"status" => status}}) in ["PROCESSING_ERROR", "ERROR"] do
+    {:error, %{status: "error"}}
+  end
+
   defp normalize_response(resp) do
     Logger.warn("Transfer response did not match any patterns: #{inspect resp}")
 #    {:error, %{status: "declined"}}

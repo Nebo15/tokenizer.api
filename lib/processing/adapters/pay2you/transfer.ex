@@ -121,56 +121,14 @@ defmodule Processing.Adapters.Pay2You.Transfer do
     {:ok, %{
       external_id: to_string(id),
       auth: normalize_authentication(status),
-      status: status["status"]
-    }}
-  end
-
-  defp normalize_response({:ok, %{"mPayNumber" => id, "mErrCode" => status_code}}) do
-    {:error, %{
-      external_id: to_string(id),
-      status: "declined",
-      decline: %{
-        code: status_code,
-        reason: Error.get_error_group(status_code)
-      }
-    }}
-  end
-
-  defp normalize_response({:ok, %{"operationNumber" => id, "mErrCode" => status_code}}) do
-    {:error, %{
-      external_id: to_string(id),
-      status: "declined",
-      decline: %{
-        code: status_code,
-        reason: Error.get_error_group(status_code)
-      }
-    }}
-  end
-
-  defp normalize_response({:ok, %{"operationNumber" => id, "secur3d" => authentication}})
-    when is_map(authentication) do
-    {:ok, %{
-      external_id: to_string(id),
-      auth: normalize_authentication(authentication),
       status: "authentication"
-    }}
-  end
-
-  defp normalize_response({:ok, %{"operationNumber" => id, "state" => %{"code" => status_code}}}) do
-    {:error, %{
-      external_id: to_string(id),
-      status: "declined",
-      decline: %{
-        code: status_code,
-        reason: Error.get_error_group(status_code)
-      }
     }}
   end
 
   defp normalize_response({:ok, data}) do
     Logger.warn("normalize_response/1: Data not mapped, : #{inspect data}")
     {:error, %{
-      status: "failed",
+      status: "processing",
     }}
   end
 

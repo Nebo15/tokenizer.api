@@ -54,7 +54,7 @@ defmodule Processing.Adapters.Pay2You.Status do
     {:ok, %{status: "declined"}}
   end
 
-  defp normalize_response({:ok, %{"status" => status}}) in ["PROCESSING_ERROR", "ERROR"] do
+  defp normalize_response({:ok, %{"status" => status}}) when status in ["PROCESSING_ERROR", "ERROR"] do
     {:error, %{status: "error"}}
   end
 

@@ -23,7 +23,7 @@ defmodule Processing.Adapters.Pay2You.LookupAuth do
     opts = [connect_timeout: @timeout, recv_timeout: @timeout, timeout: @timeout]
     case Request.post(@auth_upstream_uri, params, [], opts) do
       {:ok, %{status_code: 200, body: body}} -> {:ok, body}
-      {:ok, %{status_code: 400}} ->{:error, "400 Bad Request"}
+      {:ok, %{status_code: 400}} -> {:error, "400 Bad Request"}
       {:error, reason} -> {:error, reason}
     end
   end

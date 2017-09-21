@@ -53,10 +53,10 @@ defmodule Processing.Adapters.Pay2You.Status do
     {:ok, %{status: "completed"}}
   end
 
-  defp normalize_response({:ok, %{"status" => status, "transactionId" => transactionId} = resp})
+  defp normalize_response({:ok, %{"status" => status, "transactionId" => transaction_id} = resp})
        when status in ["SECURE", "LOOKUP"] do
     {:ok, %{
-      external_id: to_string(transactionId),
+      external_id: to_string(transaction_id),
       auth: prepare_auth(resp),
       status: "authentication",
     }}

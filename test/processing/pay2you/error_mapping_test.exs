@@ -126,5 +126,3 @@ defmodule Processing.Pay2YouErrorMappingTest do
     Plug.Adapters.Cowboy.shutdown(ref)
   end
 end
-
-

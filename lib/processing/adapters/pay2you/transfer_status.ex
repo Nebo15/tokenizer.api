@@ -19,7 +19,7 @@ defmodule Processing.Adapters.Pay2You.Status do
        end
   end
 
-  defp check_transfer_status({:ok, %{"status" => "CREATED"}}, attempt) when attempt <= 5 do
+  defp check_transfer_status({:ok, %{status: "processing"}}, attempt) when attempt <= 5 do
     :timer.sleep(1_000)
     :repeat
   end
@@ -55,6 +55,10 @@ defmodule Processing.Adapters.Pay2You.Status do
     {:ok, %{status: "authentication"}}
   end
 
+  defp normalize_response({:ok, %{"status" => status}}) when status in ["CREATED", "PENDING", "PROCESSING"] do
+    {:ok, %{status: "processing"}}
+  end
+
   defp normalize_response({:ok, %{"fundingProcessingCode" => status_code}}) do
     {:ok, %{
       status: "declined",
@@ -63,14 +67,6 @@ defmodule Processing.Adapters.Pay2You.Status do
         reason: Error.get_error_group(status_code)
       }
     }}
-  end
-
-  defp normalize_response({:ok, %{"status" => "ABORTED"}}) do
-    {:ok, %{status: "declined"}}
-  end
-
-  defp normalize_response({:ok, %{"status" => status}}) when status in ["PROCESSING_ERROR", "ERROR"] do
-    {:error, %{status: "error"}}
   end
 
   defp normalize_response(resp) do

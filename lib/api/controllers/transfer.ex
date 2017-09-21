@@ -117,7 +117,7 @@ defmodule API.Controllers.Transfer do
     {:ok, transfer}
   end
   defp receive_transfer_status({:ok, %TransferSchema{external_id: external_id} = transfer}) do
-    {_, update} = Processing.Adapters.Pay2You.Status.recursive_get(external_id, 4)
+    {_, update} = Processing.Adapters.Pay2You.Status.recursive_get(external_id)
 
     transfer = transfer
     |> Changeset.change(update)

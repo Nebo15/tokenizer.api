@@ -1,7 +1,7 @@
 defmodule Gateway.Mixfile do
   use Mix.Project
 
-  @version "0.0.11" # ToDo: revert to normal version. Now its test version for new P2Y backend
+  @version "0.0.12" # ToDo: revert to normal version. Now its test version for new P2Y backend
 
   def project do
     [app: :gateway_api,

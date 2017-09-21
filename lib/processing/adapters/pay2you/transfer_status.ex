@@ -12,6 +12,7 @@ defmodule Processing.Adapters.Pay2You.Status do
   def recursive_get(id, attempt \\ 1) do
     id
     |> get()
+    |> IO.inspect()
     |> check_transfer_status(attempt)
     |> case do
          :repeat -> recursive_get(id, attempt + 1)

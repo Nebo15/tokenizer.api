@@ -37,7 +37,7 @@ defmodule Repo.Schemas.Transfer do
         greater_than_or_equal_to: limits[:amount][:min],
         less_than_or_equal_to: limits[:amount][:max])
     |> validate_number(:fee, greater_than: 0)
-    |> validate_length(:description, min: 5, max: 1024)
+    |> validate_length(:description, max: 1024)
     |> validate_fee(:amount, :fee, fees)
     |> validate_metadata(:metadata)
     |> validate_inclusion(:status, ["authentication", "completed", "processing", "declined", "error"])

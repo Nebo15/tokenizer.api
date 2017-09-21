@@ -177,7 +177,12 @@ defmodule Processing.Adapters.Pay2You.Error do
   }
 
   def get_error_group(code) when is_integer(code) do
-    @error_grouping
-    |> Map.get(Integer.to_string(code))
+    code
+    |> Integer.to_string()
+    |> get_error_group()
+  end
+
+  def get_error_group(code) when is_binary(code) do
+    Map.get(@error_grouping, code)
   end
 end

@@ -2,7 +2,6 @@ defmodule Processing.Adapters.Pay2You.Transfer do
   @moduledoc """
   This module implements card2card and card2phone tranfsers interfaces.
   """
-  alias Processing.Adapters.Pay2You.Error
   alias Processing.Adapters.Pay2You.Request
   alias Repo.Schemas.Card
   alias Repo.Schemas.CardNumber
@@ -116,16 +115,8 @@ defmodule Processing.Adapters.Pay2You.Transfer do
   end
 
   defp normalize_response({:ok, %{"transactionId" => id}}) do
-    case Status.recursive_get(id) do
-      {:ok, %{"status" => "authentication"} = status} ->
-        {:ok, %{
-          external_id: to_string(id),
-          auth: normalize_authentication(status),
-          status: "authentication",
-        }}
-
-      status -> status
-    end
+    # Crooked Nail for FE backward compatibility. FE should call transaction status itself
+    Status.recursive_get(id)
   end
 
   defp normalize_response({:ok, data}) do
@@ -133,21 +124,6 @@ defmodule Processing.Adapters.Pay2You.Transfer do
     {:error, %{
       status: "processing",
     }}
-  end
-
-  # Lookup code
-  defp normalize_authentication(%{"status" => "LOOKUP", "transactionId" => transaction_id}) do
-    %Repo.Schemas.AuthorizationLookupCode{md: transaction_id}
-  end
-
-  # 3D Secure
-  defp normalize_authentication(%{"status" => "SECURE", "secureParams" => %{"acsUrl" => asc_url,
-    "paReq" => pa_req, "termUrl" => terminal_url, "MD" => md}}),
-    do: %Repo.Schemas.Authorization3DS{acs_url: asc_url, pa_req: pa_req, terminal_url: terminal_url, md: md}
-
-  defp normalize_authentication(data) do
-    Logger.warn("normalize_authentication/2 Data not mapped: #{inspect data}")
-    %{}
   end
 
 end

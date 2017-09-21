@@ -9,6 +9,7 @@ defmodule Processing.Pay2YouErrorMappingTest do
   @transaction_id_secure "cc0f4625-c406-4678-a1ee-37e3183b4a91"
   @transaction_id_lookup "cc0f4625-c406-4678-a1ee-37e3183b4900"
   @transaction_id_created "59390cad-a7e3-4170-a0bd-5546f731b201"
+  @transaction_id_processing_error "59390cad-a7e3-4170-a0bd-2ee4cc3ddad1"
 
   describe "status" do
     defmodule P2Y do
@@ -34,6 +35,20 @@ defmodule Processing.Pay2YouErrorMappingTest do
               },
               "status" => "SECURE",
               "transactionId" => "cc0f4625-c406-4678-a1ee-37e3183b4a91",
+            }
+
+          %{"transactionId" => "cc0f4625-c406-4678-a1ee-2ee4cc3ddad1"} -> %{
+              "transactionId": "cc0f4625-c406-4678-a1ee-2ee4cc3ddad1",
+              "status": "PROCESSING_ERROR",
+              "message": "Unknown error",
+              "amount": 100,
+              "fee": 500,
+              "fundingProcessing": "TAS",
+              "paymentProcessing": "TAS",
+              "fundingProcessingCode": "811",
+              "fundingProcessingMessage": "System error",
+              "resultCode": "811",
+              "resultMessage": "System error",
             }
 
           %{"transactionId" => "cc0f4625-c406-4678-a1ee-37e3183b4900"} -> %{
@@ -74,6 +89,13 @@ defmodule Processing.Pay2YouErrorMappingTest do
                code: "811",
                reason: "Internal_Error__Aquier"
              }}} = Status.recursive_get(@transaction_id_error)
+    end
+
+    test "map PROCESSING_ERROR" do
+      assert {:ok, %{status: "declined", decline: %{
+               code: "811",
+               reason: "Internal_Error__Aqui2er"
+             }}} = Status.recursive_get(@transaction_id_processing_error)
     end
 
     test "map SECURE" do

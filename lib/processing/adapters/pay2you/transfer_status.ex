@@ -12,7 +12,6 @@ defmodule Processing.Adapters.Pay2You.Status do
   def recursive_get(id, attempt \\ 1) do
     id
     |> get()
-    |> IO.inspect()
     |> check_transfer_status(attempt)
     |> case do
          :repeat -> recursive_get(id, attempt + 1)
@@ -48,14 +47,15 @@ defmodule Processing.Adapters.Pay2You.Status do
     {:error, %{status: "declined"}}
   end
 
-  defp normalize_response({:ok, %{"mErrCode" => 0}}),
-    do: {:ok, %{status: "completed"}}
+  defp normalize_response({:ok, %{"status" => "PROCESSED"}}) do
+    {:ok, %{status: "completed"}}
+  end
 
-  # 3DS or lookup code is not sent yet
-  defp normalize_response({:ok, %{"mErrCode" => status_code}}) when status_code in [56, 49, 59],
-    do: {:ok, %{status: "authentication"}}
+  defp normalize_response({:ok, %{"status" => status}}) when status in ["SECURE", "LOOKUP"] do
+    {:ok, %{status: "authentication"}}
+  end
 
-  defp normalize_response({:ok, %{"mErrCode" => status_code}}) do
+  defp normalize_response({:ok, %{"fundingProcessingCode" => status_code}}) do
     {:ok, %{
       status: "declined",
       decline: %{
@@ -63,10 +63,6 @@ defmodule Processing.Adapters.Pay2You.Status do
         reason: Error.get_error_group(status_code)
       }
     }}
-  end
-
-  defp normalize_response({:ok, %{"status" => "PROCESSED"}}) do
-    {:ok, %{status: "completed"}}
   end
 
   defp normalize_response({:ok, %{"status" => "ABORTED"}}) do

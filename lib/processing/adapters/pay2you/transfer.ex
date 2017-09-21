@@ -117,21 +117,19 @@ defmodule Processing.Adapters.Pay2You.Transfer do
 
   defp normalize_response({:ok, %{"transactionId" => id}}) do
     case Status.recursive_get(id) do
-      {:ok, status} -> {:ok, normalize_status(status)}
-
-      {:error, reason} ->
-        Logger.warn("Transfer failed with error: #{inspect reason}")
-        {:error, %{
-          status: "declined",
-          decline: %{
-            code: "1"
-          }
+      {:ok, %{"status" => "authentication"} = status} ->
+        {:ok, %{
+          external_id: to_string(id),
+          auth: normalize_authentication(status),
+          status: "authentication",
         }}
+
+      status -> status
     end
   end
 
   defp normalize_response({:ok, data}) do
-    Logger.warn("normalize_response/1: Data not mapped, : #{inspect data}")
+    Logger.warn("Transfer.normalize_response/1: Data not mapped, : #{inspect data}")
     {:error, %{
       status: "processing",
     }}
@@ -150,26 +148,6 @@ defmodule Processing.Adapters.Pay2You.Transfer do
   defp normalize_authentication(data) do
     Logger.warn("normalize_authentication/2 Data not mapped: #{inspect data}")
     %{}
-  end
-
-  defp normalize_status(%{"transactionId" => id, "fundingProcessingCode" => status_code} = status) do
-    %{
-      external_id: to_string(id),
-      auth: normalize_authentication(status),
-      status: "declined",
-      decline: %{
-        code: status_code,
-        reason: Error.get_error_group(status_code)
-      }
-    }
-  end
-
-  defp normalize_status(%{"transactionId" => id} = status) do
-    %{
-      external_id: to_string(id),
-      auth: normalize_authentication(status),
-      status: "authentication",
-    }
   end
 
 end

@@ -102,7 +102,7 @@ defmodule Processing.Pay2YouErrorMappingTest do
       assert {:ok, %{
                status: "authentication",
                auth: %Authorization3DS{md: @transaction_id_secure}
-             }} = Status.recursive_get(@transaction_id_secure)
+             }} = Status.recursive_get(@transaction_id_secure, 3)
     end
 
     test "map LOOKUP" do

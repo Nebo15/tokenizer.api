@@ -19,7 +19,12 @@ defmodule Processing.Adapters.Pay2You.Status do
        end
   end
 
+  # Super crooked nail
   defp check_transfer_status({:ok, %{status: "processing"}}, attempt) when attempt <= 10 do
+    :timer.sleep(1_000)
+    :repeat
+  end
+  defp check_transfer_status({:ok, %{status: "authentication"}}, attempt) when attempt <= 3 do
     :timer.sleep(1_000)
     :repeat
   end

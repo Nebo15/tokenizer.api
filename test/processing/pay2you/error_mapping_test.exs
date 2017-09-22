@@ -80,7 +80,7 @@ defmodule Processing.Pay2YouErrorMappingTest do
 
     test "map CREATED" do
       start = :os.system_time(:seconds)
-      assert {:ok, %{status: "processing"}} = Status.recursive_get(@transaction_id_created, 5)
+      assert {:ok, %{status: "processing"}} = Status.recursive_get(@transaction_id_created, 10)
       assert 1 <= :os.system_time(:seconds) - start
     end
 
@@ -94,7 +94,7 @@ defmodule Processing.Pay2YouErrorMappingTest do
     test "map PROCESSING_ERROR" do
       assert {:ok, %{status: "declined", decline: %{
                code: "811",
-               reason: "Internal_Error__Aqui2er"
+               reason: "Internal_Error__Aquier"
              }}} = Status.recursive_get(@transaction_id_processing_error)
     end
 

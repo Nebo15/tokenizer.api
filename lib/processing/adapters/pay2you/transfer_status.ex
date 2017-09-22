@@ -19,7 +19,7 @@ defmodule Processing.Adapters.Pay2You.Status do
        end
   end
 
-  defp check_transfer_status({:ok, %{status: "processing"}}, attempt) when attempt <= 5 do
+  defp check_transfer_status({:ok, %{status: "processing"}}, attempt) when attempt <= 10 do
     :timer.sleep(1_000)
     :repeat
   end
@@ -46,7 +46,7 @@ defmodule Processing.Adapters.Pay2You.Status do
 
   defp normalize_response({:error, reason}) do
     Logger.warn("Transfer failed with error: #{inspect reason}")
-    {:error, %{status: "declined"}}
+    {:error, %{status: "declined", decline: %{reason: "HTTP error"}}}
   end
 
   defp normalize_response({:ok, %{"status" => "PROCESSED"}}) do
@@ -78,7 +78,7 @@ defmodule Processing.Adapters.Pay2You.Status do
 
   defp normalize_response(resp) do
     Logger.warn("Transfer response did not match any patterns: #{inspect resp}")
-    {:error, %{status: "declined"}}
+    {:error, %{status: "declined", decline: %{reason: "not_match"}}}
   end
 
   # Lookup code

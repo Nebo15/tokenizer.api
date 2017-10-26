@@ -59,6 +59,10 @@ defmodule Processing.Adapters.Pay2You.LookupAuth do
     {:ok, %{status: "processing"}}
   end
 
+  defp normalize_response({:ok, %{"message" => "ok"}}) do
+    {:ok, %{status: "processing"}}
+  end
+
   defp normalize_response({:ok, data}) do
     Logger.warn("LookupAuth.normalize_response/1 data not mapped: #{inspect data}")
     {:error, :invalid_otp_code}

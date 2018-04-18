@@ -24,16 +24,22 @@ defmodule Repo.Changeset.Validators.Fee do
   end
 
   def calculate(amount, percent, fix, min, max) do
-    %D.Context{D.get_context | precision: 3, rounding: :half_up}
-    |> D.with_context(fn ->
-      amount
-      |> calculate_body(percent, fix)
-      |> apply_limits(min, max)
-    end)
+    amount
+    |> calculate_body(percent, fix)
+    |> apply_limits(min, max)
   end
 
   defp calculate_body(amount, percent, fix) do
-    D.add(D.mult(amount, D.div(D.new(percent), D.new(100))), D.new(fix))
+    prepared_percent =
+      percent
+      |> D.new()
+      |> D.div(D.new(100))
+      |> D.round(2)
+
+    amount
+    |> D.mult(prepared_percent)
+    |> D.add(D.new(fix))
+    |> D.round(2)
   end
 
   defp apply_limits(body, min, :infinity) do

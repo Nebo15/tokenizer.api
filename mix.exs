@@ -1,7 +1,7 @@
 defmodule Gateway.Mixfile do
   use Mix.Project
 
-  @version "0.0.21" # ToDo: revert to normal version. Now its test version for new P2Y backend
+  @version "0.0.23" # ToDo: revert to normal version. Now its test version for new P2Y backend
 
   def project do
     [app: :gateway_api,
@@ -53,6 +53,7 @@ defmodule Gateway.Mixfile do
      {:confex, "~> 1.4"},
      {:eview, "~> 0.10.0"},
      {:cowboy, "~> 1.1"},
+     {:decimal, "~> 1.5"},
      {:poison, "~> 3.1", override: true}, # TODO: Update when Phoenix 1.3 will be released
      {:httpoison, "~> 0.10"},
      {:credit_card, "~> 1.0"},
